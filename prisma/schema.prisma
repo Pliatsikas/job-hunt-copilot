@@ -1,0 +1,12 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// No models yet — M0 only proves the migration/connection path.
+// Real models (User, Profile, Application, ...) land starting M1, per SPEC.md §2.
+// Connection URLs live in prisma.config.ts (CLI) and lib/db.ts (runtime, via a
+// driver adapter) — Prisma 7 removed datasource url/directUrl from this file.
