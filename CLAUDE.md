@@ -49,6 +49,9 @@ Single developer, portfolio project. Ship small, ship deployed.
    `Application.lastAnalyzedAt` are written only by the analyze action, in the same transaction
    as the `Analysis` insert — never set them anywhere else. Same rule for any future denormalized
    field.
+9. **Confirm the target database before destructive Prisma commands.** Never run
+   `prisma migrate reset` or `prisma db push --force-reset` without first echoing the target
+   database name. This Neon project hosts more than one app's data — see NOTES.md.
 
 ## Code conventions
 
