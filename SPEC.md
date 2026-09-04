@@ -350,3 +350,13 @@ Cover letters/follow-ups (ελεύθερο κείμενο) στέλνονται 
 ίδιο JSON schema στο δικό του τρόπο και επιστρέφει `{ text, usage, latencyMs }`· το shared layer
 μένει απλό (generate schema, parse, repair). Στο M4, ένα conformance test suite με το ίδιο
 fixture σε κάθε provider κρατά αυτό το contract τίμιο.
+
+**Α6 — Password hashing: bcrypt (μέσω `bcryptjs`), όχι argon2.**
+Λόγος: το Argon2id είναι το σημερινό OWASP/NIST-προτεινόμενο algorithm (memory-hard, πιο
+ανθεκτικό σε GPU cracking), αλλά το πιο καθαρό serverless-friendly package του
+(`@node-rs/argon2`) έχει τεκμηριωμένα, ανοιχτά bundler-resolution issues στο Next.js/Vercel
+(`Can't resolve '@node-rs/argon2-wasm32-wasi'`), διορθώσιμα μόνο με ένα `serverExternalPackages`
+workaround. Το `bcryptjs` είναι pure JS — μηδέν native dependencies, μηδέν bundler config, ίδιο
+deploy behavior παντού. Για ένα solo, time-boxed milestone με "ship small, ship deployed" ως
+αρχή, το ρίσκο του argon2 δεν αξίζει το build-time gain του. bcrypt στο cost 12 παραμένει
+OWASP-αποδεκτό.
