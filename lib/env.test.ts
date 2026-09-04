@@ -34,4 +34,17 @@ describe("envSchema", () => {
     const parsed = envSchema.parse({ ...validBase, DAILY_LLM_CALL_LIMIT: "25" });
     expect(parsed.DAILY_LLM_CALL_LIMIT).toBe(25);
   });
+
+  it("accepts optional vars left empty, the way .env.example writes them", () => {
+    const parsed = envSchema.parse({
+      ...validBase,
+      AUTH_SECRET: "",
+      AUTH_GITHUB_ID: "",
+      AUTH_GITHUB_SECRET: "",
+      GEMINI_API_KEY: "",
+      GROQ_API_KEY: "",
+    });
+    expect(parsed.AUTH_SECRET).toBeUndefined();
+    expect(parsed.GEMINI_API_KEY).toBeUndefined();
+  });
 });
