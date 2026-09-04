@@ -13,6 +13,9 @@ jobs:
     env:
       DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
       DIRECT_URL: postgresql://ci:ci@localhost:5432/ci
+      AUTH_SECRET: ci-placeholder-secret
+      AUTH_GITHUB_ID: ci-placeholder-id
+      AUTH_GITHUB_SECRET: ci-placeholder-secret
     steps:
       - uses: actions/checkout@v4
 

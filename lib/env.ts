@@ -6,16 +6,15 @@ import { z } from "zod";
 const optionalEnvString = () =>
   z.preprocess((val) => (val === "" ? undefined : val), z.string().min(1).optional());
 
-// Only DATABASE_URL/DIRECT_URL are required in M0. Auth and LLM vars stay
-// optional until the milestone that reads them (M1, M4) tightens them, so an
-// M0 deploy can boot without GitHub/LLM credentials.
+// LLM vars stay optional until M4 reads them, so a pre-M4 deploy can boot
+// without LLM credentials. Auth vars are required as of M1.
 export const envSchema = z.object({
   DATABASE_URL: z.url(),
   DIRECT_URL: z.url(),
 
-  AUTH_SECRET: optionalEnvString(),
-  AUTH_GITHUB_ID: optionalEnvString(),
-  AUTH_GITHUB_SECRET: optionalEnvString(),
+  AUTH_SECRET: z.string().min(1),
+  AUTH_GITHUB_ID: z.string().min(1),
+  AUTH_GITHUB_SECRET: z.string().min(1),
 
   LLM_PROVIDER: z.enum(["gemini", "groq", "ollama", "anthropic"]).default("gemini"),
   LLM_MODEL: z.string().min(1).default("gemini-2.5-flash"),

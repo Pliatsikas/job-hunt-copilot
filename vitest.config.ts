@@ -9,6 +9,9 @@ export default defineConfig({
     env: {
       DATABASE_URL: "postgresql://test:test@localhost:5432/test",
       DIRECT_URL: "postgresql://test:test@localhost:5432/test",
+      AUTH_SECRET: "test-secret",
+      AUTH_GITHUB_ID: "test-github-id",
+      AUTH_GITHUB_SECRET: "test-github-secret",
     },
   },
 });

@@ -4,6 +4,9 @@ import { envSchema } from "./env";
 const validBase = {
   DATABASE_URL: "postgresql://user:pass@localhost:5432/db",
   DIRECT_URL: "postgresql://user:pass@localhost:5432/db",
+  AUTH_SECRET: "test-secret",
+  AUTH_GITHUB_ID: "test-github-id",
+  AUTH_GITHUB_SECRET: "test-github-secret",
 };
 
 describe("envSchema", () => {
@@ -35,16 +38,18 @@ describe("envSchema", () => {
     expect(parsed.DAILY_LLM_CALL_LIMIT).toBe(25);
   });
 
-  it("accepts optional vars left empty, the way .env.example writes them", () => {
+  it("accepts LLM vars left empty, the way .env.example writes them", () => {
     const parsed = envSchema.parse({
       ...validBase,
-      AUTH_SECRET: "",
-      AUTH_GITHUB_ID: "",
-      AUTH_GITHUB_SECRET: "",
       GEMINI_API_KEY: "",
       GROQ_API_KEY: "",
     });
-    expect(parsed.AUTH_SECRET).toBeUndefined();
     expect(parsed.GEMINI_API_KEY).toBeUndefined();
+    expect(parsed.GROQ_API_KEY).toBeUndefined();
+  });
+
+  it("rejects an empty AUTH_SECRET now that M1 requires it", () => {
+    const result = envSchema.safeParse({ ...validBase, AUTH_SECRET: "" });
+    expect(result.success).toBe(false);
   });
 });
