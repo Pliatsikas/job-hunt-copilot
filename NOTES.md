@@ -3,12 +3,22 @@
 Follow-ups and out-of-scope items, tracked here instead of the diff (per CLAUDE.md's workflow
 rules) so decisions don't only exist in chat history.
 
-## M2
+## Open
 
-- ESLint `no-restricted-imports` / `no-restricted-syntax` rule enforcing that direct
-  `db.analysis.*` / `db.document.*` / `db.event.*` calls live only inside `lib/applications/`
-  (CLAUDE.md rule 1, SPEC.md §8 Α1). Nothing to lint against until `lib/applications/` and the
-  `Analysis`/`Document`/`Event` models exist — add it alongside those models, not before.
+- **Dates render in a fixed English format, not the viewer's locale.** `lib/format.ts` uses a
+  pinned `en-GB` formatter with `timeZone: "UTC"`. A Server Component can't see the viewer's
+  locale, and formatting per-viewer needs a client component — doing it half-way would just
+  trade a wrong locale for a hydration mismatch. The product's UI language is English
+  (SPEC.md), so this is consistent for now. Revisit if the app ever needs real localisation.
+
+## Done
+
+- ~~ESLint rule confining `db.analysis.*` / `db.document.*` / `db.event.*` to
+  `lib/applications/`~~ — landed in M2 as a `no-restricted-syntax` selector in
+  `eslint.config.mjs`, with the rule switched off for `lib/applications/**` itself. Verified
+  by linting a deliberate violation (errors) and `lib/applications/` (clean).
+  `no-restricted-imports` turned out to be the wrong lever: `lib/db` is legitimately imported
+  everywhere for User/Application access, so the restriction is on the property access.
 
 ## Known build warnings (recorded, not investigated)
 
