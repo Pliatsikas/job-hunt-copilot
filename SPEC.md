@@ -360,3 +360,15 @@ workaround. Το `bcryptjs` είναι pure JS — μηδέν native dependencie
 deploy behavior παντού. Για ένα solo, time-boxed milestone με "ship small, ship deployed" ως
 αρχή, το ρίσκο του argon2 δεν αξίζει το build-time gain του. bcrypt στο cost 12 παραμένει
 OWASP-αποδεκτό.
+
+**Α7 — Το GitHub OAuth είναι optional feature, όχι boot requirement.**
+`AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET` είναι optional στο `lib/env.ts`. Ο GitHub provider
+δηλώνεται μόνο όταν υπάρχουν και τα δύο· αλλιώς το app σηκώνεται κανονικά με credentials login
+μόνο, το κουμπί "Continue with GitHub" κρύβεται στο `/login`, και γράφεται μία γραμμή στο
+startup log ότι το GitHub sign-in είναι απενεργοποιημένο.
+Λόγος: τα Preview URLs του Vercel είναι δυναμικά, οπότε δεν υπάρχει σταθερό OAuth callback να
+δηλωθεί σε ένα GitHub OAuth App γι' αυτά — το να τα κάνουμε required θα ανάγκαζε dummy τιμές σε
+environments που δεν μπορούν ποτέ να κάνουν GitHub sign-in, και ένα deploy θα έσκαγε στο boot
+για ένα feature που ούτως ή άλλως δεν θα δούλευε εκεί. `AUTH_SECRET` παραμένει required: το JWT
+signing το χρειάζεται ανεξάρτητα από provider. Το CI τρέχει σκόπιμα χωρίς το GitHub pair, ώστε
+να χτίζει το ίδιο configuration με το Preview.

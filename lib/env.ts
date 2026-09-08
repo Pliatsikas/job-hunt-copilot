@@ -6,15 +6,19 @@ import { z } from "zod";
 const optionalEnvString = () =>
   z.preprocess((val) => (val === "" ? undefined : val), z.string().min(1).optional());
 
-// LLM vars stay optional until M4 reads them, so a pre-M4 deploy can boot
-// without LLM credentials. Auth vars are required as of M1.
+// AUTH_SECRET is required as of M1 — JWT signing needs it regardless of
+// provider. The GitHub pair stays optional: Preview URLs are dynamic, so no
+// stable OAuth callback can exist there, and requiring them would only force
+// dummy values into environments that can never use GitHub sign-in. GitHub is
+// registered as a provider only when both are present (SPEC.md §8 Α7).
+// LLM vars stay optional until M4 reads them.
 export const envSchema = z.object({
   DATABASE_URL: z.url(),
   DIRECT_URL: z.url(),
 
   AUTH_SECRET: z.string().min(1),
-  AUTH_GITHUB_ID: z.string().min(1),
-  AUTH_GITHUB_SECRET: z.string().min(1),
+  AUTH_GITHUB_ID: optionalEnvString(),
+  AUTH_GITHUB_SECRET: optionalEnvString(),
 
   LLM_PROVIDER: z.enum(["gemini", "groq", "ollama", "anthropic"]).default("gemini"),
   LLM_MODEL: z.string().min(1).default("gemini-2.5-flash"),

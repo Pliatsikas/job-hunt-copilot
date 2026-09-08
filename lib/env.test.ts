@@ -52,4 +52,24 @@ describe("envSchema", () => {
     const result = envSchema.safeParse({ ...validBase, AUTH_SECRET: "" });
     expect(result.success).toBe(false);
   });
+
+  it("parses without the GitHub pair — those are optional, GitHub just stays off", () => {
+    const withoutGithub: Record<string, string> = { ...validBase };
+    delete withoutGithub.AUTH_GITHUB_ID;
+    delete withoutGithub.AUTH_GITHUB_SECRET;
+
+    const parsed = envSchema.parse(withoutGithub);
+    expect(parsed.AUTH_GITHUB_ID).toBeUndefined();
+    expect(parsed.AUTH_GITHUB_SECRET).toBeUndefined();
+  });
+
+  it("treats an empty GitHub pair as absent, the way .env.example writes them", () => {
+    const parsed = envSchema.parse({
+      ...validBase,
+      AUTH_GITHUB_ID: "",
+      AUTH_GITHUB_SECRET: "",
+    });
+    expect(parsed.AUTH_GITHUB_ID).toBeUndefined();
+    expect(parsed.AUTH_GITHUB_SECRET).toBeUndefined();
+  });
 });
