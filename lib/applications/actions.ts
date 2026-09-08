@@ -34,7 +34,7 @@ function firstIssue(error: { issues: { message: string }[] }) {
 }
 
 /** Companies are per-user and keyed by name — reuse rather than duplicate. */
-async function resolveCompanyId(userId: string, name: string | undefined) {
+async function resolveCompanyId(userId: string, name: string | null) {
   if (!name) return null;
   const company = await db.company.upsert({
     where: { userId_name: { userId, name } },

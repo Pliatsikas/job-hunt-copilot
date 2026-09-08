@@ -13,24 +13,28 @@ export const STATUSES = [
 ] as const;
 
 // Form fields arrive as "" when left blank, and <input type="date"> gives
-// "YYYY-MM-DD". Treat blank as absent rather than as an invalid value.
-const blankToUndefined = (val: unknown) => (val === "" ? undefined : val);
+// "YYYY-MM-DD". Blank must become null rather than undefined: Prisma skips
+// undefined fields on update, so an emptied box would silently keep its old
+// value instead of clearing.
+const blankToNull = (val: unknown) => (val === "" || val == null ? null : val);
 
-const optionalText = () => z.preprocess(blankToUndefined, z.string().min(1).optional());
-const optionalDate = () => z.preprocess(blankToUndefined, z.coerce.date().optional());
+const clearableText = () => z.preprocess(blankToNull, z.string().min(1).nullable());
+const clearableDate = () => z.preprocess(blankToNull, z.coerce.date().nullable());
 
 export const applicationFormSchema = z.object({
   roleTitle: z.string().min(1, "Role title is required"),
-  companyName: optionalText(),
-  jobUrl: z.preprocess(blankToUndefined, z.url("Enter a valid URL").optional()),
+  // Not written to the row directly — resolved into a companyId, where null
+  // already means "no company".
+  companyName: z.preprocess(blankToNull, z.string().min(1).nullable()),
+  jobUrl: z.preprocess(blankToNull, z.url("Enter a valid URL").nullable()),
   jobDescription: z.string().min(1, "Paste the job description"),
-  source: optionalText(),
-  location: optionalText(),
+  source: clearableText(),
+  location: clearableText(),
   workMode: z.enum(WORK_MODES).default("ONSITE"),
-  salaryNote: optionalText(),
+  salaryNote: clearableText(),
   status: z.enum(STATUSES).default("SAVED"),
-  appliedAt: optionalDate(),
-  nextActionAt: optionalDate(),
+  appliedAt: clearableDate(),
+  nextActionAt: clearableDate(),
 });
 
 export type ApplicationFormValues = z.infer<typeof applicationFormSchema>;
