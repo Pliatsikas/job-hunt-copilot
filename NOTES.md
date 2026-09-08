@@ -23,6 +23,20 @@ rules) so decisions don't only exist in chat history.
   ~86kB either way, so this is separate from the pg/bcryptjs Edge problem that split fixed.
   Likely a JWE-compression code path that Auth.js's default signed (JWS) sessions never reach.
 
+## After M2
+
+- **Give this app its own Neon role, so the two projects stop sharing one credential.**
+  Today the project has exactly one role, `neondb_owner`, and it owns both databases —
+  `job_hunt_copilot` (this app) and `neondb` (TaskFlow). That means any password rotation on
+  either side breaks the other; confirmed the hard way during the 2026-09-08 rotation, which
+  had to be coordinated across both apps.
+  Fix: `neonctl roles create` a dedicated role (e.g. `jhc_owner`), grant it on the
+  `job_hunt_copilot` database, move this app's `DATABASE_URL`/`DIRECT_URL` onto it, verify,
+  and leave `neondb_owner` to TaskFlow alone. Note the grants have to be broad enough for
+  Prisma Migrate (CREATE/ALTER), and must be issued while connected as `neondb_owner`.
+  Deferred deliberately: it decouples future rotations but does not itself close an exposed
+  credential, so it ranks below actually rotating. Do it after M2, not during.
+
 ## Infrastructure
 
 - The Neon project (`taskflow`, id `calm-pine-71198930`) is shared between TaskFlow and this
@@ -31,3 +45,6 @@ rules) so decisions don't only exist in chat history.
   (`migrate reset`, `db push --force-reset`) without confirming the target database name first
   — see CLAUDE.md rule 9. If real isolation from TaskFlow is ever needed, use a Neon branch,
   not a separate project — the free tier allows multiple branches, not multiple projects.
+- Both databases are owned by the single role `neondb_owner`, and `neonctl roles` has no
+  password-reset subcommand — rotations happen in the Neon Console, and they are inherently a
+  two-app coordination. See the "After M2" note above for the fix.
