@@ -3,9 +3,9 @@
 Follow-ups and out-of-scope items, tracked here instead of the diff (per CLAUDE.md's workflow
 rules) so decisions don't only exist in chat history.
 
-## M8 — polish checklist
+## M9 — polish checklist
 
-Deliberately not started before M8. Recorded now so the list doesn't get rebuilt from memory.
+Deliberately not started before M9. Recorded now so the list doesn't get rebuilt from memory.
 
 **Applies:**
 
@@ -36,12 +36,12 @@ Deliberately not started before M8. Recorded now so the list doesn't get rebuilt
   content they cannot reach accomplishes nothing.
 - **Custom domain** — optional, owner's call, not a completion criterion.
 
-## M8 — eval planning
+## M9 — eval planning
 
 - **The Gemini free tier caps requests per model per day, not per key.** Measured at 20/day
   for `gemini-3.5-flash`; sibling models (`gemini-3.1-flash-lite`, `gemini-flash-latest`) draw
   on separate buckets, which is how the M5 provider comparison ran at all after 3.5-flash was
-  exhausted. Consequence for M8: an eval sweep that fires every fixture at one model in one
+  exhausted. Consequence for M9: an eval sweep that fires every fixture at one model in one
   burst will exhaust that model partway through and leave a half-finished table. Spread runs
   across models and providers deliberately, and record which model produced which row —
   otherwise a "before/after prompt version" comparison is silently comparing two models.
@@ -61,7 +61,7 @@ Deliberately not started before M8. Recorded now so the list doesn't get rebuilt
   1. `cover-letter.v1` marks the bridge as guidance and names the failure mode explicitly.
   2. `lib/llm/fabrication.ts` (`findFabricatedClaims`) flags a first-person present/perfect
      claim in the same sentence as a skill the CV does not evidence, in English and Greek.
-  3. `evals/fixtures/no-fabricated-bridge.json` pins it as an M8 eval case.
+  3. `evals/fixtures/no-fabricated-bridge.json` pins it as an M9 eval case.
 
   **What the automated check does and does not cover.** It catches the blunt grammatical form
   — "I am building X", "έχω υλοποιήσει X", "I work with X" — scoped to the sentence naming the

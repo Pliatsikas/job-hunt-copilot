@@ -179,7 +179,7 @@ model Analysis {
   matchScore    Int // 0-100, mirrored out of result for indexed sorting
   result        Json // the validated AnalysisResult
   // matchedSkills entries removed by the grounding check (SPEC.md §8 Α3).
-  // Honest signal, shown in the UI and an eval metric in M8.
+  // Honest signal, shown in the UI and an eval metric in M9.
   droppedClaims Int      @default(0)
   inputTokens   Int?
   outputTokens  Int?

@@ -115,7 +115,7 @@ model Analysis {
   promptVersion String            // "analyze@3" — για να συγκρίνεις εκδόσεις
   matchScore    Int               // 0-100
   result        Json              // το validated AnalysisResult
-  droppedClaims Int      @default(0)  // matchedSkills entries removed by the grounding check — eval metric in M8
+  droppedClaims Int      @default(0)  // matchedSkills entries removed by the grounding check — eval metric in M9
   inputTokens   Int?
   outputTokens  Int?
   latencyMs     Int?
@@ -275,9 +275,17 @@ lib/llm/
 | M5 | Cover letters & follow-ups | 1.5 | Παραγωγή EL/EN, versions, copy/download |
 | M6 | Reminders & Today | 1 | nextActionAt, stale detection, dashboard |
 | M7 | Skills gap insights | 1 | Aggregation query + chart + μία πρόταση συμπέρασμα |
-| M8 | Evals, tests, README, polish | 1.5 | `pnpm eval` τρέχει, Playwright happy path, README με screenshots + «τι ήταν δύσκολο» |
+| M8 | Usage limits & abuse protection | 1.5 | Token budgets ανά χρήστη + global kill switch, IP rate limiting στο auth, "usage today" view |
+| M9 | Evals, tests, README, polish | 1.5 | `pnpm eval` τρέχει, Playwright happy path, README με screenshots + «τι ήταν δύσκολο» |
+| M10 | CV import από PDF | 1 | Upload → extraction → LLM cleanup → review screen· επιτυχία = το grounding βρίσκει quotes |
+| M11 | Tailored CV ανά αγγελία | 1.5 | Μόνο αναδιάταξη υπάρχοντος περιεχομένου, grounding σε κάθε γραμμή, PDF export, versions |
+| M12 | Job ingestion (χωρίς scraping) | 2 | Saved searches, dedupe, auto-score στην άφιξη, triage queue |
 
-**Εκτός scope (γράψ' τα ως issues, μη τα πιάσεις):** scraping από job boards, browser extension, PDF parsing του CV, ομάδες/sharing, πληρωμές, email inbox integration, mobile app.
+**Γιατί το hardening (M8) μπήκε πριν το κλείσιμο:** το app είναι ήδη δημόσιο, με ανοιχτό
+registration και ζωντανά API keys. Ένα project που κλείνει με README ενώ ο οποιοσδήποτε μπορεί
+να κάψει το quota του δεν είναι «τελειωμένο» — απλώς δεν το έχει δοκιμάσει κανείς ακόμα.
+
+**Εκτός scope (γράψ' τα ως issues, μη τα πιάσεις):** scraping από job boards, browser extension, ομάδες/sharing, πληρωμές, email inbox integration, mobile app.
 
 ---
 
@@ -300,7 +308,91 @@ Validation του env με Zod σε `lib/env.ts`, να σκάει στο boot α
 
 ---
 
-## 7. README (γράψ' το στο M8, όχι στο τέλος του τέλους)
+## 6.1 M8 — Usage limits & abuse protection
+
+Το app είναι δημόσιο, με ανοιχτό registration και πραγματικά API keys από πίσω. Χωρίς όρια, ο
+πρώτος που θα βρει το `/register` μπορεί να εξαντλήσει το ημερήσιο quota του project.
+
+- **`User.role` (`USER` | `ADMIN`).** Ο λογαριασμός του owner είναι `ADMIN` με χαλαρά όρια,
+  ώστε το testing να μη μετράει με τα ίδια μέτρα με έναν επισκέπτη.
+- **Το `UsageCounter` μετράει tokens, όχι calls.** input + output ανά χρήστη ανά μέρα. Ένα
+  call με 200 tokens και ένα με 8.000 δεν είναι το ίδιο κόστος, και το «50 calls/μέρα» δεν
+  προστατεύει από το δεύτερο.
+- **Τρία επίπεδα:**
+  1. ημερήσιο budget ανά χρήστη,
+  2. global ημερήσιο budget που λειτουργεί ως kill switch για όλο το project,
+  3. IP rate limiting στα auth endpoints (register/login), γιατί το φθηνότερο abuse είναι να
+     φτιάχνεις λογαριασμούς.
+- **Ποτέ σιωπηλή αποτυχία.** Όταν χτυπηθεί ένα όριο, ο χρήστης βλέπει ποιο όριο ήταν και πότε
+  μηδενίζει — όχι ένα generic «κάτι πήγε στραβά». Το ίδιο πρότυπο με τα `LlmAuthError` /
+  `LlmQuotaError` του M4/M5: το σφάλμα ονομάζεται εκεί που συμβαίνει.
+- **View «η χρήση σου σήμερα»**, ώστε το όριο να μην είναι έκπληξη.
+- **Απόφαση: το registration μένει ανοιχτό**, με αυστηρά per-user όρια, και ο demo λογαριασμός
+  έχει pre-seeded δεδομένα ώστε ένας επισκέπτης να δει την αξία χωρίς να ξοδέψει quota. Το
+  κλείσιμο του registration θα προστάτευε το quota αλλά θα σκότωνε τον λόγο ύπαρξης ενός
+  portfolio project: να μπορεί κάποιος να το δοκιμάσει.
+
+---
+
+## 6.2 M10 — CV import από PDF
+
+- Upload → text extraction → ένα LLM cleanup pass που ξαναγράφει το κείμενο **μία πρόταση ανά
+  γραμμή**.
+- **Υποχρεωτική οθόνη review πριν την αποθήκευση.** Τα στοιχεία επικοινωνίας αφαιρούνται
+  αυτόματα — δεν χρειάζονται στα prompts και δεν υπάρχει λόγος να ταξιδεύουν σε provider.
+- **Ορισμός επιτυχίας: αν μετά το import το grounding βρίσκει quotes**, όχι αν «βγήκε κείμενο».
+  Το πραγματικό πρόβλημα είναι τα PDF με στήλες, όπου η εξαγωγή μπλέκει contact details μέσα
+  στο work experience και σπάει κάθε πρόταση στη μέση. Το CV του owner ήταν ακριβώς τέτοιο,
+  και γι' αυτό το M3 ξεκίνησε με χειροκίνητο paste.
+
+---
+
+## 6.3 M11 — Tailored CV ανά αγγελία
+
+Το `DocType.CV_TAILORED` υπάρχει ήδη στο data model από το M5.
+
+- **Σκληρός κανόνας: μόνο αναδιάταξη και επαναδιατύπωση υπάρχοντος περιεχομένου.** Καμία νέα
+  εμπειρία, καμία νέα τεχνολογία, καμία αλλαγή σε ημερομηνίες ή τίτλους.
+- **Κάθε γραμμή πρέπει να ανάγεται στο `cvText`**, με τον ίδιο grounding έλεγχο που ήδη
+  εφαρμόζεται στην ανάλυση. Ο fabrication detector του M5 (`lib/llm/fabrication.ts`)
+  επεκτείνεται εδώ.
+- **Το ρίσκο είναι μεγαλύτερο από ένα cover letter.** Ένα cover letter διαβάζεται ως επιχείρημα·
+  ένα CV διαβάζεται ως γεγονός. Ένα φουσκωμένο cover letter είναι κακό στυλ — ένα φουσκωμένο CV
+  είναι ψέμα σε επίσημο έγγραφο, και ο χρήστης θα το ανακαλύψει στη συνέντευξη.
+- Έμφαση στα ATS keywords της αγγελίας, αναδιάταξη projects κατά συνάφεια, export σε PDF,
+  versioned όπως τα υπόλοιπα Documents.
+
+---
+
+## 6.4 M12 — Job ingestion, ρητά ΧΩΡΙΣ scraping
+
+**Γιατί όχι scraping.** Δεν είναι θέμα δυσκολίας:
+
+1. Παραβιάζει τους όρους χρήσης των job boards.
+2. Οδηγεί σε μπλοκάρισμα IP — και μαζί με αυτό πέφτει και το deployment.
+3. Σπάει σε κάθε αλλαγή markup, δηλαδή συντήρηση χωρίς τέλος για μηδενικό μαθησιακό όφελος.
+4. **Δεν υπερασπίζεται σε συνέντευξη.** «Έκανα scrape το LinkedIn» δεν είναι επίδειξη
+   ικανότητας· είναι κόκκινη σημαία για το πώς θα φερθείς στα δεδομένα ενός εργοδότη.
+
+Ήδη κανόνας του project (CLAUDE.md #4): ποτέ fetch σε job board URL από τον server.
+
+**Νόμιμες πηγές, κατά σειρά προτεραιότητας:**
+
+1. **Public company board APIs** — Greenhouse, Lever, Workable. Δημόσια, τεκμηριωμένα,
+   σταθερά· φτιαγμένα ακριβώς γι' αυτή τη χρήση.
+2. **Free job APIs με όρους που το επιτρέπουν** — Remotive, Arbeitnow, Jooble, Adzuna.
+3. **RSS feeds**, όπου προσφέρονται.
+4. **Import από email alerts** — ο χρήστης ήδη λαμβάνει τα alerts· τα προωθεί.
+5. **Bookmarklet που ενεργοποιεί ο χρήστης** πάνω στη σελίδα που ήδη βλέπει. Δεν είναι
+   scraping: δεν υπάρχει αυτοματοποιημένο crawling, μόνο μια ρητή ενέργεια του χρήστη στο
+   περιεχόμενο που έχει ήδη ανοιχτό.
+
+**Features:** saved searches, dedupe κατά company + title, auto-score στην άφιξη (επαναχρήση
+του analyze action), triage queue με one-click dismiss.
+
+---
+
+## 7. README (γράψ' το στο M9, όχι στο τέλος του τέλους)
 
 Δομή που διαβάζεται σε 60 δευτερόλεπτα:
 1. Μία πρόταση + screenshot της ανάλυσης
