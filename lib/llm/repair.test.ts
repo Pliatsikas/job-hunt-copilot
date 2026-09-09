@@ -18,6 +18,10 @@ function providerReturning(...replies: LlmResult[]): LlmProvider & { calls: numb
       provider.calls += 1;
       return replies[Math.min(index++, replies.length - 1)];
     },
+    // Unused here — repair only concerns the non-streaming path.
+    async *stream() {
+      yield "";
+    },
   };
   return provider;
 }

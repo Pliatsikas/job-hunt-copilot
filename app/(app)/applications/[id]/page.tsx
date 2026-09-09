@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { addNote, changeStatus } from "@/lib/applications/actions";
 import { analyzeApplication } from "@/lib/applications/analyze";
 import { requireOwnedApplication } from "@/lib/applications/guards";
-import { listAnalyses, listEvents } from "@/lib/applications/queries";
+import { listAnalyses, listDocuments, listEvents } from "@/lib/applications/queries";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { STATUS_LABELS, StatusBadge } from "@/components/status-badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/card";
 import { AnalysisView } from "./analysis-view";
 import { AnalyzeButton } from "./analyze-button";
+import { DocumentActions } from "./document-actions";
+import { GeneratePanel } from "./generate-panel";
 import { NoteForm } from "./note-form";
 import { StatusChanger } from "./status-changer";
 
@@ -28,9 +30,10 @@ export default async function ApplicationDetailPage({
   const application = await requireOwnedApplication(id).catch(() => null);
   if (!application) notFound();
 
-  const [events, analyses] = await Promise.all([
+  const [events, analyses, documents] = await Promise.all([
     listEvents(application.id),
     listAnalyses(application.id),
+    listDocuments(application.id),
   ]);
   const [latestAnalysis, ...previousAnalyses] = analyses;
 
@@ -151,6 +154,42 @@ export default async function ApplicationDetailPage({
                 </summary>
                 <div className="mt-4">
                   <AnalysisView analysis={analysis} />
+                </div>
+              </details>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Generate</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <GeneratePanel applicationId={application.id} />
+        </CardContent>
+      </Card>
+
+      {documents.length > 0 && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Saved documents ({documents.length})</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            {documents.map((doc) => (
+              <details key={doc.id} className="rounded-lg border p-4">
+                <summary className="cursor-pointer text-sm">
+                  {doc.type === "COVER_LETTER" ? "Cover letter" : "Follow-up email"} · v
+                  {doc.version} · {doc.language} · {formatDateTime(doc.createdAt)}
+                </summary>
+                <div className="mt-3 flex flex-col gap-3">
+                  <div className="rounded-lg bg-muted/30 p-3 text-sm whitespace-pre-wrap">
+                    {doc.content}
+                  </div>
+                  <DocumentActions
+                    content={doc.content}
+                    filename={`${doc.type === "COVER_LETTER" ? "cover-letter" : "follow-up"}-v${doc.version}-${doc.language}.md`}
+                  />
                 </div>
               </details>
             ))}

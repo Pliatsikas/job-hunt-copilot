@@ -1,13 +1,15 @@
 import Groq from "groq-sdk";
 import { toJsonSchema } from "../json-schema";
-import { isAuthFailure } from "../provider-errors";
+import { isAuthFailure, isQuotaExhausted } from "../provider-errors";
 import { withTransientRetry } from "../retry";
 import {
   LlmAuthError,
   LlmProviderError,
+  LlmQuotaError,
   type LlmProvider,
   type LlmRequest,
   type LlmResult,
+  type LlmStreamRequest,
 } from "../types";
 
 export function createGroqProvider(apiKey: string, model: string): LlmProvider {
@@ -45,6 +47,12 @@ export function createGroqProvider(apiKey: string, model: string): LlmProvider {
         if (!text.trim()) {
           throw new LlmProviderError("groq", "Groq returned an empty response");
         }
+        if (response.choices[0]?.finish_reason === "length") {
+          throw new LlmProviderError(
+            "groq",
+            "Groq hit its output limit before finishing. Try a shorter job description.",
+          );
+        }
 
         return {
           text,
@@ -57,10 +65,49 @@ export function createGroqProvider(apiKey: string, model: string): LlmProvider {
       } catch (error) {
         if (error instanceof LlmProviderError) throw error;
         // Named here, where the provider knows which variable holds its key.
+        if (isQuotaExhausted(error)) throw new LlmQuotaError("groq", model, error);
         if (isAuthFailure(error)) throw new LlmAuthError("groq", "GROQ_API_KEY", error);
         throw new LlmProviderError(
           "groq",
           error instanceof Error ? error.message : "Groq request failed",
+          error,
+        );
+      }
+    },
+
+    async *stream(request: LlmStreamRequest) {
+      try {
+        const response = await withTransientRetry(() =>
+          client.chat.completions.create({
+            model,
+            temperature: request.temperature,
+            max_tokens: request.maxTokens,
+            stream: true,
+            messages: [
+              { role: "system", content: request.system },
+              { role: "user", content: request.user },
+            ],
+          }),
+        );
+
+        let truncated = false;
+        for await (const chunk of response) {
+          const text = chunk.choices[0]?.delta?.content;
+          if (text) yield text;
+          if (chunk.choices[0]?.finish_reason === "length") truncated = true;
+        }
+        if (truncated) {
+          throw new LlmProviderError(
+            "groq",
+            "Groq hit its output limit before finishing this document.",
+          );
+        }
+      } catch (error) {
+        if (isQuotaExhausted(error)) throw new LlmQuotaError("groq", model, error);
+        if (isAuthFailure(error)) throw new LlmAuthError("groq", "GROQ_API_KEY", error);
+        throw new LlmProviderError(
+          "groq",
+          error instanceof Error ? error.message : "Groq stream failed",
           error,
         );
       }

@@ -9,8 +9,6 @@ datasource db {
 // Connection URLs live in prisma.config.ts (CLI) and lib/db.ts (runtime, via a
 // driver adapter) — Prisma 7 removed datasource url/directUrl from this file.
 
-// Document lands in M5 — its relations are deliberately absent here rather
-// than stubbed, so each milestone owns its own migration.
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -25,6 +23,7 @@ model User {
   companies     Company[]
   applications  Application[]
   analyses      Analysis[]
+  documents     Document[]
   events        Event[]
 }
 
@@ -121,8 +120,9 @@ model Application {
 
   user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   company  Company?   @relation(fields: [companyId], references: [id], onDelete: SetNull)
-  analyses Analysis[]
-  events   Event[]
+  analyses  Analysis[]
+  documents Document[]
+  events    Event[]
 
   @@index([userId, status])
   @@index([userId, nextActionAt])
@@ -201,4 +201,29 @@ model UsageCounter {
   calls  Int      @default(0)
 
   @@unique([userId, day])
+}
+
+model Document {
+  id            String   @id @default(cuid())
+  applicationId String
+  userId        String // denormalized from Application, set in the same write (SPEC.md §8 Α1)
+  type          DocType
+  language      String   @default("en") // "en" | "el"
+  content       String   @db.Text
+  // Monotonic per (applicationId, type): regenerating keeps the old text
+  // rather than overwriting it.
+  version       Int      @default(1)
+  createdAt     DateTime @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId, type, version])
+  @@index([userId, createdAt])
+}
+
+enum DocType {
+  COVER_LETTER
+  CV_TAILORED
+  FOLLOW_UP_EMAIL
 }

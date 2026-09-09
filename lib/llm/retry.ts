@@ -4,13 +4,15 @@
  * it answered badly. Conflating them would either burn the single repair
  * attempt on a network blip or silently retry bad content.
  */
-import { httpStatusOf } from "./provider-errors";
+import { httpStatusOf, isQuotaExhausted } from "./provider-errors";
 
 const RETRYABLE_STATUS = [429, 500, 502, 503, 504];
 const MAX_ATTEMPTS = 3;
 const BASE_DELAY_MS = 1_000;
 
 export function isTransient(error: unknown): boolean {
+  // A spent quota is a 429 that retrying cannot fix.
+  if (isQuotaExhausted(error)) return false;
   const status = httpStatusOf(error);
   return status !== null && RETRYABLE_STATUS.includes(status);
 }

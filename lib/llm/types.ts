@@ -24,10 +24,19 @@ export type LlmRequest = {
   temperature?: number;
 };
 
+/**
+ * Free-text generation. No schema: there is nothing to validate mid-stream,
+ * which is precisely why this may stream while analysis may not
+ * (SPEC.md §8 Α4).
+ */
+export type LlmStreamRequest = Omit<LlmRequest, "schema">;
+
 export interface LlmProvider {
   readonly name: string;
   readonly model: string;
   complete(request: LlmRequest): Promise<LlmResult>;
+  /** Yields text chunks as they arrive. */
+  stream(request: LlmStreamRequest): AsyncIterable<string>;
 }
 
 /** Thrown when a provider itself fails (network, auth, quota). */
@@ -55,5 +64,20 @@ export class LlmAuthError extends LlmProviderError {
       cause,
     );
     this.name = "LlmAuthError";
+  }
+}
+
+/**
+ * The provider's allowance is spent. Named separately from a generic failure
+ * because the useful response is "wait" or "switch provider", not "retry".
+ */
+export class LlmQuotaError extends LlmProviderError {
+  constructor(provider: string, model: string, cause?: unknown) {
+    super(
+      provider,
+      `${provider} has no quota left for ${model} right now — the free tier caps requests per day. Wait for it to reset, or set LLM_PROVIDER to another provider.`,
+      cause,
+    );
+    this.name = "LlmQuotaError";
   }
 }

@@ -40,3 +40,22 @@ export function isAuthFailure(error: unknown): boolean {
   const message = (error instanceof Error ? error.message : String(error ?? "")).toLowerCase();
   return AUTH_MARKERS.some((marker) => message.includes(marker));
 }
+
+const QUOTA_MARKERS = [
+  "resource_exhausted",
+  "exceeded your current quota",
+  "quota exceeded",
+  "insufficient_quota",
+];
+
+/**
+ * A spent allowance, not a momentary spike. Both arrive as 429, but only one
+ * is worth retrying: a per-minute limit clears in seconds, a daily quota does
+ * not, and hammering it three times with backoff just wastes the user's time
+ * before showing them the same failure.
+ */
+export function isQuotaExhausted(error: unknown): boolean {
+  if (httpStatusOf(error) !== 429) return false;
+  const message = (error instanceof Error ? error.message : String(error ?? "")).toLowerCase();
+  return QUOTA_MARKERS.some((marker) => message.includes(marker));
+}

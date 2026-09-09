@@ -88,3 +88,14 @@ export async function listAnalyses(applicationId: string) {
     orderBy: { createdAt: "desc" },
   });
 }
+
+/** Documents for one application, newest first — version history. */
+export async function listDocuments(applicationId: string) {
+  const user = await requireUser();
+
+  // Filtered by userId AND applicationId, per SPEC.md §8 Α1.
+  return db.document.findMany({
+    where: { applicationId, userId: user.id },
+    orderBy: [{ type: "asc" }, { version: "desc" }],
+  });
+}
