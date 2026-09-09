@@ -36,6 +36,18 @@ Deliberately not started before M8. Recorded now so the list doesn't get rebuilt
   content they cannot reach accomplishes nothing.
 - **Custom domain** — optional, owner's call, not a completion criterion.
 
+## M8 — eval planning
+
+- **The Gemini free tier caps requests per model per day, not per key.** Measured at 20/day
+  for `gemini-3.5-flash`; sibling models (`gemini-3.1-flash-lite`, `gemini-flash-latest`) draw
+  on separate buckets, which is how the M5 provider comparison ran at all after 3.5-flash was
+  exhausted. Consequence for M8: an eval sweep that fires every fixture at one model in one
+  burst will exhaust that model partway through and leave a half-finished table. Spread runs
+  across models and providers deliberately, and record which model produced which row —
+  otherwise a "before/after prompt version" comparison is silently comparing two models.
+  A quota failure is already distinguishable in code (`LlmQuotaError`) rather than looking
+  like a transient blip, so the runner can report it rather than retrying into the wall.
+
 ## Known failure modes
 
 - **`howToBridge` advice restated as current activity.** The analysis suggests how to close a

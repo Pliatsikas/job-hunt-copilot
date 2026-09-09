@@ -9,6 +9,7 @@ import {
   noteSchema,
   statusChangeSchema,
 } from "../schemas/application";
+import { nextActionForStatus } from "./follow-up-policy";
 import { requireOwnedApplication } from "./guards";
 
 export type ActionState = { error?: string };
@@ -87,6 +88,17 @@ export async function updateApplication(
       data: { ...values, companyId },
     });
 
+    if (statusChanged && !values.nextActionAt) {
+      // The form's own date wins if the user typed one.
+      const implied = nextActionForStatus(values.status, new Date());
+      if (implied) {
+        await tx.application.update({
+          where: { id: existing.id },
+          data: { nextActionAt: implied },
+        });
+      }
+    }
+
     if (statusChanged) {
       await tx.event.create({
         data: {
@@ -101,6 +113,7 @@ export async function updateApplication(
   });
 
   revalidatePath("/applications");
+  revalidatePath("/today");
   revalidatePath(`/applications/${existing.id}`);
   redirect(`/applications/${existing.id}`);
 }
@@ -117,10 +130,18 @@ export async function changeStatus(
 
   if (parsed.data.status === existing.status) return {};
 
+  // A status change implies its own follow-up: applied -> nudge in 10 days,
+  // interview -> thank-you in 2. Any explicit date the user set is replaced,
+  // because the new status supersedes it.
+  const nextActionAt = nextActionForStatus(parsed.data.status, new Date());
+
   await db.$transaction(async (tx) => {
     await tx.application.update({
       where: { id: existing.id },
-      data: { status: parsed.data.status },
+      data: {
+        status: parsed.data.status,
+        ...(nextActionAt ? { nextActionAt } : {}),
+      },
     });
     await tx.event.create({
       data: {
@@ -132,6 +153,8 @@ export async function changeStatus(
       },
     });
   });
+
+  revalidatePath("/today");
 
   revalidatePath("/applications");
   revalidatePath(`/applications/${existing.id}`);

@@ -61,6 +61,11 @@ Single developer, portfolio project. Ship small, ship deployed.
 - Dates: store UTC, render in the user's locale. Never construct dates from strings by hand.
 - No `any`. No `@ts-ignore`. If a type is hard, model it properly or ask.
 - Tailwind: no arbitrary values unless there's no scale token that fits.
+- **Any regex that touches Greek text uses the `u` flag and Unicode-aware boundaries**
+  (`(?<!\p{L})…(?!\p{L})`), never `\b`. `\b` is defined on ASCII word characters, so it never
+  matches before a Greek letter — the pattern silently matches nothing. This shipped once in
+  M5's fabrication detector and passed a fully green test suite, because every case
+  exercising it was written in English.
 
 ## Structure
 
