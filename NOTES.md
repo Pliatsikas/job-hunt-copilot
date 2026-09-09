@@ -7,6 +7,14 @@ rules) so decisions don't only exist in chat history.
 
 Deliberately not started before M9. Recorded now so the list doesn't get rebuilt from memory.
 
+- **Charts are hand-rolled server-rendered markup, not Recharts.** M7 allowed Recharts; the
+  bar chart is a `<div>` with a width percentage and the trend is a 40-line `<svg>` polyline,
+  so `/insights` ships 178 B of route JS and a 109 kB first load against 156 kB for
+  `/applications/[id]`. Both charts print every value as text and the SVG carries a full
+  `aria-label`, so nothing is behind a hover. Revisit only if a chart needs real interaction
+  (brushing, zoom, a tooltip carrying data not already on screen) — that is when a charting
+  runtime earns its bundle, and this checklist's 150 kB rule is the trigger to argue it.
+
 **Applies:**
 
 - Unique `<title>` and meta description per page via the Next metadata API. Nothing may ship
@@ -75,6 +83,18 @@ Deliberately not started before M9. Recorded now so the list doesn't get rebuilt
   manualReview list in the fixture; do not treat a green eval run as clearance.
 
 ## Open
+
+- **`gaps[].skill` is often a requirement sentence, not a skill.** Surfaced by M7: aggregating
+  the real analyses in my account produced entries like *"3-5 years of web development
+  experience"*, *"pixijs, webpack, gulp, webaudio"* and *"moodle or other educational platforms
+  (lms)"*. Each is a faithful reading of the ad, but they never repeat across postings, so every
+  count is 1 and the gap chart degrades into a flat list. The aggregation is doing the right
+  thing; the input granularity is wrong.
+
+  The fix belongs in `analyze.v1` (one skill per gap entry; years-of-experience demands belong
+  in `redFlags`, which already exists for exactly this), and changing the prompt invalidates
+  comparisons against earlier `Analysis` rows — so it is M9 work, alongside the evals, not a
+  quiet edit now. Deliberately not fixed in M7.
 
 - **Dates render in a fixed English format, not the viewer's locale.** `lib/format.ts` uses a
   pinned `en-GB` formatter with `timeZone: "UTC"`. A Server Component can't see the viewer's
