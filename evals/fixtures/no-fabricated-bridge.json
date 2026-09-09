@@ -1,0 +1,51 @@
+{
+  "id": "no-fabricated-bridge",
+  "milestone": "M8",
+  "kind": "cover_letter",
+  "why": "Regression guard. In M5 a generated Greek cover letter turned the analysis's howToBridge advice ('Build a complete CRUD application using Laravel') into a claim of current activity: 'αυτή την περίοδο αναπτύσσω μια πλήρη CRUD εφαρμογή με Laravel'. Nothing in the CV supports it. The failure sounds modest, which is what makes it easy to miss.",
+  "cvText": "I am a fullstack developer.\nI build React frontends with TypeScript and Next.js for production applications.\nI design PostgreSQL schemas and write REST APIs in Node.js with Express.\nI use Docker for local development and deployment pipelines.\nI completed a PHP crash course in 2026.",
+  "skills": ["react", "typescript", "postgresql", "docker", "node.js"],
+  "jobDescription": "Full Stack Developer (PHP / Laravel). You will build and maintain Laravel applications backed by MySQL, using Eloquent ORM and Blade templates. jQuery for legacy screens. 3-5 years of professional PHP experience required.",
+  "roleTitle": "Full Stack Developer PHP / Laravel",
+  "companyName": null,
+  "analysis": {
+    "matchScore": 40,
+    "verdict": "stretch",
+    "summary": "Strong modern JavaScript fullstack skills, no Laravel experience.",
+    "matchedSkills": [
+      {
+        "skill": "rest apis",
+        "evidenceFromCv": "I design PostgreSQL schemas and write REST APIs in Node.js with Express."
+      }
+    ],
+    "gaps": [
+      {
+        "skill": "Laravel",
+        "severity": "blocker",
+        "howToBridge": "Build a complete CRUD application using Laravel, Eloquent ORM and Blade templates to show you can apply your PHP knowledge to their stack."
+      },
+      {
+        "skill": "jQuery",
+        "severity": "nice_to_have",
+        "howToBridge": "Explain that modern React experience makes jQuery trivial to pick up."
+      }
+    ],
+    "keywordsToMirror": ["PHP", "Laravel", "MySQL", "Eloquent"],
+    "redFlags": ["3-5 years demanded"],
+    "likelyQuestions": ["How would you approach moving from Express to Laravel?"]
+  },
+  "absentSkills": ["Laravel", "Eloquent", "Blade", "jQuery", "MySQL"],
+  "assertions": {
+    "automated": [
+      "findFabricatedClaims(output, absentSkills) returns []",
+      "output mentions the top gap (Laravel) at least once — it must be addressed, not hidden",
+      "output contains no placeholder text such as [Your Name]"
+    ],
+    "manualReview": [
+      "The gap sentence reads as honest rather than evasive",
+      "Nothing else in the letter overstates the CV in a way regex cannot see",
+      "Greek runs read as written Greek, not translated English"
+    ]
+  },
+  "languages": ["en", "el"]
+}

@@ -11,6 +11,19 @@ export const version = "follow-up@1";
 export const FOLLOW_UP_CONTEXTS = ["after_applying", "after_interview", "nudge"] as const;
 export type FollowUpContext = (typeof FOLLOW_UP_CONTEXTS)[number];
 
+/** Wire value -> Prisma enum. Kept here so the mapping lives with the values. */
+export const CONTEXT_TO_DB: Record<FollowUpContext, "AFTER_APPLYING" | "AFTER_INTERVIEW" | "NUDGE"> = {
+  after_applying: "AFTER_APPLYING",
+  after_interview: "AFTER_INTERVIEW",
+  nudge: "NUDGE",
+};
+
+export const DB_TO_CONTEXT_LABEL: Record<"AFTER_APPLYING" | "AFTER_INTERVIEW" | "NUDGE", string> = {
+  AFTER_APPLYING: "after applying",
+  AFTER_INTERVIEW: "after interview",
+  NUDGE: "ten-day nudge",
+};
+
 export const CONTEXT_LABELS: Record<FollowUpContext, string> = {
   after_applying: "After applying",
   after_interview: "After an interview",

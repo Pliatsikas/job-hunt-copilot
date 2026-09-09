@@ -25,6 +25,8 @@ export type SaveDocumentInput = {
   applicationId: string;
   userId: string;
   type: "COVER_LETTER" | "FOLLOW_UP_EMAIL";
+  /** Follow-ups only — which situation produced this draft. */
+  context?: "AFTER_APPLYING" | "AFTER_INTERVIEW" | "NUDGE" | null;
   language: string;
   content: string;
 };
@@ -48,6 +50,7 @@ export async function saveGeneratedDocument(input: SaveDocumentInput) {
         applicationId: input.applicationId,
         userId: input.userId,
         type: input.type,
+        context: input.context ?? null,
         language: input.language,
         content: input.content,
         version,

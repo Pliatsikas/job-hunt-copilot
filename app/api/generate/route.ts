@@ -106,6 +106,7 @@ export async function POST(request: Request) {
               applicationId: application.id,
               userId: application.userId,
               type: input.kind,
+              context: input.context ? followUpPrompt.CONTEXT_TO_DB[input.context] : null,
               language: input.language,
               content: full.trim(),
             });

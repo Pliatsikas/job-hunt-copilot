@@ -208,6 +208,9 @@ model Document {
   applicationId String
   userId        String // denormalized from Application, set in the same write (SPEC.md §8 Α1)
   type          DocType
+  // Only set for follow-ups: which of the three situations produced this.
+  // Nullable because a cover letter has no context.
+  context       FollowUpContext?
   language      String   @default("en") // "en" | "el"
   content       String   @db.Text
   // Monotonic per (applicationId, type): regenerating keeps the old text
@@ -226,4 +229,10 @@ enum DocType {
   COVER_LETTER
   CV_TAILORED
   FOLLOW_UP_EMAIL
+}
+
+enum FollowUpContext {
+  AFTER_APPLYING
+  AFTER_INTERVIEW
+  NUDGE
 }

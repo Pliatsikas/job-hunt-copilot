@@ -6,7 +6,7 @@ import type { LlmProvider } from "./types";
 /** Default model per provider, used when LLM_MODEL isn't overridden. */
 const DEFAULT_MODELS: Record<string, string> = {
   gemini: "gemini-3.5-flash",
-  groq: "llama-3.3-70b-versatile",
+  groq: "openai/gpt-oss-120b",
 };
 
 /**

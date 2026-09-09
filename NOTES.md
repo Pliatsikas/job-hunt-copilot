@@ -36,6 +36,32 @@ Deliberately not started before M8. Recorded now so the list doesn't get rebuilt
   content they cannot reach accomplishes nothing.
 - **Custom domain** — optional, owner's call, not a completion criterion.
 
+## Known failure modes
+
+- **`howToBridge` advice restated as current activity.** The analysis suggests how to close a
+  gap; the cover letter then claims the candidate is already doing it. Observed in M5: the
+  advice "Build a complete CRUD application using Laravel" came back as
+  *"αυτή την περίοδο αναπτύσσω μια πλήρη CRUD εφαρμογή με Laravel"* — "I am currently building
+  a full CRUD application with Laravel" — which nothing in the CV supports. It is dangerous
+  precisely because it sounds modest: a reader skims it as humility rather than as a claim.
+
+  Mitigated in three layers, none of which is sufficient alone:
+  1. `cover-letter.v1` marks the bridge as guidance and names the failure mode explicitly.
+  2. `lib/llm/fabrication.ts` (`findFabricatedClaims`) flags a first-person present/perfect
+     claim in the same sentence as a skill the CV does not evidence, in English and Greek.
+  3. `evals/fixtures/no-fabricated-bridge.json` pins it as an M8 eval case.
+
+  **What the automated check does and does not cover.** It catches the blunt grammatical form
+  — "I am building X", "έχω υλοποιήσει X", "I work with X" — scoped to the sentence naming the
+  absent skill. It is a lint, not a proof. It cannot catch:
+  - a fluent paraphrase that implies experience without a first-person verb
+    ("recent Laravel work has shown me…");
+  - an overstatement of something genuinely in the CV ("expert in" for a crash course);
+  - whether the letter is honest *in aggregate*, which is a judgement about emphasis.
+
+  Those need a human reading one output per prompt version. That read is the point of the
+  manualReview list in the fixture; do not treat a green eval run as clearance.
+
 ## Open
 
 - **Dates render in a fixed English format, not the viewer's locale.** `lib/format.ts` uses a

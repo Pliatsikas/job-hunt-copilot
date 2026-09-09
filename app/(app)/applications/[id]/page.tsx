@@ -4,6 +4,7 @@ import { addNote, changeStatus } from "@/lib/applications/actions";
 import { analyzeApplication } from "@/lib/applications/analyze";
 import { requireOwnedApplication } from "@/lib/applications/guards";
 import { listAnalyses, listDocuments, listEvents } from "@/lib/applications/queries";
+import { DB_TO_CONTEXT_LABEL } from "@/lib/llm/prompts/follow-up.v1";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { STATUS_LABELS, StatusBadge } from "@/components/status-badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -179,8 +180,9 @@ export default async function ApplicationDetailPage({
             {documents.map((doc) => (
               <details key={doc.id} className="rounded-lg border p-4">
                 <summary className="cursor-pointer text-sm">
-                  {doc.type === "COVER_LETTER" ? "Cover letter" : "Follow-up email"} · v
-                  {doc.version} · {doc.language} · {formatDateTime(doc.createdAt)}
+                  {doc.type === "COVER_LETTER" ? "Cover letter" : "Follow-up email"}
+                  {doc.context ? ` (${DB_TO_CONTEXT_LABEL[doc.context]})` : ""} · v{doc.version} ·{" "}
+                  {doc.language} · {formatDateTime(doc.createdAt)}
                 </summary>
                 <div className="mt-3 flex flex-col gap-3">
                   <div className="rounded-lg bg-muted/30 p-3 text-sm whitespace-pre-wrap">
