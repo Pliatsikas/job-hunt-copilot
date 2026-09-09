@@ -3,6 +3,39 @@
 Follow-ups and out-of-scope items, tracked here instead of the diff (per CLAUDE.md's workflow
 rules) so decisions don't only exist in chat history.
 
+## M8 — polish checklist
+
+Deliberately not started before M8. Recorded now so the list doesn't get rebuilt from memory.
+
+**Applies:**
+
+- Unique `<title>` and meta description per page via the Next metadata API. Nothing may ship
+  rendering as "Create Next App".
+- A favicon, and one OG/social share image for the public pages.
+- `app/not-found.tsx` and `app/error.tsx` with real copy — a user who hits either should learn
+  what happened and what to do, not read a stack trace.
+- Exactly one `h1` per page. Meaningful `alt` text. Visible keyboard focus on every
+  interactive element.
+- Zero console errors and warnings in production. No source maps shipped to production.
+  Report the largest client bundles and justify anything over 150kB rather than shrugging at it.
+- No placeholder or lorem text anywhere.
+- `robots.txt` that **disallows** the authenticated routes (`/today`, `/applications`,
+  `/profile`). This app is not meant to be indexed.
+
+**Explicitly out of scope, with the reasoning:**
+
+- **`sitemap.xml` and canonical tags** — there are three public pages and no duplicate-content
+  or discovery problem. A sitemap solves crawl discovery at scale; at this size it is
+  ceremony, and canonical tags answer a duplication question this app doesn't have.
+- **Breadcrumbs and structured data** — navigation is two levels deep. Breadcrumbs exist to
+  rescue users from deep hierarchies; there is no hierarchy here to get lost in.
+- **LocalBusiness schema** — it would be factually false. This is a personal job-search tool,
+  not a business with a location and opening hours. Publishing schema that asserts otherwise
+  is deceptive markup, and search engines treat it as spam. Not a judgement call.
+- **`llms.txt`** — the app sits behind authentication. A file telling crawlers how to consume
+  content they cannot reach accomplishes nothing.
+- **Custom domain** — optional, owner's call, not a completion criterion.
+
 ## Open
 
 - **Dates render in a fixed English format, not the viewer's locale.** `lib/format.ts` uses a
