@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Scratch exports that may contain personal data (CV text, etc). This repo is
+# public — keep them out of it.
+Claude outputs/
