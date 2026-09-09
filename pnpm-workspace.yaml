@@ -1,8 +1,10 @@
 allowBuilds:
+  '@google/genai': true
   '@prisma/engines': true
   esbuild: true
   msgpackr-extract: true
   prisma: true
+  protobufjs: true
   sharp: false
   unrs-resolver: false
   workerd: true

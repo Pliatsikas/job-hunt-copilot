@@ -13,7 +13,7 @@ describe("envSchema", () => {
   it("accepts a minimal valid env and fills in defaults", () => {
     const parsed = envSchema.parse(validBase);
     expect(parsed.LLM_PROVIDER).toBe("gemini");
-    expect(parsed.LLM_MODEL).toBe("gemini-2.5-flash");
+    expect(parsed.LLM_MODEL).toBe("gemini-3.5-flash");
     expect(parsed.DAILY_LLM_CALL_LIMIT).toBe(50);
   });
 

@@ -92,7 +92,10 @@ evals/fixtures/*.json  evals/run.ts
   conformance test suite (M4) runs the same fixture through every registered provider; adding a
   provider means passing that suite, nothing else.
 - The Zod schema is the single source of truth: the JSON schema in the prompt is generated
-  from it with `zod-to-json-schema`.
+  from it with Zod 4's native `z.toJSONSchema()` (via `lib/llm/json-schema.ts`), never
+  hand-written. The `zod-to-json-schema` package targets Zod 3 and is deliberately not used.
+- Transport failures are not parse failures. Providers retry 429/5xx with backoff
+  (`lib/llm/retry.ts`); the single repair attempt is reserved for schema failures.
 - Grounding is concrete: normalize both sides (lowercase, collapse whitespace, strip smart
   quotes/trailing punctuation), then substring-match `evidenceFromCv` against the normalized
   `cvText`. Minimum 15 characters after normalization — a bare skill name is not evidence.

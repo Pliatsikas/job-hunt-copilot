@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { addNote, changeStatus } from "@/lib/applications/actions";
+import { analyzeApplication } from "@/lib/applications/analyze";
 import { requireOwnedApplication } from "@/lib/applications/guards";
-import { listEvents } from "@/lib/applications/queries";
+import { listAnalyses, listEvents } from "@/lib/applications/queries";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { STATUS_LABELS, StatusBadge } from "@/components/status-badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -12,6 +13,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { AnalysisView } from "./analysis-view";
+import { AnalyzeButton } from "./analyze-button";
 import { NoteForm } from "./note-form";
 import { StatusChanger } from "./status-changer";
 
@@ -25,7 +28,11 @@ export default async function ApplicationDetailPage({
   const application = await requireOwnedApplication(id).catch(() => null);
   if (!application) notFound();
 
-  const events = await listEvents(application.id);
+  const [events, analyses] = await Promise.all([
+    listEvents(application.id),
+    listAnalyses(application.id),
+  ]);
+  const [latestAnalysis, ...previousAnalyses] = analyses;
 
   return (
     <div className="px-6 py-8">
@@ -82,6 +89,18 @@ export default async function ApplicationDetailPage({
 
           <Card>
             <CardHeader>
+              <CardTitle>Analysis</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AnalyzeButton
+                action={analyzeApplication.bind(null, application.id)}
+                hasPrevious={analyses.length > 0}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Details</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-2 text-sm">
@@ -106,6 +125,38 @@ export default async function ApplicationDetailPage({
           </Card>
         </div>
       </div>
+
+      {latestAnalysis && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Match analysis</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AnalysisView analysis={latestAnalysis} />
+          </CardContent>
+        </Card>
+      )}
+
+      {previousAnalyses.length > 0 && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Previous analyses ({previousAnalyses.length})</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            {previousAnalyses.map((analysis) => (
+              <details key={analysis.id} className="rounded-lg border p-4">
+                <summary className="cursor-pointer text-sm">
+                  Score {analysis.matchScore} · {formatDateTime(analysis.createdAt)} ·{" "}
+                  {analysis.promptVersion}
+                </summary>
+                <div className="mt-4">
+                  <AnalysisView analysis={analysis} />
+                </div>
+              </details>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="mt-6">
         <CardHeader>

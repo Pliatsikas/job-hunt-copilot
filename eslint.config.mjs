@@ -31,7 +31,15 @@ const eslintConfig = [
   },
   {
     files: ["**/*.ts", "**/*.tsx"],
-    rules: { "no-restricted-syntax": ["error", ownedModelAccess] },
+    rules: {
+      "no-restricted-syntax": ["error", ownedModelAccess],
+      // Server actions must keep the (prevState, formData) signature even when
+      // a given action reads neither. Underscore marks that as deliberate.
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
+      ],
+    },
   },
   {
     // The one layer allowed to touch them directly.

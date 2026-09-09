@@ -9,8 +9,8 @@ datasource db {
 // Connection URLs live in prisma.config.ts (CLI) and lib/db.ts (runtime, via a
 // driver adapter) — Prisma 7 removed datasource url/directUrl from this file.
 
-// Analysis/Document land in M4/M5 — their relations are deliberately absent
-// here rather than stubbed, so each milestone owns its own migration.
+// Document lands in M5 — its relations are deliberately absent here rather
+// than stubbed, so each milestone owns its own migration.
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -24,6 +24,7 @@ model User {
   profile       Profile?
   companies     Company[]
   applications  Application[]
+  analyses      Analysis[]
   events        Event[]
 }
 
@@ -118,9 +119,10 @@ model Application {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
-  events  Event[]
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company  Company?   @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  analyses Analysis[]
+  events   Event[]
 
   @@index([userId, status])
   @@index([userId, nextActionAt])
@@ -165,4 +167,38 @@ enum EventType {
   STATUS_CHANGE
   ANALYSIS_RUN
   DOCUMENT_CREATED
+}
+
+model Analysis {
+  id            String   @id @default(cuid())
+  applicationId String
+  userId        String // denormalized from Application, set in the same write (SPEC.md §8 Α1)
+  provider      String // "gemini" | "groq"
+  model         String
+  promptVersion String // e.g. "analyze@1" — lets two runs be compared
+  matchScore    Int // 0-100, mirrored out of result for indexed sorting
+  result        Json // the validated AnalysisResult
+  // matchedSkills entries removed by the grounding check (SPEC.md §8 Α3).
+  // Honest signal, shown in the UI and an eval metric in M8.
+  droppedClaims Int      @default(0)
+  inputTokens   Int?
+  outputTokens  Int?
+  latencyMs     Int?
+  createdAt     DateTime @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId, createdAt])
+  @@index([userId, createdAt])
+}
+
+// Per-user daily cap on provider calls — the cost brake.
+model UsageCounter {
+  id     String   @id @default(cuid())
+  userId String
+  day    DateTime @db.Date
+  calls  Int      @default(0)
+
+  @@unique([userId, day])
 }

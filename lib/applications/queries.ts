@@ -77,3 +77,14 @@ export async function listEvents(applicationId: string) {
     orderBy: { at: "desc" },
   });
 }
+
+/** Analyses for one application, newest first — previous runs stay reachable. */
+export async function listAnalyses(applicationId: string) {
+  const user = await requireUser();
+
+  // Filtered by userId AND applicationId, per SPEC.md §8 Α1.
+  return db.analysis.findMany({
+    where: { applicationId, userId: user.id },
+    orderBy: { createdAt: "desc" },
+  });
+}
