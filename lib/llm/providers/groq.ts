@@ -1,7 +1,14 @@
 import Groq from "groq-sdk";
 import { toJsonSchema } from "../json-schema";
+import { isAuthFailure } from "../provider-errors";
 import { withTransientRetry } from "../retry";
-import { LlmProviderError, type LlmProvider, type LlmRequest, type LlmResult } from "../types";
+import {
+  LlmAuthError,
+  LlmProviderError,
+  type LlmProvider,
+  type LlmRequest,
+  type LlmResult,
+} from "../types";
 
 export function createGroqProvider(apiKey: string, model: string): LlmProvider {
   const client = new Groq({ apiKey });
@@ -49,6 +56,8 @@ export function createGroqProvider(apiKey: string, model: string): LlmProvider {
         };
       } catch (error) {
         if (error instanceof LlmProviderError) throw error;
+        // Named here, where the provider knows which variable holds its key.
+        if (isAuthFailure(error)) throw new LlmAuthError("groq", "GROQ_API_KEY", error);
         throw new LlmProviderError(
           "groq",
           error instanceof Error ? error.message : "Groq request failed",

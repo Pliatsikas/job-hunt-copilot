@@ -41,3 +41,19 @@ export class LlmProviderError extends Error {
     this.name = "LlmProviderError";
   }
 }
+
+/**
+ * A rejected credential. Carries the name of the environment variable that
+ * needs fixing, because "API key not valid" on its own doesn't tell you which
+ * of several keys, in which of several environments, to go and look at.
+ */
+export class LlmAuthError extends LlmProviderError {
+  constructor(provider: string, public readonly envVar: string, cause?: unknown) {
+    super(
+      provider,
+      `${envVar} was rejected by the provider. Check that the key is valid and set for this environment.`,
+      cause,
+    );
+    this.name = "LlmAuthError";
+  }
+}

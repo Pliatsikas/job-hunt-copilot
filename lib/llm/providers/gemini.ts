@@ -1,7 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
 import { stripUnsupportedKeywords, toJsonSchema } from "../json-schema";
+import { isAuthFailure } from "../provider-errors";
 import { withTransientRetry } from "../retry";
-import { LlmProviderError, type LlmProvider, type LlmRequest, type LlmResult } from "../types";
+import {
+  LlmAuthError,
+  LlmProviderError,
+  type LlmProvider,
+  type LlmRequest,
+  type LlmResult,
+} from "../types";
 
 // Gemini's responseSchema is an OpenAPI subset: these annotations make it
 // reject the request outright.
@@ -50,6 +57,8 @@ export function createGeminiProvider(apiKey: string, model: string): LlmProvider
         };
       } catch (error) {
         if (error instanceof LlmProviderError) throw error;
+        // Named here, where the provider knows which variable holds its key.
+        if (isAuthFailure(error)) throw new LlmAuthError("gemini", "GEMINI_API_KEY", error);
         throw new LlmProviderError(
           "gemini",
           error instanceof Error ? error.message : "Gemini request failed",

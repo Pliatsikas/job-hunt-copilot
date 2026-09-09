@@ -7,6 +7,7 @@ import { groundAnalysis } from "../llm/grounding";
 import * as analyzePrompt from "../llm/prompts/analyze.v1";
 import { AnalysisError, completeWithRepair } from "../llm/repair";
 import { assertUnderDailyLimit, recordProviderCall } from "../llm/usage";
+import { LlmAuthError } from "../llm/types";
 import { getProfile } from "../profile/get";
 import { analysisResultSchema } from "../schemas/analysis";
 import { requireOwnedApplication } from "./guards";
@@ -94,6 +95,12 @@ export async function analyzeApplication(
     return { ranAt: Date.now() };
   } catch (error) {
     if (error instanceof AnalysisError) {
+      return { error: error.message };
+    }
+    // A rejected key already carries a readable message naming the variable —
+    // pass it through rather than wrapping raw provider JSON in a prefix.
+    if (error instanceof LlmAuthError) {
+      console.error(`Provider auth failure (${error.provider}):`, error.cause);
       return { error: error.message };
     }
     // Surfaced, not swallowed — but without leaking provider internals.
