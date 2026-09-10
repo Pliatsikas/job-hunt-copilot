@@ -1,0 +1,22 @@
+{
+  "id": "frontend-react-testing-heavy",
+  "kind": "analysis",
+  "notes": "Good fit on the frontend stack, but the ad leans hard on automated testing and accessibility, which the CV barely evidences. Tests whether a strong overall match still surfaces an honest gap instead of rounding it away.",
+  "roleTitle": "Frontend Developer (React)",
+  "companyName": null,
+  "source": "synthetic",
+  "language": "en",
+  "jobDescription": "Frontend Developer (React) — Remote within EU\n\nOur SaaS product serves clinics across Europe. The frontend is a large React application in TypeScript, and we hold a high bar on testing and accessibility because our users work under time pressure.\n\nResponsibilities:\n- Build and maintain features in React and TypeScript\n- Style with Tailwind CSS following our design system\n- Write unit tests with Vitest and end-to-end tests with Playwright for every feature you ship\n- Meet WCAG 2.2 AA: keyboard navigation, focus management, screen reader labels\n- Work with the design team on component API decisions\n\nRequirements:\n- Solid React and TypeScript\n- Demonstrated experience writing automated tests as part of normal work, not as an afterthought\n- Understanding of web accessibility in practice\n- Comfortable in an English-speaking remote team\n\nNice to have: Storybook, design systems experience, performance profiling.",
+  "expectedScoreRange": [
+    55,
+    80
+  ],
+  "mustFindSkills": [
+    "react",
+    "typescript",
+    "tailwind css"
+  ],
+  "mustFlagGaps": [
+    "accessibility"
+  ]
+}

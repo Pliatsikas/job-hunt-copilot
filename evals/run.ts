@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { env } from "../lib/env";
 import { groundAnalysis } from "../lib/llm/grounding";
@@ -45,7 +45,12 @@ const GROQ_MODELS = ["openai/gpt-oss-120b"];
 
 type ProviderName = "groq" | "gemini";
 
-type Args = { provider: ProviderName; dryRun: boolean; only: string | null };
+type Args = {
+  provider: ProviderName;
+  dryRun: boolean;
+  only: string | null;
+  report: string | null;
+};
 
 function parseArgs(argv: string[]): Args {
   const provider = (value(argv, "--provider") ?? env.LLM_PROVIDER) as string;
@@ -56,6 +61,7 @@ function parseArgs(argv: string[]): Args {
     provider,
     dryRun: argv.includes("--dry-run"),
     only: value(argv, "--only"),
+    report: value(argv, "--report"),
   };
 }
 
@@ -80,12 +86,21 @@ function makeProvider(provider: ProviderName, model: string): LlmProvider {
   return createGroqProvider(env.GROQ_API_KEY, model);
 }
 
+/**
+ * Why a row has no result. A 503 from an overloaded model says nothing about
+ * whether the prompt produces valid output, and folding it into "schema-valid"
+ * would report a 60% schema rate for a provider that in fact returned valid
+ * JSON every single time it answered.
+ */
+type Failure = "transport" | "schema" | null;
+
 type Row = {
   id: string;
   kind: EvalFixture["kind"];
   model: string;
   ok: boolean;
   error: string | null;
+  failure: Failure;
   matchScore: number | null;
   droppedClaims: number | null;
   attempts: number | null;
@@ -94,6 +109,17 @@ type Row = {
   outputTokens: number | null;
   score: FixtureScore | null;
   fabrications: string[] | null;
+  /** The band the fixture author set, so the file is self-contained. */
+  expectedScoreRange: readonly [number, number] | null;
+  /**
+   * The grounded analysis itself. Without it the results file records that a
+   * score was in range but not why, and "is the model wrong or is the band
+   * wrong?" cannot be answered from the artifact — only re-run, which produces
+   * different numbers and answers a different question.
+   */
+  result: AnalysisResult | null;
+  /** The generated document, for the cover-letter fixtures. */
+  output: string | null;
 };
 
 async function runAnalysis(
@@ -108,6 +134,7 @@ async function runAnalysis(
     model: provider.model,
     ok: false,
     error: null,
+    failure: null,
     matchScore: null,
     droppedClaims: null,
     attempts: null,
@@ -116,6 +143,9 @@ async function runAnalysis(
     outputTokens: null,
     score: null,
     fabrications: null,
+    expectedScoreRange: fixture.expectedScoreRange,
+    result: null,
+    output: null,
   };
 
   try {
@@ -149,14 +179,25 @@ async function runAnalysis(
       inputTokens: out.usage.inputTokens,
       outputTokens: out.usage.outputTokens,
       score: scoreFixture(fixture, result),
+      result,
     };
   } catch (error) {
     if (error instanceof LlmQuotaError) throw error;
     return {
       ...base,
       error: error instanceof Error ? error.message : String(error),
+      failure: classify(error),
     };
   }
+}
+
+/**
+ * A 503 from an overloaded model says nothing about whether the prompt yields
+ * valid output. AnalysisError is thrown only after the single repair has also
+ * failed the schema; everything else never got as far as producing an answer.
+ */
+function classify(error: unknown): Failure {
+  return error instanceof AnalysisError ? "schema" : "transport";
 }
 
 async function runCoverLetter(
@@ -170,6 +211,7 @@ async function runCoverLetter(
     model: provider.model,
     ok: false,
     error: null,
+    failure: null,
     matchScore: null,
     droppedClaims: null,
     attempts: null,
@@ -178,6 +220,9 @@ async function runCoverLetter(
     outputTokens: null,
     score: null,
     fabrications: null,
+    expectedScoreRange: null,
+    result: null,
+    output: null,
   };
 
   try {
@@ -215,18 +260,36 @@ async function runCoverLetter(
       inputTokens: usage.inputTokens,
       outputTokens: usage.outputTokens,
       fabrications: findings.map((f) => f.sentence ?? JSON.stringify(f)),
+      output: text.trim(),
     };
   } catch (error) {
     if (error instanceof LlmQuotaError) throw error;
     return {
       ...base,
       error: error instanceof Error ? error.message : String(error),
+      failure: classify(error),
     };
   }
 }
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
+
+  // Re-render a run that already happened, spending nothing. At temperature
+  // 0.2 a second run is a different sample, so "let me look at that again"
+  // has to mean the saved file and not a fresh call.
+  if (args.report) {
+    const saved = JSON.parse(await readFile(args.report, "utf8")) as {
+      promptVersion: string;
+      provider: string;
+      ranAt: string;
+      rows: Row[];
+    };
+    console.log(`${saved.promptVersion} · ${saved.provider} · ${saved.ranAt}`);
+    report(saved.rows);
+    return;
+  }
+
   const all = await loadFixtures();
   const fixtures = args.only ? all.filter((f) => f.id === args.only) : all;
   if (!fixtures.length)
@@ -305,8 +368,19 @@ function report(rows: Row[]) {
   if (!analysis.length) {
     console.log("no analysis fixtures loaded — nothing to score");
   } else {
+    // Completed first, and separately: a provider that never answered has not
+    // produced invalid output, it has produced no output. Folding the two
+    // together reported a 60% schema rate for a run whose every answer parsed.
+    const transport = analysis.filter((r) => r.failure === "transport");
+    const answered = analysis.filter((r) => r.ok || r.failure === "schema");
+    if (transport.length) {
+      console.log(
+        `completed            ${answered.length}/${analysis.length}  (${transport.length} never answered: ${transport.map((r) => r.id).join(", ")})`,
+      );
+    }
+    const answeredCount = analysis.filter((r) => r.ok || r.failure === "schema").length;
     console.log(
-      `schema-valid          ${valid.length}/${analysis.length}  (${pct(valid.length / analysis.length)})`,
+      `schema-valid          ${valid.length}/${answeredCount}  (${pct(answeredCount ? valid.length / answeredCount : 1)} of answers received)`,
     );
     console.log(
       `in expected range     ${scored.filter((r) => r.score!.inRange).length}/${scored.length}`,

@@ -1,0 +1,20 @@
+{
+  "id": "data-engineer-spark",
+  "kind": "analysis",
+  "notes": "Second clear mismatch, in a different direction from the DevOps one: data engineering shares the word 'pipeline' with the candidate's RAG work without sharing anything technical. Tests that vocabulary overlap does not become a match.",
+  "roleTitle": "Data Engineer",
+  "companyName": null,
+  "source": "synthetic",
+  "language": "en",
+  "jobDescription": "Data Engineer — Batch and Streaming\n\nYou will own the pipelines that feed our analytics and machine learning platforms.\n\nResponsibilities:\n- Build batch pipelines in Apache Spark (Scala and PySpark)\n- Orchestrate workflows in Airflow with clear SLAs and backfill strategies\n- Maintain streaming ingestion through Kafka into our lakehouse\n- Model data in dbt and maintain the warehouse layer in Snowflake\n- Own data quality checks and lineage documentation\n\nRequirements:\n- 4+ years in data engineering\n- Production Spark experience at terabyte scale\n- Strong SQL, including window functions and query tuning\n- Comfort with the JVM ecosystem",
+  "expectedScoreRange": [
+    0,
+    22
+  ],
+  "mustFindSkills": [],
+  "mustFlagGaps": [
+    "apache spark",
+    "airflow",
+    "kafka"
+  ]
+}

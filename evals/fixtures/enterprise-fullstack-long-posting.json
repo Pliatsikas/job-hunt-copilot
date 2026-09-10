@@ -1,0 +1,24 @@
+{
+  "id": "enterprise-fullstack-long-posting",
+  "kind": "analysis",
+  "notes": "The long one, deliberately padded with the boilerplate real corporate ads carry — benefits, values, process. Tests two things: that the analysis extracts requirements from noise rather than mirroring the ad's own language, and that a long input does not push the response into truncation. The frontend half genuinely fits; the backend half does not.",
+  "roleTitle": "Fullstack Engineer",
+  "companyName": null,
+  "source": "synthetic",
+  "language": "en",
+  "jobDescription": "Fullstack Engineer — Digital Platform Team\n\nAbout us\nWe are a listed group operating across eleven countries in retail and financial services, employing more than four thousand people. Our Digital Platform Team builds the customer-facing systems that serve two million monthly active users, and we are in the middle of a multi-year modernisation programme moving from a monolith to domain-aligned services.\n\nOur culture\nWe believe in psychological safety, continuous learning and shipping small. We run two-week iterations, we do not do heroics, and we protect focus time. Every engineer has a personal development budget and two learning days per month.\n\nThe role\nYou will join a cross-functional team of six: four engineers, a product manager and a designer. You will contribute to both the frontend and the backend of our customer portal, and you will be expected to take features from refinement through to production support.\n\nWhat you will do\n- Build user-facing features in React with TypeScript, consuming our internal design system\n- Implement backend services in Java with Spring Boot, following our internal API guidelines\n- Publish and consume domain events over Kafka, with careful attention to schema evolution\n- Write integration tests against Testcontainers and contribute to our contract testing suite\n- Deploy through our GitOps pipeline to AWS (EKS, RDS, S3), with progressive rollout\n- Participate in a business-hours support rotation, roughly one week in six\n- Contribute to architecture decision records and take part in design review\n\nWhat we are looking for\n- 4+ years of professional software engineering experience, at least two of them fullstack\n- Strong React and TypeScript, including state management in a large codebase\n- Production experience with Java and the Spring ecosystem\n- Familiarity with event-driven architecture and its failure modes\n- Experience operating what you build in a cloud environment\n- Comfortable working in English in a distributed team across three time zones\n\nNice to have\n- Experience with domain-driven design in practice\n- Exposure to regulated environments and audit requirements\n- Contributions to internal tooling or developer experience\n\nProcess\nAn introductory call, a technical conversation about a system you have built, a pair programming session on a small realistic problem, and a final conversation with the team. We aim to complete the process within three weeks and we give feedback at every stage.\n\nBenefits\nPrivate health insurance, hybrid working with two office days, an annual bonus scheme, pension contributions, and relocation support where applicable.",
+  "expectedScoreRange": [
+    25,
+    55
+  ],
+  "mustFindSkills": [
+    "react",
+    "typescript"
+  ],
+  "mustFlagGaps": [
+    "java",
+    "spring boot",
+    "kafka",
+    "aws"
+  ]
+}

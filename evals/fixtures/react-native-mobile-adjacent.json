@@ -1,0 +1,21 @@
+{
+  "id": "react-native-mobile-adjacent",
+  "kind": "analysis",
+  "notes": "The hardest case to score: adjacent, not aligned. React and TypeScript transfer directly, but nothing in the CV is mobile, and app store release work is absent entirely. A model that scores this like a React web role is over-crediting transferability; one that scores it like the DevOps mismatch is ignoring it.",
+  "roleTitle": "React Native Developer",
+  "companyName": null,
+  "source": "synthetic",
+  "language": "en",
+  "jobDescription": "React Native Developer — Consumer App\n\nOur app has 300,000 installs across iOS and Android and we release every two weeks.\n\nWhat you will do:\n- Build features in React Native with TypeScript, using Expo where it fits\n- Handle native module integration when Expo does not cover a need\n- Own push notifications, deep linking and offline behaviour\n- Manage releases through App Store Connect and Google Play, including staged rollout\n- Profile and fix performance problems on low-end Android devices\n\nRequirements:\n- Demonstrated React Native work, ideally an app you can point to in a store\n- Strong React fundamentals and TypeScript\n- Understanding of mobile-specific constraints: battery, network, memory\n- Familiarity with the mobile release and review process\n\nNice to have: native iOS or Android experience, experience with analytics and crash reporting tooling.",
+  "expectedScoreRange": [
+    28,
+    58
+  ],
+  "mustFindSkills": [
+    "react",
+    "typescript"
+  ],
+  "mustFlagGaps": [
+    "react native"
+  ]
+}

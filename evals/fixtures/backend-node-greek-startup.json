@@ -1,0 +1,23 @@
+{
+  "id": "backend-node-greek-startup",
+  "kind": "analysis",
+  "notes": "Greek-language ad that is a genuine fit. Paired with the WordPress fixture, it separates 'the model handles Greek' from 'the model scores Greek ads lower'. If both Greek fixtures land low while the English fits land high, the language is the variable, not the match.",
+  "roleTitle": "Backend Developer (Node.js)",
+  "companyName": null,
+  "source": "synthetic",
+  "language": "el",
+  "jobDescription": "Backend Developer (Node.js) — Αθήνα ή εξ αποστάσεως\n\nΕίμαστε startup στον χώρο των logistics και χτίζουμε την πλατφόρμα διαχείρισης παραγγελιών από την αρχή.\n\nΤι θα κάνεις:\n- Ανάπτυξη REST APIs σε Node.js και Express με TypeScript\n- Σχεδιασμό σχήματος σε PostgreSQL και migrations με Prisma\n- Υλοποίηση real-time ενημερώσεων για την παρακολούθηση αποστολών\n- Χρήση Redis για caching και ουρές εργασιών\n- Συμμετοχή στη διαδικασία code review και στη συντήρηση του CI\n\nΤι ζητάμε:\n- Καλή γνώση JavaScript ή TypeScript σε πλευρά server\n- Εμπειρία με σχεσιακές βάσεις δεδομένων\n- Εξοικείωση με Docker για τοπική ανάπτυξη\n- Διάθεση να δουλέψεις σε μικρή ομάδα όπου αναλαμβάνεις ευθύνη από νωρίς\n- 0-3 έτη εμπειρίας\n\nΠροσφέρουμε καθορισμένο μισθολογικό εύρος, ευέλικτο ωράριο και κάλυψη εξόδων για συνέδρια.",
+  "expectedScoreRange": [
+    65,
+    90
+  ],
+  "mustFindSkills": [
+    "node.js",
+    "express",
+    "typescript",
+    "postgresql",
+    "redis",
+    "docker"
+  ],
+  "mustFlagGaps": []
+}

@@ -1,0 +1,22 @@
+{
+  "id": "senior-devops-kubernetes",
+  "kind": "analysis",
+  "notes": "Clear mismatch. A high score here would mean the analysis is generous to anything technical. Docker is the only genuine overlap, and it should be credited as exactly that and no more.",
+  "roleTitle": "Senior DevOps Engineer",
+  "companyName": null,
+  "source": "synthetic",
+  "language": "en",
+  "jobDescription": "Senior DevOps Engineer\n\nYou will own the platform that our sixty engineers deploy to.\n\nResponsibilities:\n- Operate and scale multi-cluster Kubernetes on AWS EKS\n- Own infrastructure as code in Terraform across three environments\n- Maintain service mesh configuration (Istio) and ingress policy\n- Build and tune observability: Prometheus, Grafana, distributed tracing\n- Lead incident response and run blameless postmortems\n- Manage cost: reserved capacity planning, rightsizing, spot strategy\n\nRequirements:\n- 6+ years in infrastructure or platform engineering\n- Deep Kubernetes knowledge, including CRDs and operators\n- Production Terraform at scale\n- Strong Linux and networking fundamentals\n- On-call participation in a follow-the-sun rotation",
+  "expectedScoreRange": [
+    0,
+    22
+  ],
+  "mustFindSkills": [
+    "docker"
+  ],
+  "mustFlagGaps": [
+    "kubernetes",
+    "terraform",
+    "aws"
+  ]
+}

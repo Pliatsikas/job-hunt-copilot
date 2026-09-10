@@ -1,0 +1,22 @@
+{
+  "id": "dotnet-senior-five-years",
+  "kind": "analysis",
+  "notes": "Two things at once. It demands 5+ years, which analyze@2 must route to redFlags rather than to a gap entry. And it asks for C#, which the candidate genuinely has through Unity game development — so the analysis should credit the language while still naming the missing ASP.NET and Azure ecosystem. A model that either ignores the Unity C# or treats it as enterprise backend experience is wrong in opposite directions.",
+  "roleTitle": "Senior .NET Developer",
+  "companyName": null,
+  "source": "synthetic",
+  "language": "en",
+  "jobDescription": "Senior .NET Developer (Athens, Hybrid)\n\nWe modernise core banking integrations for financial institutions.\n\nWhat you will do:\n- Design and build services in C# with ASP.NET Core\n- Work with Entity Framework Core against SQL Server\n- Deploy to Azure App Service and Azure Functions\n- Integrate with message queues (Azure Service Bus)\n- Mentor two mid-level developers and lead design reviews\n\nRequirements:\n- 5+ years of professional .NET development\n- Strong C# fundamentals including async programming\n- Production experience with Azure\n- Experience in regulated environments is an advantage\n\nCompensation is discussed at the interview stage.",
+  "expectedScoreRange": [
+    8,
+    35
+  ],
+  "mustFindSkills": [
+    "c#"
+  ],
+  "mustFlagGaps": [
+    "asp.net core",
+    "azure",
+    "sql server"
+  ]
+}

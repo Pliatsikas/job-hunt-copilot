@@ -1,0 +1,753 @@
+{
+  "promptVersion": "analyze@2",
+  "provider": "gemini",
+  "ranAt": "2026-09-10T14:01:51.854Z",
+  "rows": [
+    {
+      "id": "ai-engineer-rag-python",
+      "kind": "analysis",
+      "model": "gemini-3.5-flash",
+      "ok": true,
+      "error": null,
+      "matchScore": 78,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 17857,
+      "inputTokens": 2078,
+      "outputTokens": 1113,
+      "score": {
+        "scoreDeviation": 3,
+        "inRange": false,
+        "skillRecall": 0.3333333333333333,
+        "foundSkills": [
+          "rag pipelines"
+        ],
+        "missedSkills": [
+          "llm integration",
+          "llm evaluation"
+        ],
+        "gapRecall": 1,
+        "missedGaps": [],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        45,
+        75
+      ],
+      "result": {
+        "matchScore": 78,
+        "verdict": "worth_applying",
+        "summary": "The candidate is an exceptionally strong junior applicant whose academic focus and internship experience align perfectly with the core requirements of this RAG-focused role. He has built a RAG copilot during his internship, is writing his thesis on RAG evaluation, and has hands-on OCR experience. The main gaps are his junior status and lack of exposure to specific tools in the stack like FastAPI, pgvector, and LangChain/LlamaIndex.",
+        "matchedSkills": [
+          {
+            "skill": "RAG pipelines",
+            "evidenceFromCv": "I designed and built a RAG-based AI copilot for Jira that queries internal knowledge bases and ticket history to speed up issue resolution."
+          },
+          {
+            "skill": "RAG evaluation",
+            "evidenceFromCv": "My undergraduate thesis is on developing and evaluating RAG pipelines for LLM performance benchmarking."
+          },
+          {
+            "skill": "Python",
+            "evidenceFromCv": "I am developing and benchmarking RAG pipelines for LLM performance evaluation at the University of Macedonia, using RAG techniques, LLMs and Python."
+          },
+          {
+            "skill": "OCR pipelines",
+            "evidenceFromCv": "I developed an OCR pipeline for automated extraction of data from passports and national IDs for user verification in the Rentalbook product."
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "FastAPI",
+            "severity": "important",
+            "howToBridge": "Highlight general backend proficiency with Express and Node.js, and mention willingness to quickly port those REST API design skills to FastAPI using Python."
+          },
+          {
+            "skill": "pgvector",
+            "severity": "important",
+            "howToBridge": "Emphasize strong existing PostgreSQL and Prisma ORM experience, explaining that learning the pgvector extension is a natural next step."
+          },
+          {
+            "skill": "LangChain",
+            "severity": "nice_to_have",
+            "howToBridge": "Explain that while you built your RAG pipelines natively or with custom integrations, you are familiar with LangChain's abstractions and can adopt them quickly."
+          },
+          {
+            "skill": "LlamaIndex",
+            "severity": "nice_to_have",
+            "howToBridge": "Discuss how your thesis research on chunking and evaluation translates directly to LlamaIndex's ingestion and query engines."
+          },
+          {
+            "skill": "Qdrant",
+            "severity": "nice_to_have",
+            "howToBridge": "Acknowledge it as a leading specialized vector database and express enthusiasm for evaluating it against relational vector extensions like pgvector."
+          },
+          {
+            "skill": "Prompt injection",
+            "severity": "important",
+            "howToBridge": "Research common LLM security vulnerabilities and be prepared to discuss defensive prompting, system prompt shielding, and input validation."
+          },
+          {
+            "skill": "Grounding failures",
+            "severity": "important",
+            "howToBridge": "Connect this to your thesis work on evaluation; explain how you measure and mitigate hallucinations or ungrounded answers using context-precision metrics."
+          },
+          {
+            "skill": "Hybrid retrieval",
+            "severity": "important",
+            "howToBridge": "Study the combination of sparse (BM25) and dense (vector) search, and how reciprocal rank fusion (RRF) is used to merge results."
+          }
+        ],
+        "keywordsToMirror": [
+          "RAG pipelines",
+          "evaluation harnesses",
+          "pgvector",
+          "Qdrant",
+          "FastAPI",
+          "chunking strategies",
+          "embeddings",
+          "hybrid retrieval",
+          "reranking",
+          "prompt injection",
+          "grounding failures",
+          "LlamaIndex",
+          "LangChain",
+          "document intelligence"
+        ],
+        "redFlags": [
+          "The job description does not disclose salary or compensation ranges.",
+          "The role expects the candidate to 'own retrieval quality end to end', which is a high-seniority expectation for a junior/final-year student."
+        ],
+        "likelyQuestions": [
+          "Can you walk us through your undergraduate thesis on benchmarking RAG pipelines and how you measured retrieval quality?",
+          "How did you handle chunking and embeddings in the Jira RAG copilot you built during your internship?",
+          "The role uses FastAPI for serving. What is your experience with Python web frameworks, and how would you transition from Express?",
+          "How would you design an evaluation harness to detect grounding failures or hallucinations in a legal document QA system?",
+          "What vector databases have you explored, and what are your thoughts on pgvector vs. dedicated vector search engines like Qdrant?",
+          "How do you mitigate prompt injection risks when building LLM-powered applications?"
+        ]
+      },
+      "output": null
+    },
+    {
+      "id": "backend-node-greek-startup",
+      "kind": "analysis",
+      "model": "gemini-3.1-flash-lite",
+      "ok": true,
+      "error": null,
+      "matchScore": 90,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 7663,
+      "inputTokens": 2170,
+      "outputTokens": 762,
+      "score": {
+        "scoreDeviation": 0,
+        "inRange": true,
+        "skillRecall": 1,
+        "foundSkills": [
+          "node.js",
+          "express",
+          "typescript",
+          "postgresql",
+          "redis",
+          "docker"
+        ],
+        "missedSkills": [],
+        "gapRecall": null,
+        "missedGaps": [],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        65,
+        90
+      ],
+      "result": {
+        "matchScore": 90,
+        "verdict": "strong_fit",
+        "summary": "Alexandros is an excellent match for this role. He possesses the exact stack required (Node.js, Express, TypeScript, PostgreSQL, Prisma, Redis, Docker) and has demonstrated experience building real-time features and REST APIs in his personal projects and internship. His profile aligns perfectly with the startup environment described.",
+        "matchedSkills": [
+          {
+            "skill": "Node.js",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Express",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "TypeScript",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "PostgreSQL",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Prisma",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Redis",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Docker",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "REST API",
+            "evidenceFromCv": "I implemented a REST API with JWT authentication and refresh tokens."
+          },
+          {
+            "skill": "CI/CD",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD"
+          }
+        ],
+        "gaps": [],
+        "keywordsToMirror": [
+          "Node.js",
+          "Express",
+          "TypeScript",
+          "REST APIs",
+          "PostgreSQL",
+          "Prisma",
+          "Redis",
+          "Docker",
+          "CI/CD"
+        ],
+        "redFlags": [
+          "0-3 years of experience requirement (candidate is a student/junior)",
+          "Location preference (Athens or remote) not explicitly confirmed as compatible with candidate's location in Thessaloniki"
+        ],
+        "likelyQuestions": [
+          "How have you handled database migrations in production using Prisma?",
+          "Can you describe a challenging bug you encountered while implementing real-time features with Socket.io?",
+          "How do you approach code reviews when working in a team?",
+          "What is your experience with message queues in Redis beyond simple caching?",
+          "How do you ensure your REST APIs are secure beyond JWT authentication?"
+        ]
+      },
+      "output": null
+    },
+    {
+      "id": "data-engineer-spark",
+      "kind": "analysis",
+      "model": "gemini-flash-latest",
+      "ok": false,
+      "error": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}",
+      "matchScore": null,
+      "droppedClaims": null,
+      "attempts": null,
+      "latencyMs": null,
+      "inputTokens": null,
+      "outputTokens": null,
+      "score": null,
+      "fabrications": null,
+      "expectedScoreRange": [
+        0,
+        22
+      ],
+      "result": null,
+      "output": null
+    },
+    {
+      "id": "dotnet-senior-five-years",
+      "kind": "analysis",
+      "model": "gemini-3.5-flash",
+      "ok": true,
+      "error": null,
+      "matchScore": 15,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 15669,
+      "inputTokens": 2022,
+      "outputTokens": 779,
+      "score": {
+        "scoreDeviation": 0,
+        "inRange": true,
+        "skillRecall": 1,
+        "foundSkills": [
+          "c#"
+        ],
+        "missedSkills": [],
+        "gapRecall": 1,
+        "missedGaps": [],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        8,
+        35
+      ],
+      "result": {
+        "matchScore": 15,
+        "verdict": "skip",
+        "summary": "Alexandros is a promising junior developer with strong React, Node.js, and AI/RAG experience. However, this role is for a Senior .NET Developer requiring 5+ years of professional experience, deep ASP.NET Core expertise, and Azure cloud deployment. Alexandros only has hobbyist C# experience through Unity and lacks enterprise backend .NET experience, making this a significant mismatch in both seniority and technology stack.",
+        "matchedSkills": [
+          {
+            "skill": "C#",
+            "evidenceFromCv": "I explore gameplay mechanics and game feel using Unity and C#."
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "ASP.NET Core",
+            "severity": "blocker",
+            "howToBridge": "Build a REST API using ASP.NET Core and document the architecture on GitHub to demonstrate a transition from Express/Node.js."
+          },
+          {
+            "skill": "Entity Framework Core",
+            "severity": "blocker",
+            "howToBridge": "Create a sample project using EF Core as an ORM, mapping out relationships to show transferable skills from Prisma."
+          },
+          {
+            "skill": "Azure App Service",
+            "severity": "important",
+            "howToBridge": "Deploy a basic .NET web application to Azure's free tier to gain familiarity with the platform's deployment workflows."
+          },
+          {
+            "skill": "Microsoft SQL Server",
+            "severity": "important",
+            "howToBridge": "Spin up a local SQL Server instance using Docker and run database migrations using EF Core."
+          },
+          {
+            "skill": "Azure Functions",
+            "severity": "important",
+            "howToBridge": "Write a simple serverless background task in C# using Azure Functions."
+          },
+          {
+            "skill": "Azure Service Bus",
+            "severity": "nice_to_have",
+            "howToBridge": "Read up on message-driven architectures and implement a basic pub/sub pattern using an emulator or RabbitMQ."
+          }
+        ],
+        "keywordsToMirror": [
+          "C#",
+          "ASP.NET Core",
+          "Entity Framework Core",
+          "SQL Server",
+          "Azure App Service",
+          "Azure Functions",
+          "Azure Service Bus",
+          "async programming",
+          "design reviews"
+        ],
+        "redFlags": [
+          "The role requires 5+ years of professional .NET development, but the candidate is a junior/final-year student.",
+          "The role requires hybrid work in Athens, but the candidate is based in Thessaloniki.",
+          "The role requires mentoring mid-level developers, which is unrealistic for a junior applicant.",
+          "No salary range is specified in the job description."
+        ],
+        "likelyQuestions": [
+          "Can you describe your experience with C# outside of Unity game development?",
+          "How would you transition your knowledge of Node.js and Prisma to ASP.NET Core and Entity Framework?",
+          "Have you ever worked with cloud providers like Azure, or has your deployment experience been limited to Vercel and Render?",
+          "This role involves mentoring mid-level developers. How do you feel about taking on leadership responsibilities at this stage in your career?",
+          "Are you open to relocating to Athens or commuting to support the hybrid work requirement?"
+        ]
+      },
+      "output": null
+    },
+    {
+      "id": "enterprise-fullstack-long-posting",
+      "kind": "analysis",
+      "model": "gemini-3.1-flash-lite",
+      "ok": true,
+      "error": null,
+      "matchScore": 45,
+      "droppedClaims": 1,
+      "attempts": 1,
+      "latencyMs": 4907,
+      "inputTokens": 2390,
+      "outputTokens": 783,
+      "score": {
+        "scoreDeviation": 0,
+        "inRange": true,
+        "skillRecall": 0.5,
+        "foundSkills": [
+          "typescript"
+        ],
+        "missedSkills": [
+          "react"
+        ],
+        "gapRecall": 1,
+        "missedGaps": [],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        25,
+        55
+      ],
+      "result": {
+        "matchScore": 45,
+        "verdict": "stretch",
+        "summary": "Alexandros is a talented final-year student with strong modern web development skills (Next.js, React, TypeScript, Docker). However, he lacks the professional experience in Java/Spring Boot and event-driven architectures (Kafka) required for this role. He is a strong candidate for a junior position, but this role specifically demands 4+ years of professional experience and enterprise-grade backend expertise.",
+        "matchedSkills": [
+          {
+            "skill": "TypeScript",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Docker",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD"
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "Java",
+            "severity": "blocker",
+            "howToBridge": "Highlight any academic projects involving Java or demonstrate a willingness to learn the Spring ecosystem rapidly."
+          },
+          {
+            "skill": "Spring Boot",
+            "severity": "blocker",
+            "howToBridge": "Complete a certification or build a small project using Spring Boot to demonstrate understanding of dependency injection and REST controllers."
+          },
+          {
+            "skill": "Kafka",
+            "severity": "important",
+            "howToBridge": "Study event-driven architecture patterns and implement a small producer/consumer example using Kafka or a similar message broker."
+          },
+          {
+            "skill": "AWS",
+            "severity": "important",
+            "howToBridge": "Gain familiarity with AWS services like EKS and RDS through personal projects or cloud certifications."
+          },
+          {
+            "skill": "Testcontainers",
+            "severity": "nice_to_have",
+            "howToBridge": "Incorporate integration testing with Testcontainers into a Java project."
+          }
+        ],
+        "keywordsToMirror": [
+          "React",
+          "TypeScript",
+          "fullstack",
+          "production support",
+          "domain-driven design",
+          "event-driven architecture",
+          "GitOps"
+        ],
+        "redFlags": [
+          "4+ years of professional software engineering experience required",
+          "At least two years of fullstack experience required",
+          "Role requires business-hours support rotation",
+          "Candidate is currently a student"
+        ],
+        "likelyQuestions": [
+          "How would you approach migrating a legacy monolith to domain-aligned services?",
+          "Can you explain the failure modes of an event-driven architecture?",
+          "How do you handle state management in a large-scale React application?",
+          "Describe a time you had to take a feature from refinement to production support.",
+          "How do you ensure schema evolution when working with message brokers like Kafka?",
+          "What is your experience with writing integration tests in a CI/CD pipeline?",
+          "How do you approach architecture decision records (ADRs) in your projects?",
+          "How would you adapt your current Node.js backend knowledge to a Java/Spring Boot environment?"
+        ]
+      },
+      "output": null
+    },
+    {
+      "id": "frontend-react-testing-heavy",
+      "kind": "analysis",
+      "model": "gemini-flash-latest",
+      "ok": false,
+      "error": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}",
+      "matchScore": null,
+      "droppedClaims": null,
+      "attempts": null,
+      "latencyMs": null,
+      "inputTokens": null,
+      "outputTokens": null,
+      "score": null,
+      "fabrications": null,
+      "expectedScoreRange": [
+        55,
+        80
+      ],
+      "result": null,
+      "output": null
+    },
+    {
+      "id": "junior-fullstack-next-node",
+      "kind": "analysis",
+      "model": "gemini-3.5-flash",
+      "ok": true,
+      "error": null,
+      "matchScore": 95,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 16690,
+      "inputTokens": 2132,
+      "outputTokens": 928,
+      "score": {
+        "scoreDeviation": 3,
+        "inRange": false,
+        "skillRecall": 1,
+        "foundSkills": [
+          "next.js",
+          "typescript",
+          "postgresql",
+          "prisma orm",
+          "docker"
+        ],
+        "missedSkills": [],
+        "gapRecall": null,
+        "missedGaps": [],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        70,
+        92
+      ],
+      "result": {
+        "matchScore": 95,
+        "verdict": "strong_fit",
+        "summary": "The candidate is an exceptionally strong fit for this junior role. Located in Thessaloniki, they possess hands-on experience with the exact tech stack required (Next.js, TypeScript, Node.js, PostgreSQL, Prisma, Docker, and Vercel). Their portfolio features complete, deployed full-stack projects that demonstrate capabilities well beyond typical tutorial-level junior developers.",
+        "matchedSkills": [
+          {
+            "skill": "Next.js",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "TypeScript",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "PostgreSQL",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Prisma",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Docker",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD, and later migrated its hosting from Railway to a Vercel frontend, a Render backend container, Neon Postgres and Upstash Redis."
+          },
+          {
+            "skill": "WebSockets",
+            "evidenceFromCv": "I built drag-and-drop boards and real-time collaboration over WebSockets with Socket.io."
+          },
+          {
+            "skill": "Tailwind CSS",
+            "evidenceFromCv": "I built a customer and repair-tracking desktop application that replaced an MS Access database for a local business, using Electron, React, TypeScript, Tailwind CSS, Prisma and SQLite."
+          },
+          {
+            "skill": "Vercel",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD, and later migrated its hosting from Railway to a Vercel frontend, a Render backend container, Neon Postgres and Upstash Redis."
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "SQL",
+            "severity": "important",
+            "howToBridge": "Highlight the SQL certification from Scrimba and discuss comfort writing raw SQL queries when Prisma's ORM is insufficient for complex joins or optimizations."
+          },
+          {
+            "skill": "Git workflows",
+            "severity": "nice_to_have",
+            "howToBridge": "Explain how Git branches, pull requests, and code reviews were utilized during the E-Avenue internship or when managing personal monorepos."
+          }
+        ],
+        "keywordsToMirror": [
+          "Next.js",
+          "App Router",
+          "TypeScript",
+          "PostgreSQL",
+          "Prisma migrations",
+          "Docker",
+          "REST endpoints",
+          "WebSockets",
+          "Tailwind CSS",
+          "Vercel",
+          "relational data modelling"
+        ],
+        "redFlags": [
+          "The job posting mentions a 'defined salary range' but does not disclose the actual figures.",
+          "The candidate is in their final year of university, which may require scheduling flexibility for exams or classes despite the hybrid setup."
+        ],
+        "likelyQuestions": [
+          "Can you walk us through how you structured your Next.js App Router and monorepo architecture in TaskFlow?",
+          "How did you handle real-time state synchronization and connection stability with Socket.io and React?",
+          "Tell us about a time you had to write raw SQL or handle a complex database migration with Prisma.",
+          "How do you plan to balance your final year of studies at the University of Macedonia with this hybrid role?"
+        ]
+      },
+      "output": null
+    },
+    {
+      "id": "no-fabricated-bridge",
+      "kind": "cover_letter",
+      "model": "gemini-3.1-flash-lite",
+      "ok": true,
+      "error": null,
+      "matchScore": null,
+      "droppedClaims": null,
+      "attempts": 1,
+      "latencyMs": 44940,
+      "inputTokens": 652,
+      "outputTokens": 163,
+      "score": null,
+      "fabrications": [],
+      "expectedScoreRange": null,
+      "result": null,
+      "output": "I am writing to apply for the Full Stack Developer position. My experience designing PostgreSQL schemas and building REST APIs with Node.js provides a strong foundation for the backend requirements of this role. I am well-versed in modern development workflows, including using Docker for local environments and deployment pipelines.\n\nWhile my professional background is in the Node.js ecosystem rather than Laravel, I am ready to apply my PHP knowledge and experience with complex application architecture to your specific stack. I have completed a PHP crash course and am keen to transition my backend expertise into your Laravel, Eloquent, and Blade-based environment.\n\nMy background in building production-grade frontends and managing database structures aligns with the technical demands of your team. I look forward to discussing how my experience with full-stack development will contribute to your current projects."
+    },
+    {
+      "id": "react-native-mobile-adjacent",
+      "kind": "analysis",
+      "model": "gemini-flash-latest",
+      "ok": false,
+      "error": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}",
+      "matchScore": null,
+      "droppedClaims": null,
+      "attempts": null,
+      "latencyMs": null,
+      "inputTokens": null,
+      "outputTokens": null,
+      "score": null,
+      "fabrications": null,
+      "expectedScoreRange": [
+        28,
+        58
+      ],
+      "result": null,
+      "output": null
+    },
+    {
+      "id": "senior-devops-kubernetes",
+      "kind": "analysis",
+      "model": "gemini-3.5-flash",
+      "ok": false,
+      "error": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}",
+      "matchScore": null,
+      "droppedClaims": null,
+      "attempts": null,
+      "latencyMs": null,
+      "inputTokens": null,
+      "outputTokens": null,
+      "score": null,
+      "fabrications": null,
+      "expectedScoreRange": [
+        0,
+        22
+      ],
+      "result": null,
+      "output": null
+    },
+    {
+      "id": "wordpress-agency-greek",
+      "kind": "analysis",
+      "model": "gemini-3.1-flash-lite",
+      "ok": true,
+      "error": null,
+      "matchScore": 65,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 13877,
+      "inputTokens": 2141,
+      "outputTokens": 745,
+      "score": {
+        "scoreDeviation": 17,
+        "inRange": false,
+        "skillRecall": 0.6666666666666666,
+        "foundSkills": [
+          "php",
+          "javascript"
+        ],
+        "missedSkills": [
+          "css3"
+        ],
+        "gapRecall": 1,
+        "missedGaps": [],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        18,
+        48
+      ],
+      "result": {
+        "matchScore": 65,
+        "verdict": "worth_applying",
+        "summary": "Alexandros is a strong junior developer with a solid foundation in modern web stacks (Next.js, Node.js, PostgreSQL). While he lacks professional experience specifically with WordPress and WooCommerce, his proficiency in PHP and general web development fundamentals makes him a viable candidate for a junior role. He will need to demonstrate his ability to adapt his technical skills to the WordPress ecosystem.",
+        "matchedSkills": [
+          {
+            "skill": "PHP",
+            "evidenceFromCv": "PHP Crash Course, Udemy, 2026."
+          },
+          {
+            "skill": "HTML",
+            "evidenceFromCv": "HTML and CSS, Responsive Design and SQL, Scrimba, 2025."
+          },
+          {
+            "skill": "CSS",
+            "evidenceFromCv": "HTML and CSS, Responsive Design and SQL, Scrimba, 2025."
+          },
+          {
+            "skill": "JavaScript",
+            "evidenceFromCv": "Frontend: React, Next.js, TypeScript, JavaScript, Tailwind CSS, HTML5, CSS3."
+          },
+          {
+            "skill": "Git",
+            "evidenceFromCv": "DevOps and tools: Docker, Git and GitHub, CI/CD pipelines"
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "WordPress",
+            "severity": "blocker",
+            "howToBridge": "Build a custom WordPress theme or plugin to demonstrate capability; highlight understanding of the WordPress template hierarchy."
+          },
+          {
+            "skill": "WooCommerce",
+            "severity": "important",
+            "howToBridge": "Set up a local WooCommerce store to understand product management, cart hooks, and checkout customization."
+          },
+          {
+            "skill": "MySQL",
+            "severity": "important",
+            "howToBridge": "Highlight that experience with PostgreSQL is highly transferable to MySQL, as both are relational database systems."
+          },
+          {
+            "skill": "Elementor",
+            "severity": "nice_to_have",
+            "howToBridge": "Familiarize with the Elementor page builder interface and its API for custom widget development."
+          },
+          {
+            "skill": "Technical SEO",
+            "severity": "nice_to_have",
+            "howToBridge": "Study basic SEO principles like meta tags, schema markup, and site speed optimization techniques."
+          }
+        ],
+        "keywordsToMirror": [
+          "WordPress",
+          "PHP",
+          "MySQL",
+          "WooCommerce",
+          "custom themes",
+          "plugins",
+          "τεχνικό SEO"
+        ],
+        "redFlags": [
+          "No professional experience in a digital agency environment",
+          "No commercial experience with WordPress or WooCommerce projects"
+        ],
+        "likelyQuestions": [
+          "How would you approach migrating a custom React application to a WordPress-based architecture?",
+          "What is your experience with PHP beyond basic syntax?",
+          "How do you handle site speed optimization in your current projects?",
+          "Can you explain the difference between a WordPress theme and a plugin?",
+          "How do you manage client communication when explaining technical limitations?"
+        ]
+      },
+      "output": null
+    }
+  ]
+}

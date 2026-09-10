@@ -1,0 +1,22 @@
+{
+  "id": "junior-fullstack-next-node",
+  "kind": "analysis",
+  "notes": "The clear positive case. Synthetic ad written to match the candidate's actual stack almost exactly, so a low score here means the analysis is under-crediting real evidence. If any fixture should land high, it is this one.",
+  "roleTitle": "Junior Fullstack Developer",
+  "companyName": null,
+  "source": "synthetic",
+  "language": "en",
+  "jobDescription": "Junior Fullstack Developer (Hybrid, Thessaloniki)\n\nWe are a small product team building an internal operations platform for logistics companies. You will work across the stack with two senior developers and a designer.\n\nWhat you will do:\n- Build features end to end in Next.js (App Router) and TypeScript\n- Write and maintain REST endpoints in Node.js\n- Model data in PostgreSQL and work with Prisma migrations\n- Help keep our Docker-based local environment and CI pipeline healthy\n- Participate in code review and pair on tricky problems\n\nWhat we are looking for:\n- Comfortable with React and TypeScript in a real project, not only tutorials\n- Understands relational data modelling and can write SQL when the ORM is not enough\n- Familiar with Git workflows and pull requests\n- 0-2 years of professional experience, or a strong portfolio of shipped side projects\n- Good written English; Greek is useful but not required\n\nNice to have: experience with real-time features (WebSockets), Tailwind CSS, deployment on Vercel or similar platforms.\n\nWe offer a defined salary range for the level, hybrid work, and a mentoring plan for the first six months.",
+  "expectedScoreRange": [
+    70,
+    92
+  ],
+  "mustFindSkills": [
+    "next.js",
+    "typescript",
+    "postgresql",
+    "prisma orm",
+    "docker"
+  ],
+  "mustFlagGaps": []
+}

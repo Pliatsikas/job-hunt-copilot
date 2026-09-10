@@ -1,8 +1,902 @@
 {
   "promptVersion": "analyze@2",
   "provider": "groq",
-  "ranAt": "2026-09-10T09:31:58.824Z",
+  "ranAt": "2026-09-10T13:50:30.252Z",
   "rows": [
+    {
+      "id": "ai-engineer-rag-python",
+      "kind": "analysis",
+      "model": "openai/gpt-oss-120b",
+      "ok": true,
+      "error": null,
+      "matchScore": 55,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 6695,
+      "inputTokens": 2380,
+      "outputTokens": 2846,
+      "score": {
+        "scoreDeviation": 0,
+        "inRange": true,
+        "skillRecall": 0.6666666666666666,
+        "foundSkills": [
+          "rag pipelines",
+          "llm integration"
+        ],
+        "missedSkills": [
+          "llm evaluation"
+        ],
+        "gapRecall": 1,
+        "missedGaps": [],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        45,
+        75
+      ],
+      "result": {
+        "matchScore": 55,
+        "verdict": "stretch",
+        "summary": "Alexandros has solid hands‑on experience building RAG pipelines and OCR systems, and has evaluated RAG performance in his thesis. However, he lacks explicit Python, FastAPI, and vector‑store experience (pgvector/Qdrant), which are core to the role. He also does not mention LangChain/LlamaIndex or prompt‑injection mitigation. With focused upskilling, he could become a strong candidate.",
+        "matchedSkills": [
+          {
+            "skill": "RAG pipelines",
+            "evidenceFromCv": "I designed and built a RAG-based AI copilot for Jira that queries internal knowledge bases and ticket history to speed up issue resolution."
+          },
+          {
+            "skill": "OCR pipelines",
+            "evidenceFromCv": "I developed an OCR pipeline for automated extraction of data from passports and national IDs for user verification in the Rentalbook product."
+          },
+          {
+            "skill": "RAG evaluation",
+            "evidenceFromCv": "My undergraduate thesis is on developing and evaluating RAG pipelines for LLM performance benchmarking."
+          },
+          {
+            "skill": "Prompt engineering",
+            "evidenceFromCv": "AI and data: RAG pipelines, LLM integration, prompt engineering, LLM evaluation, Google Colab."
+          },
+          {
+            "skill": "LLM integration",
+            "evidenceFromCv": "AI and data: RAG pipelines, LLM integration, prompt engineering, LLM evaluation, Google Colab."
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "Python",
+            "severity": "blocker",
+            "howToBridge": "Study Python basics and build a small FastAPI service to demonstrate competence before interview."
+          },
+          {
+            "skill": "FastAPI",
+            "severity": "blocker",
+            "howToBridge": "Complete a FastAPI tutorial and create a simple RAG endpoint."
+          },
+          {
+            "skill": "pgvector",
+            "severity": "blocker",
+            "howToBridge": "Read pgvector documentation and set up a test vector store in PostgreSQL."
+          },
+          {
+            "skill": "Qdrant",
+            "severity": "blocker",
+            "howToBridge": "Experiment with Qdrant via its Docker image and integrate with a prototype."
+          },
+          {
+            "skill": "LangChain",
+            "severity": "important",
+            "howToBridge": "Follow LangChain quickstart and build a simple chain for document retrieval."
+          },
+          {
+            "skill": "LlamaIndex",
+            "severity": "important",
+            "howToBridge": "Explore LlamaIndex examples and implement a basic index."
+          },
+          {
+            "skill": "embeddings",
+            "severity": "important",
+            "howToBridge": "Learn about sentence‑transformers embeddings and apply in a small project."
+          },
+          {
+            "skill": "reranking",
+            "severity": "important",
+            "howToBridge": "Study reranking techniques and prototype using a cross‑encoder."
+          },
+          {
+            "skill": "prompt injection awareness",
+            "severity": "nice_to_have",
+            "howToBridge": "Read about prompt injection attacks and mitigation strategies."
+          },
+          {
+            "skill": "cost management",
+            "severity": "nice_to_have",
+            "howToBridge": "Familiarize with LLM pricing models and implement token usage tracking."
+          }
+        ],
+        "keywordsToMirror": [
+          "RAG pipelines",
+          "FastAPI",
+          "pgvector",
+          "Qdrant",
+          "LLM",
+          "prompt versioning",
+          "retrieval quality",
+          "evaluation harnesses",
+          "LangChain",
+          "LlamaIndex",
+          "OCR pipelines",
+          "embeddings",
+          "reranking",
+          "prompt injection",
+          "cost management"
+        ],
+        "redFlags": [],
+        "likelyQuestions": [
+          "Can you walk us through the RAG pipeline you built during your internship?",
+          "How did you evaluate the performance of your RAG system?",
+          "What experience do you have with Python and FastAPI?",
+          "Have you worked with vector stores such as pgvector or Qdrant?",
+          "How do you handle prompt injection risks in LLM applications?",
+          "Can you describe your OCR pipeline implementation?",
+          "What is your approach to managing LLM usage costs?",
+          "Are you familiar with LangChain or LlamaIndex for building retrieval pipelines?"
+        ]
+      },
+      "output": null
+    },
+    {
+      "id": "backend-node-greek-startup",
+      "kind": "analysis",
+      "model": "openai/gpt-oss-120b",
+      "ok": true,
+      "error": null,
+      "matchScore": 85,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 20311,
+      "inputTokens": 2456,
+      "outputTokens": 2177,
+      "score": {
+        "scoreDeviation": 0,
+        "inRange": true,
+        "skillRecall": 1,
+        "foundSkills": [
+          "node.js",
+          "express",
+          "typescript",
+          "postgresql",
+          "redis",
+          "docker"
+        ],
+        "missedSkills": [],
+        "gapRecall": null,
+        "missedGaps": [],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        65,
+        90
+      ],
+      "result": {
+        "matchScore": 85,
+        "verdict": "strong_fit",
+        "summary": "Alexandros has solid experience with Node.js, Express, TypeScript, PostgreSQL, Prisma, Redis, Docker, CI/CD, and real-time WebSocket features, directly matching the core requirements of the backend developer role. Minor gap is lack of explicit code‑review experience, but overall a strong candidate for a junior position.",
+        "matchedSkills": [
+          {
+            "skill": "Node.js",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Express",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "TypeScript",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "PostgreSQL",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Prisma",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Redis",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD, and later migrated its hosting from Railway to a Vercel frontend, a Render backend container, Neon Postgres and Upstash Redis."
+          },
+          {
+            "skill": "Docker",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD, and later migrated its hosting from Railway to a Vercel frontend, a Render backend container, Neon Postgres and Upstash Redis."
+          },
+          {
+            "skill": "CI/CD",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD, and later migrated its hosting from Railway to a Vercel frontend, a Render backend container, Neon Postgres and Upstash Redis."
+          },
+          {
+            "skill": "REST API",
+            "evidenceFromCv": "I implemented a REST API with JWT authentication and refresh tokens."
+          },
+          {
+            "skill": "real-time (WebSockets)",
+            "evidenceFromCv": "I built drag-and-drop boards and real-time collaboration over WebSockets with Socket.io."
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "code review",
+            "severity": "nice_to_have",
+            "howToBridge": "Mention any informal code review practices from past projects or express willingness to adopt formal code review processes."
+          }
+        ],
+        "keywordsToMirror": [
+          "Node.js",
+          "Express",
+          "TypeScript",
+          "PostgreSQL",
+          "Prisma",
+          "Redis",
+          "Docker",
+          "CI/CD",
+          "REST APIs",
+          "real-time"
+        ],
+        "redFlags": [],
+        "likelyQuestions": [
+          "Can you describe your experience building REST APIs with Node.js and Express?",
+          "How have you used Prisma for database schema design and migrations?",
+          "Explain how you implemented real-time features using Socket.io and WebSockets.",
+          "What is your experience with Docker in local development and deployment?",
+          "How do you set up and maintain CI/CD pipelines?",
+          "Describe your familiarity with Redis for caching or job queues.",
+          "How comfortable are you taking ownership of features in a small team?",
+          "Do you have experience participating in code reviews?"
+        ]
+      },
+      "output": null
+    },
+    {
+      "id": "data-engineer-spark",
+      "kind": "analysis",
+      "model": "openai/gpt-oss-120b",
+      "ok": true,
+      "error": null,
+      "matchScore": 20,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 9621,
+      "inputTokens": 2319,
+      "outputTokens": 2450,
+      "score": {
+        "scoreDeviation": 0,
+        "inRange": true,
+        "skillRecall": 1,
+        "foundSkills": [],
+        "missedSkills": [],
+        "gapRecall": 1,
+        "missedGaps": [],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        0,
+        22
+      ],
+      "result": {
+        "matchScore": 20,
+        "verdict": "stretch",
+        "summary": "Alexandros is a junior full‑stack developer with solid experience in PostgreSQL and Docker, but lacks core data‑engineering skills required for this role. He does not have experience with Spark, Airflow, Kafka, dbt, Snowflake, or advanced SQL features, nor familiarity with the JVM ecosystem. The gaps are significant blockers for a data‑engineer position, though his programming background could allow rapid upskilling.",
+        "matchedSkills": [
+          {
+            "skill": "SQL",
+            "evidenceFromCv": "PostgreSQL schemas"
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "Apache Spark",
+            "severity": "blocker",
+            "howToBridge": "Complete a Spark fundamentals course (Scala or PySpark) and build a sample batch pipeline processing terabyte‑scale data."
+          },
+          {
+            "skill": "Scala",
+            "severity": "blocker",
+            "howToBridge": "Learn Scala basics through online tutorials and apply it in small Spark jobs."
+          },
+          {
+            "skill": "PySpark",
+            "severity": "blocker",
+            "howToBridge": "Take a PySpark course and implement a simple ETL pipeline to demonstrate competence."
+          },
+          {
+            "skill": "Airflow",
+            "severity": "blocker",
+            "howToBridge": "Set up a local Airflow instance, create DAGs for batch jobs, and showcase them in a portfolio."
+          },
+          {
+            "skill": "Kafka",
+            "severity": "blocker",
+            "howToBridge": "Follow a Kafka tutorial, build a producer/consumer demo, and integrate it with a streaming job."
+          },
+          {
+            "skill": "dbt",
+            "severity": "blocker",
+            "howToBridge": "Learn dbt basics, model a small dataset, and document transformations in a GitHub repo."
+          },
+          {
+            "skill": "Snowflake",
+            "severity": "blocker",
+            "howToBridge": "Obtain a Snowflake free trial, load sample data, and run queries to demonstrate warehouse usage."
+          },
+          {
+            "skill": "data quality checks",
+            "severity": "important",
+            "howToBridge": "Study data testing frameworks (e.g., Great Expectations) and add quality checks to a sample pipeline."
+          },
+          {
+            "skill": "lineage documentation",
+            "severity": "nice_to_have",
+            "howToBridge": "Use tools like OpenLineage or simple diagramming to document data flow in a demo project."
+          },
+          {
+            "skill": "window functions",
+            "severity": "important",
+            "howToBridge": "Practice advanced SQL queries with window functions on PostgreSQL and showcase examples."
+          }
+        ],
+        "keywordsToMirror": [
+          "Apache Spark",
+          "Scala",
+          "PySpark",
+          "Airflow",
+          "Kafka",
+          "dbt",
+          "Snowflake",
+          "SQL",
+          "JVM ecosystem"
+        ],
+        "redFlags": [
+          "4+ years in data engineering",
+          "Production Spark experience at terabyte scale",
+          "Strong SQL, including window functions and query tuning"
+        ],
+        "likelyQuestions": [
+          "Do you have experience with Apache Spark at terabyte scale?",
+          "Are you familiar with Airflow for workflow orchestration?",
+          "Have you worked with Kafka for streaming data ingestion?",
+          "Do you have experience using dbt for data modeling?",
+          "Are you experienced with Snowflake as a data warehouse?",
+          "Can you describe your experience with JVM languages like Scala?",
+          "How do you ensure data quality and lineage in your pipelines?",
+          "Do you have experience with advanced SQL features such as window functions and query tuning?"
+        ]
+      },
+      "output": null
+    },
+    {
+      "id": "dotnet-senior-five-years",
+      "kind": "analysis",
+      "model": "openai/gpt-oss-120b",
+      "ok": true,
+      "error": null,
+      "matchScore": 15,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 38468,
+      "inputTokens": 2319,
+      "outputTokens": 1619,
+      "score": {
+        "scoreDeviation": 0,
+        "inRange": true,
+        "skillRecall": 0,
+        "foundSkills": [],
+        "missedSkills": [
+          "c#"
+        ],
+        "gapRecall": 1,
+        "missedGaps": [],
+        "wordyGaps": [
+          ".NET development (5+ years)"
+        ]
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        8,
+        35
+      ],
+      "result": {
+        "matchScore": 15,
+        "verdict": "skip",
+        "summary": "The candidate is a junior full‑stack developer with strong JavaScript/Node.js experience but lacks any .NET, C#, ASP.NET Core, Entity Framework, SQL Server, or Azure expertise required for the senior role. They also do not meet the 5+ years .NET experience, senior‑level mentoring, or regulated‑environment background, and are based in Thessaloniki while the job expects an Athens hybrid presence. Consequently, the fit is poor and the application should be skipped.",
+        "matchedSkills": [],
+        "gaps": [
+          {
+            "skill": "C#",
+            "severity": "blocker",
+            "howToBridge": "Complete a C#/.NET fundamentals course and build a small ASP.NET Core API project to demonstrate competence."
+          },
+          {
+            "skill": "ASP.NET Core",
+            "severity": "blocker",
+            "howToBridge": "Follow tutorials to create REST services with ASP.NET Core, then deploy a sample app to Azure."
+          },
+          {
+            "skill": "Entity Framework Core",
+            "severity": "blocker",
+            "howToBridge": "Learn EF Core through hands‑on projects, e.g., building a data layer for a sample SQL Server database."
+          },
+          {
+            "skill": "SQL Server",
+            "severity": "blocker",
+            "howToBridge": "Set up a local SQL Server instance, practice schema design and queries, and integrate it with EF Core."
+          },
+          {
+            "skill": "Azure App Service",
+            "severity": "blocker",
+            "howToBridge": "Take Azure fundamentals training and deploy a test ASP.NET Core app to Azure App Service."
+          },
+          {
+            "skill": "Azure Functions",
+            "severity": "blocker",
+            "howToBridge": "Build and publish a simple serverless function on Azure Functions as a proof of concept."
+          },
+          {
+            "skill": "Azure Service Bus",
+            "severity": "blocker",
+            "howToBridge": "Complete Azure Service Bus tutorials and implement a message‑queue demo in a .NET project."
+          },
+          {
+            "skill": ".NET development (5+ years)",
+            "severity": "blocker",
+            "howToBridge": "Gain professional .NET experience through contract work or contribute to open‑source .NET projects to build a portfolio."
+          },
+          {
+            "skill": "Mentoring senior developers",
+            "severity": "important",
+            "howToBridge": "Seek opportunities to lead small teams or mentor junior peers in current projects to develop leadership skills."
+          },
+          {
+            "skill": "Regulated environment experience",
+            "severity": "nice_to_have",
+            "howToBridge": "Study compliance standards (e.g., PCI‑DSS) and highlight any related coursework or projects."
+          }
+        ],
+        "keywordsToMirror": [
+          "C#",
+          "ASP.NET Core",
+          "Entity Framework Core",
+          "SQL Server",
+          "Azure",
+          "Azure App Service",
+          "Azure Functions",
+          "Azure Service Bus",
+          "async programming",
+          "mentor"
+        ],
+        "redFlags": [
+          "5+ years of professional .NET development required",
+          "Senior-level position may be beyond candidate's experience",
+          "Job location requires Athens hybrid work"
+        ],
+        "likelyQuestions": [
+          "What experience do you have with C# and ASP.NET Core?",
+          "Can you describe any work you’ve done with Azure services such as App Service or Functions?",
+          "How would you approach mentoring junior developers and leading design reviews?",
+          "Do you have experience with async programming in C#?",
+          "Have you worked in regulated environments like banking or finance?",
+          "Are you willing to relocate to Athens or work in a hybrid model?",
+          "What is your experience with Entity Framework Core and SQL Server?",
+          "How do you ensure production‑grade quality and reliability in the services you build?"
+        ]
+      },
+      "output": null
+    },
+    {
+      "id": "enterprise-fullstack-long-posting",
+      "kind": "analysis",
+      "model": "openai/gpt-oss-120b",
+      "ok": true,
+      "error": null,
+      "matchScore": 45,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 39909,
+      "inputTokens": 2686,
+      "outputTokens": 3824,
+      "score": {
+        "scoreDeviation": 0,
+        "inRange": true,
+        "skillRecall": 1,
+        "foundSkills": [
+          "react",
+          "typescript"
+        ],
+        "missedSkills": [],
+        "gapRecall": 1,
+        "missedGaps": [],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        25,
+        55
+      ],
+      "result": {
+        "matchScore": 45,
+        "verdict": "stretch",
+        "summary": "Alexandros is a junior full‑stack developer with solid React, TypeScript, Node.js and Docker experience, having built a production‑ready SaaS (TaskFlow) and deployed it using Vercel, Render, Railway and Neon. He lacks Java/Spring, Kafka, AWS and the 4‑year experience required, making him a stretch candidate who would need focused upskilling.",
+        "matchedSkills": [
+          {
+            "skill": "React",
+            "evidenceFromCv": "Frontend: React, Next.js, TypeScript, JavaScript, Tailwind CSS, HTML5, CSS3."
+          },
+          {
+            "skill": "TypeScript",
+            "evidenceFromCv": "Frontend: React, Next.js, TypeScript, JavaScript, Tailwind CSS, HTML5, CSS3."
+          },
+          {
+            "skill": "Docker",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD, and later migrated its hosting from Railway to a Vercel frontend, a Render backend container, Neon Postgres and Upstash Redis."
+          },
+          {
+            "skill": "CI/CD pipelines",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD, and later migrated its hosting from Railway to a Vercel frontend, a Render backend container, Neon Postgres and Upstash Redis."
+          },
+          {
+            "skill": "PostgreSQL",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Node.js",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Express",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "JWT authentication",
+            "evidenceFromCv": "DevOps and tools: Docker, Git and GitHub, CI/CD pipelines, JWT authentication, Vercel, Render, Railway, Neon."
+          },
+          {
+            "skill": "Vercel",
+            "evidenceFromCv": "DevOps and tools: Docker, Git and GitHub, CI/CD pipelines, JWT authentication, Vercel, Render, Railway, Neon."
+          },
+          {
+            "skill": "Render",
+            "evidenceFromCv": "DevOps and tools: Docker, Git and GitHub, CI/CD pipelines, JWT authentication, Vercel, Render, Railway, Neon."
+          },
+          {
+            "skill": "Railway",
+            "evidenceFromCv": "DevOps and tools: Docker, Git and GitHub, CI/CD pipelines, JWT authentication, Vercel, Render, Railway, Neon."
+          },
+          {
+            "skill": "Neon",
+            "evidenceFromCv": "DevOps and tools: Docker, Git and GitHub, CI/CD pipelines, JWT authentication, Vercel, Render, Railway, Neon."
+          },
+          {
+            "skill": "Git",
+            "evidenceFromCv": "DevOps and tools: Docker, Git and GitHub, CI/CD pipelines, JWT authentication, Vercel, Render, Railway, Neon."
+          },
+          {
+            "skill": "GitHub",
+            "evidenceFromCv": "DevOps and tools: Docker, Git and GitHub, CI/CD pipelines, JWT authentication, Vercel, Render, Railway, Neon."
+          },
+          {
+            "skill": "Socket.io",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "Java",
+            "severity": "blocker",
+            "howToBridge": "Start a small side project using Java and Spring Boot, such as building a REST API, and follow the official Spring guides to gain hands‑on experience."
+          },
+          {
+            "skill": "Spring Boot",
+            "severity": "blocker",
+            "howToBridge": "Complete a Spring Boot tutorial and deploy a simple service to a local Docker container to understand the framework."
+          },
+          {
+            "skill": "Kafka",
+            "severity": "important",
+            "howToBridge": "Take an introductory Kafka course and build a producer‑consumer demo, then experiment with schema evolution."
+          },
+          {
+            "skill": "Testcontainers",
+            "severity": "important",
+            "howToBridge": "Learn Testcontainers by following its documentation and writing integration tests for a Java microservice."
+          },
+          {
+            "skill": "AWS",
+            "severity": "important",
+            "howToBridge": "Enroll in AWS fundamentals and practice deploying Docker containers to EKS, using RDS and S3 for storage."
+          },
+          {
+            "skill": "Event-driven architecture",
+            "severity": "important",
+            "howToBridge": "Study event‑driven design patterns and implement a simple event bus using Kafka or RabbitMQ in a side project."
+          },
+          {
+            "skill": "Domain events",
+            "severity": "nice_to_have",
+            "howToBridge": "Read about domain events in DDD literature and model them in a small prototype service."
+          }
+        ],
+        "keywordsToMirror": [
+          "React",
+          "TypeScript",
+          "Java",
+          "Spring Boot",
+          "Kafka",
+          "Testcontainers",
+          "AWS",
+          "EKS",
+          "RDS",
+          "S3",
+          "GitOps",
+          "domain events",
+          "event-driven architecture",
+          "continuous learning",
+          "two-week iterations"
+        ],
+        "redFlags": [
+          "Job requires 4+ years of professional software engineering experience, but candidate has only a few months of internship and support roles.",
+          "Position is senior/lead level expecting extensive fullstack experience, while candidate is a junior developer still in university."
+        ],
+        "likelyQuestions": [
+          "Can you walk us through the fullstack TaskFlow project you built?",
+          "How would you approach learning Java and Spring Boot given your current experience?",
+          "What experience do you have deploying applications to cloud platforms, and how would you transition to AWS services like EKS, RDS, and S3?",
+          "Describe your understanding of event‑driven architecture and how you would handle schema evolution with Kafka.",
+          "How do you ensure reliability and testing in your services, particularly with integration tests and tools like Testcontainers?",
+          "What is your experience with CI/CD pipelines and GitOps practices?",
+          "How comfortable are you with being on‑call for production support rotations?",
+          "How do you manage state and scalability in large React and TypeScript codebases?"
+        ]
+      },
+      "output": null
+    },
+    {
+      "id": "frontend-react-testing-heavy",
+      "kind": "analysis",
+      "model": "openai/gpt-oss-120b",
+      "ok": true,
+      "error": null,
+      "matchScore": 65,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 50617,
+      "inputTokens": 2376,
+      "outputTokens": 2239,
+      "score": {
+        "scoreDeviation": 0,
+        "inRange": true,
+        "skillRecall": 1,
+        "foundSkills": [
+          "react",
+          "typescript",
+          "tailwind css"
+        ],
+        "missedSkills": [],
+        "gapRecall": 0,
+        "missedGaps": [
+          "accessibility"
+        ],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        55,
+        80
+      ],
+      "result": {
+        "matchScore": 65,
+        "verdict": "worth_applying",
+        "summary": "Alexandros has solid React, TypeScript, and Tailwind CSS experience demonstrated in multiple projects and a clear full‑stack background. However, the CV lacks any mention of automated testing tools (Vitest, Playwright) and practical accessibility work (WCAG), which are core requirements. The candidate is a junior developer with strong fundamentals, making the role worth applying for while highlighting the testing and accessibility gaps.",
+        "matchedSkills": [
+          {
+            "skill": "React",
+            "evidenceFromCv": "Frontend: React, Next.js, TypeScript, JavaScript, Tailwind CSS, HTML5, CSS3."
+          },
+          {
+            "skill": "TypeScript",
+            "evidenceFromCv": "Frontend: React, Next.js, TypeScript, JavaScript, Tailwind CSS, HTML5, CSS3."
+          },
+          {
+            "skill": "Tailwind CSS",
+            "evidenceFromCv": "Frontend: React, Next.js, TypeScript, JavaScript, Tailwind CSS, HTML5, CSS3."
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "Vitest",
+            "severity": "blocker",
+            "howToBridge": "Learn Vitest basics and add unit tests to recent projects; discuss the learning plan in the interview."
+          },
+          {
+            "skill": "Playwright",
+            "severity": "blocker",
+            "howToBridge": "Build a small end‑to‑end test suite with Playwright for a component and showcase it during the interview."
+          },
+          {
+            "skill": "WCAG 2.2 AA",
+            "severity": "blocker",
+            "howToBridge": "Study WCAG guidelines, run an accessibility audit (e.g., axe) on existing UI, and be ready to explain remediation steps."
+          },
+          {
+            "skill": "Storybook",
+            "severity": "nice_to_have",
+            "howToBridge": "Create a Storybook for a reusable component library and include the link in the portfolio."
+          },
+          {
+            "skill": "design systems",
+            "severity": "nice_to_have",
+            "howToBridge": "Familiarise with design‑system principles and contribute component API decisions in a side project."
+          },
+          {
+            "skill": "performance profiling",
+            "severity": "nice_to_have",
+            "howToBridge": "Use Chrome DevTools/Lighthouse to profile a React app and prepare a short case study of optimisations."
+          }
+        ],
+        "keywordsToMirror": [
+          "React",
+          "TypeScript",
+          "Tailwind CSS",
+          "Vitest",
+          "Playwright",
+          "WCAG",
+          "design system",
+          "Storybook",
+          "performance profiling"
+        ],
+        "redFlags": [],
+        "likelyQuestions": [
+          "Can you describe your experience with automated testing in React projects?",
+          "How have you ensured accessibility (WCAG) in your front‑end work?",
+          "Do you have hands‑on experience with Vitest or Playwright?",
+          "What is your approach to writing unit tests for components?",
+          "How comfortable are you working in an English‑speaking remote team?",
+          "Have you used Storybook or contributed to a design system?",
+          "How do you profile and improve performance in a React application?",
+          "Can you give an example of a challenging accessibility issue you solved?"
+        ]
+      },
+      "output": null
+    },
+    {
+      "id": "junior-fullstack-next-node",
+      "kind": "analysis",
+      "model": "openai/gpt-oss-120b",
+      "ok": true,
+      "error": null,
+      "matchScore": 85,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 35978,
+      "inputTokens": 2429,
+      "outputTokens": 2791,
+      "score": {
+        "scoreDeviation": 0,
+        "inRange": true,
+        "skillRecall": 1,
+        "foundSkills": [
+          "next.js",
+          "typescript",
+          "postgresql",
+          "prisma orm",
+          "docker"
+        ],
+        "missedSkills": [],
+        "gapRecall": null,
+        "missedGaps": [],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        70,
+        92
+      ],
+      "result": {
+        "matchScore": 85,
+        "verdict": "strong_fit",
+        "summary": "Alexandros is a junior full‑stack developer with solid experience in Next.js, TypeScript, React, Node.js, PostgreSQL, Prisma, Docker, CI/CD, Git, WebSockets and Tailwind CSS, demonstrated through his TaskFlow SaaS project and other work. He meets all core requirements and most nice‑to‑have items, with only minor gaps in explicit SQL query writing and formal pull‑request workflow, which can be addressed quickly.",
+        "matchedSkills": [
+          {
+            "skill": "Next.js",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "TypeScript",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "React",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Node.js",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "PostgreSQL",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Prisma",
+            "evidenceFromCv": "TaskFlow stack: Next.js 15, React, Node.js, Express, PostgreSQL, Prisma, Socket.io, Docker, TypeScript."
+          },
+          {
+            "skill": "Docker",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD, and later migrated its hosting from Railway to a Vercel frontend, a Render backend container, Neon Postgres and Upstash Redis."
+          },
+          {
+            "skill": "CI/CD",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD, and later migrated its hosting from Railway to a Vercel frontend, a Render backend container, Neon Postgres and Upstash Redis."
+          },
+          {
+            "skill": "Git",
+            "evidenceFromCv": "DevOps and tools: Docker, Git and GitHub, CI/CD pipelines, JWT authentication, Vercel, Render, Railway, Neon."
+          },
+          {
+            "skill": "WebSockets",
+            "evidenceFromCv": "I built drag-and-drop boards and real-time collaboration over WebSockets with Socket.io."
+          },
+          {
+            "skill": "Tailwind CSS",
+            "evidenceFromCv": "Frontend: React, Next.js, TypeScript, JavaScript, Tailwind CSS, HTML5, CSS3."
+          },
+          {
+            "skill": "Vercel",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD, and later migrated its hosting from Railway to a Vercel frontend, a Render backend container, Neon Postgres and Upstash Redis."
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "SQL",
+            "severity": "important",
+            "howToBridge": "Mention experience writing raw SQL queries in your projects or study PostgreSQL query syntax before the interview."
+          },
+          {
+            "skill": "pull requests",
+            "severity": "nice_to_have",
+            "howToBridge": "Explain your use of the GitHub pull‑request workflow in the TaskFlow project during the interview."
+          }
+        ],
+        "keywordsToMirror": [
+          "Next.js",
+          "TypeScript",
+          "React",
+          "Node.js",
+          "PostgreSQL",
+          "Prisma",
+          "Docker",
+          "CI pipeline",
+          "Git",
+          "WebSockets",
+          "Tailwind CSS",
+          "Vercel"
+        ],
+        "redFlags": [
+          "0-2 years of professional experience requirement"
+        ],
+        "likelyQuestions": [
+          "Can you walk us through how you built the TaskFlow application using Next.js and TypeScript?",
+          "How did you implement real-time collaboration with WebSockets in your project?",
+          "Describe your experience with Docker and CI/CD pipelines in a development workflow.",
+          "What is your approach to modeling data and writing migrations with Prisma and PostgreSQL?",
+          "How do you manage Git workflows and pull requests in a team setting?",
+          "Can you discuss any challenges you faced deploying to Vercel and how you resolved them?",
+          "How comfortable are you writing raw SQL queries when needed?",
+          "How do you ensure code quality during code reviews and pair programming?"
+        ]
+      },
+      "output": null
+    },
     {
       "id": "no-fabricated-bridge",
       "kind": "cover_letter",
@@ -12,11 +906,409 @@
       "matchScore": null,
       "droppedClaims": null,
       "attempts": 1,
-      "latencyMs": 1290,
+      "latencyMs": 6766,
       "inputTokens": 694,
-      "outputTokens": 454,
+      "outputTokens": 138,
       "score": null,
-      "fabrications": []
+      "fabrications": [],
+      "expectedScoreRange": null,
+      "result": null,
+      "output": "I have several years of full‑stack experience building production‑grade applications, most recently delivering React front‑ends with TypeScript and Next.js while designing PostgreSQL schemas and REST APIs in Node.js/Express. My work with Docker for development and deployment pipelines ensures reliable, repeatable builds, and I am comfortable translating that expertise to PHP environments. I have not yet worked with Laravel, but my recent PHP crash course and extensive API development give me a solid foundation to quickly adopt Laravel, Eloquent ORM and Blade for a complete CRUD application."
+    },
+    {
+      "id": "react-native-mobile-adjacent",
+      "kind": "analysis",
+      "model": "openai/gpt-oss-120b",
+      "ok": true,
+      "error": null,
+      "matchScore": 30,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 37466,
+      "inputTokens": 2363,
+      "outputTokens": 2243,
+      "score": {
+        "scoreDeviation": 0,
+        "inRange": true,
+        "skillRecall": 1,
+        "foundSkills": [
+          "react",
+          "typescript"
+        ],
+        "missedSkills": [],
+        "gapRecall": 1,
+        "missedGaps": [],
+        "wordyGaps": [
+          "Native iOS or Android experience"
+        ]
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        28,
+        58
+      ],
+      "result": {
+        "matchScore": 30,
+        "verdict": "stretch",
+        "summary": "Alexandros has solid React, TypeScript, JavaScript and CI/CD experience from web projects, but lacks any React Native or mobile development exposure. Key mobile-specific skills (React Native, Expo, push notifications, deep linking, offline support, native module integration, app store release processes, Android performance profiling) are missing, making this a stretch fit.",
+        "matchedSkills": [
+          {
+            "skill": "React",
+            "evidenceFromCv": "Frontend: React, Next.js, TypeScript, JavaScript, Tailwind CSS, HTML5, CSS3."
+          },
+          {
+            "skill": "TypeScript",
+            "evidenceFromCv": "Frontend: React, Next.js, TypeScript, JavaScript, Tailwind CSS, HTML5, CSS3."
+          },
+          {
+            "skill": "JavaScript",
+            "evidenceFromCv": "Frontend: React, Next.js, TypeScript, JavaScript, Tailwind CSS, HTML5, CSS3."
+          },
+          {
+            "skill": "Docker",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD, and later migrated its hosting from Railway to a Vercel frontend, a Render backend container, Neon Postgres and Upstash Redis."
+          },
+          {
+            "skill": "CI/CD pipelines",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD, and later migrated its hosting from Railway to a Vercel frontend, a Render backend container, Neon Postgres and Upstash Redis."
+          },
+          {
+            "skill": "Git",
+            "evidenceFromCv": "DevOps and tools: Docker, Git and GitHub, CI/CD pipelines, JWT authentication, Vercel, Render, Railway, Neon."
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "React Native",
+            "severity": "blocker",
+            "howToBridge": "Study React Native basics, build a simple cross‑platform app and publish it to a store to demonstrate competence."
+          },
+          {
+            "skill": "Expo",
+            "severity": "important",
+            "howToBridge": "Complete an Expo tutorial and create a prototype app using Expo managed workflow."
+          },
+          {
+            "skill": "Native module integration",
+            "severity": "important",
+            "howToBridge": "Learn how to link native iOS/Android modules in React Native and build a small feature requiring a native library."
+          },
+          {
+            "skill": "Push notifications",
+            "severity": "important",
+            "howToBridge": "Implement push notifications using Firebase Cloud Messaging in a React Native demo."
+          },
+          {
+            "skill": "Deep linking",
+            "severity": "important",
+            "howToBridge": "Add deep linking support to the demo app and test URL handling on both platforms."
+          },
+          {
+            "skill": "Offline behavior",
+            "severity": "important",
+            "howToBridge": "Integrate a local storage solution (e.g., Realm or SQLite) in the demo and showcase data sync when back online."
+          },
+          {
+            "skill": "Mobile release process",
+            "severity": "important",
+            "howToBridge": "Follow Apple and Google guides to prepare app bundles, configure App Store Connect and Google Play Console, and submit a test release."
+          },
+          {
+            "skill": "Performance profiling on Android",
+            "severity": "important",
+            "howToBridge": "Use Android Studio profiler and React Native performance tools on a low‑end device to identify and fix bottlenecks."
+          },
+          {
+            "skill": "Native iOS or Android experience",
+            "severity": "nice_to_have",
+            "howToBridge": "Complete a small native module (e.g., camera or sensor access) in Swift/Kotlin and integrate it with React Native."
+          }
+        ],
+        "keywordsToMirror": [
+          "React Native",
+          "TypeScript",
+          "Expo",
+          "push notifications",
+          "deep linking",
+          "offline",
+          "App Store Connect",
+          "Google Play",
+          "performance profiling",
+          "native module integration"
+        ],
+        "redFlags": [],
+        "likelyQuestions": [
+          "Can you show a React Native app you've built and explain its architecture?",
+          "How would you implement push notifications in a React Native project?",
+          "Describe your approach to profiling and fixing performance issues on low‑end Android devices.",
+          "When would you choose to eject from Expo, and how do you handle native modules?",
+          "What steps are involved in releasing an app through App Store Connect and Google Play?",
+          "How do you manage offline data synchronization and caching in mobile apps?",
+          "What techniques do you use to minimize battery consumption in React Native apps?",
+          "Do you have any experience with native iOS or Android code, and how would you integrate it?"
+        ]
+      },
+      "output": null
+    },
+    {
+      "id": "senior-devops-kubernetes",
+      "kind": "analysis",
+      "model": "openai/gpt-oss-120b",
+      "ok": true,
+      "error": null,
+      "matchScore": 20,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 19245,
+      "inputTokens": 2342,
+      "outputTokens": 2584,
+      "score": {
+        "scoreDeviation": 0,
+        "inRange": true,
+        "skillRecall": 1,
+        "foundSkills": [
+          "docker"
+        ],
+        "missedSkills": [],
+        "gapRecall": 0.6666666666666666,
+        "missedGaps": [
+          "aws"
+        ],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        0,
+        22
+      ],
+      "result": {
+        "matchScore": 20,
+        "verdict": "skip",
+        "summary": "Alexandros is a junior full‑stack and AI developer with solid experience in Docker, CI/CD pipelines, Git, and REST API design, but lacks all core DevOps skills required for a senior role such as Kubernetes, Terraform, Istio, Prometheus, Grafana, Linux/networking expertise, incident response, cost management and on‑call duties. The senior‑level experience requirement also exceeds his background.",
+        "matchedSkills": [
+          {
+            "skill": "Docker",
+            "evidenceFromCv": "Docker deployments."
+          },
+          {
+            "skill": "CI/CD pipelines",
+            "evidenceFromCv": "I deployed TaskFlow with Docker and CI/CD"
+          },
+          {
+            "skill": "Git",
+            "evidenceFromCv": "Docker, Git and GitHub, CI/CD pipelines"
+          },
+          {
+            "skill": "REST API design",
+            "evidenceFromCv": "REST API design, PHP."
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "Kubernetes",
+            "severity": "blocker",
+            "howToBridge": "Complete a Kubernetes fundamentals course and build a small EKS cluster to gain hands‑on experience."
+          },
+          {
+            "skill": "Terraform",
+            "severity": "blocker",
+            "howToBridge": "Take a Terraform for AWS course and practice writing IaC modules for EKS resources."
+          },
+          {
+            "skill": "Istio",
+            "severity": "blocker",
+            "howToBridge": "Follow Istio tutorials and set up a service mesh on a local Kubernetes cluster."
+          },
+          {
+            "skill": "Prometheus",
+            "severity": "blocker",
+            "howToBridge": "Learn Prometheus monitoring by instrumenting a sample app and visualising metrics in Grafana."
+          },
+          {
+            "skill": "Grafana",
+            "severity": "blocker",
+            "howToBridge": "Complete Grafana dashboard tutorials and integrate with Prometheus."
+          },
+          {
+            "skill": "Linux fundamentals",
+            "severity": "blocker",
+            "howToBridge": "Study Linux system administration (filesystems, processes, permissions) and practice on a VM."
+          },
+          {
+            "skill": "Networking fundamentals",
+            "severity": "blocker",
+            "howToBridge": "Review TCP/IP, DNS, load balancing concepts and configure networking in Kubernetes."
+          },
+          {
+            "skill": "Incident response",
+            "severity": "important",
+            "howToBridge": "Read SRE incident response guides and simulate post‑mortems on past projects."
+          },
+          {
+            "skill": "Cost management",
+            "severity": "important",
+            "howToBridge": "Learn AWS cost‑optimization strategies (reserved instances, spot instances) and apply to a test account."
+          },
+          {
+            "skill": "On‑call rotation",
+            "severity": "nice_to_have",
+            "howToBridge": "Volunteer for on‑call duties in a small open‑source project to gain experience."
+          }
+        ],
+        "keywordsToMirror": [
+          "Kubernetes",
+          "AWS EKS",
+          "Terraform",
+          "Istio",
+          "Prometheus",
+          "Grafana",
+          "observability",
+          "incident response",
+          "cost management",
+          "Linux",
+          "networking",
+          "on-call",
+          "reserved capacity",
+          "rightsizing",
+          "spot strategy"
+        ],
+        "redFlags": [
+          "6+ years in infrastructure or platform engineering",
+          "Senior level position (candidate is junior)",
+          "On‑call participation in a follow‑the‑sun rotation"
+        ],
+        "likelyQuestions": [
+          "Can you describe your experience with Kubernetes and EKS?",
+          "How have you used Terraform in production environments?",
+          "What is your approach to incident response and postmortems?",
+          "How do you manage cost and capacity in cloud environments?",
+          "Explain your experience with service mesh and Istio.",
+          "How comfortable are you with Linux networking fundamentals?",
+          "Describe a time you built observability with Prometheus and Grafana.",
+          "How do you handle on‑call rotations and blameless postmortems?"
+        ]
+      },
+      "output": null
+    },
+    {
+      "id": "wordpress-agency-greek",
+      "kind": "analysis",
+      "model": "openai/gpt-oss-120b",
+      "ok": true,
+      "error": null,
+      "matchScore": 45,
+      "droppedClaims": 0,
+      "attempts": 1,
+      "latencyMs": 29956,
+      "inputTokens": 2433,
+      "outputTokens": 1809,
+      "score": {
+        "scoreDeviation": 0,
+        "inRange": true,
+        "skillRecall": 0.6666666666666666,
+        "foundSkills": [
+          "php",
+          "javascript"
+        ],
+        "missedSkills": [
+          "css3"
+        ],
+        "gapRecall": 1,
+        "missedGaps": [],
+        "wordyGaps": []
+      },
+      "fabrications": null,
+      "expectedScoreRange": [
+        18,
+        48
+      ],
+      "result": {
+        "matchScore": 45,
+        "verdict": "stretch",
+        "summary": "Alexandros has solid PHP, HTML, CSS, JavaScript and Git experience and is fluent in Greek and English, but lacks any WordPress, MySQL, WooCommerce or SEO experience required for the role. He could be considered for a junior position if willing to quickly learn WordPress development.",
+        "matchedSkills": [
+          {
+            "skill": "PHP",
+            "evidenceFromCv": "Backend and databases: Node.js, Express, PostgreSQL, Prisma ORM, Redis, Socket.io, REST API design, PHP."
+          },
+          {
+            "skill": "HTML",
+            "evidenceFromCv": "Frontend: React, Next.js, TypeScript, JavaScript, Tailwind CSS, HTML5, CSS3."
+          },
+          {
+            "skill": "CSS",
+            "evidenceFromCv": "Frontend: React, Next.js, TypeScript, JavaScript, Tailwind CSS, HTML5, CSS3."
+          },
+          {
+            "skill": "JavaScript",
+            "evidenceFromCv": "Frontend: React, Next.js, TypeScript, JavaScript, Tailwind CSS, HTML5, CSS3."
+          },
+          {
+            "skill": "Git",
+            "evidenceFromCv": "Docker, Git and GitHub, CI/CD pipelines, JWT authentication, Vercel, Render, Railway, Neon."
+          },
+          {
+            "skill": "Greek",
+            "evidenceFromCv": "Greek is my native language."
+          },
+          {
+            "skill": "English",
+            "evidenceFromCv": "My English is at C2 Proficiency level."
+          }
+        ],
+        "gaps": [
+          {
+            "skill": "WordPress",
+            "severity": "blocker",
+            "howToBridge": "Study WordPress theme/plugin development and build a small demo plugin before interview."
+          },
+          {
+            "skill": "MySQL",
+            "severity": "blocker",
+            "howToBridge": "Complete an online MySQL tutorial and migrate a sample project from PostgreSQL to MySQL."
+          },
+          {
+            "skill": "WooCommerce",
+            "severity": "important",
+            "howToBridge": "Follow WooCommerce integration guides and create a mock online store to discuss."
+          },
+          {
+            "skill": "SEO",
+            "severity": "important",
+            "howToBridge": "Read up on technical SEO basics and be ready to explain performance‑optimization steps."
+          },
+          {
+            "skill": "Elementor",
+            "severity": "nice_to_have",
+            "howToBridge": "Experiment with Elementor on a test WordPress site to speak about its usage."
+          }
+        ],
+        "keywordsToMirror": [
+          "WordPress",
+          "PHP",
+          "MySQL",
+          "HTML",
+          "CSS",
+          "JavaScript",
+          "Greek",
+          "English",
+          "WooCommerce",
+          "Elementor",
+          "SEO"
+        ],
+        "redFlags": [],
+        "likelyQuestions": [
+          "Do you have experience developing WordPress themes or plugins?",
+          "Have you worked with WooCommerce for e‑commerce sites?",
+          "What is your experience with MySQL databases?",
+          "Can you describe a project where you optimized site performance or SEO?",
+          "How comfortable are you with Elementor or similar page builders?",
+          "How do you handle client communication for technical issues?",
+          "Are you familiar with the advertising industry requirements?",
+          "What is your availability to work on‑site in Thessaloniki?"
+        ]
+      },
+      "output": null
     }
   ]
 }
