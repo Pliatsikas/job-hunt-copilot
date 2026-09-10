@@ -3,6 +3,9 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     environment: "node",
+    // Playwright owns e2e/. Vitest would try to run those specs and fail on
+    // the @playwright/test imports.
+    exclude: ["node_modules/**", "e2e/**", ".next/**"],
     // Dummy but shape-valid, so importing lib/env.ts doesn't throw just from
     // being loaded in the test process. Real validation is exercised against
     // envSchema directly in lib/env.test.ts, not via these ambient values.

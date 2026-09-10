@@ -4,12 +4,18 @@ import type {
   ChatCompletionCreateParamsStreaming,
 } from "groq-sdk/resources/chat/completions";
 import { toJsonSchema } from "../json-schema";
-import { isAuthFailure, isQuotaExhausted } from "../provider-errors";
+import {
+  failedGenerationOf,
+  isAuthFailure,
+  isQuotaExhausted,
+  isSchemaValidationFailure,
+} from "../provider-errors";
 import { withTransientRetry } from "../retry";
 import {
   LlmAuthError,
   LlmProviderError,
   LlmQuotaError,
+  LlmSchemaError,
   type LlmProvider,
   type LlmRequest,
   type LlmResult,
@@ -82,6 +88,18 @@ export function createGroqProvider(apiKey: string, model: string): LlmProvider {
         // Named here, where the provider knows which variable holds its key.
         if (isQuotaExhausted(error)) throw new LlmQuotaError("groq", model, error);
         if (isAuthFailure(error)) throw new LlmAuthError("groq", "GROQ_API_KEY", error);
+        // Strict mode rejects its own model's output before returning it, so a
+        // response that ran out of tokens mid-array arrives as a 400 rather
+        // than with finish_reason "length". It is a schema failure wearing a
+        // transport failure's clothes.
+        if (isSchemaValidationFailure(error)) {
+          throw new LlmSchemaError(
+            "groq",
+            "Groq rejected the model's output for not matching the schema — usually the answer ran out of room before it finished.",
+            failedGenerationOf(error),
+            error,
+          );
+        }
         throw new LlmProviderError(
           "groq",
           error instanceof Error ? error.message : "Groq request failed",
@@ -100,11 +118,21 @@ export function createGroqProvider(apiKey: string, model: string): LlmProvider {
         // silently masking a real type error.
         const params: ChatCompletionCreateParamsStreaming & {
           stream_options?: { include_usage?: boolean };
+          reasoning_effort?: "low" | "medium" | "high";
         } = {
           model,
           temperature: request.temperature,
           max_tokens: request.maxTokens,
           stream: true,
+          // gpt-oss reasons before answering, and on prose that reasoning is
+          // most of the bill: measured at 824 of 972 completion tokens for one
+          // cover letter, against 36 at "low". Same letter, 46% fewer tokens
+          // end to end and a third of the latency.
+          //
+          // Only on stream(). complete() keeps full reasoning, because the
+          // structured analysis is the one place the deliberation earns its
+          // cost — the same split as Gemini's thinkingBudget in M4.
+          reasoning_effort: "low",
           // Without this the stream reports no usage at all and every
           // generated letter would cost the budget nothing.
           stream_options: { include_usage: true },

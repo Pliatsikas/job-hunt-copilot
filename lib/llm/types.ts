@@ -112,3 +112,22 @@ export class LlmQuotaError extends LlmProviderError {
     this.name = "LlmQuotaError";
   }
 }
+
+/**
+ * The provider rejected its own model's output for not matching the schema.
+ * Distinct from a transport failure: retrying the identical request would
+ * reproduce it, but a repair attempt carrying the error might not. Named so
+ * the shared layer can route it to the repair path rather than to backoff.
+ */
+export class LlmSchemaError extends LlmProviderError {
+  constructor(
+    provider: string,
+    message: string,
+    /** The partial output the provider refused, when it reports one. */
+    public readonly failedGeneration: string | null,
+    cause?: unknown,
+  ) {
+    super(provider, message, cause);
+    this.name = "LlmSchemaError";
+  }
+}

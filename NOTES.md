@@ -84,6 +84,23 @@ Deliberately not started before M9. Recorded now so the list doesn't get rebuilt
 
 ## Open
 
+- **`redFlags` now carries two different kinds of thing.** `analyze@2` routes non-skill
+  requirements there — years of experience, degrees, location — alongside what `redFlags` already
+  held: judgements about whether the posting is a bad deal ("no salary range", "one developer
+  expected to cover web, mobile and UI/UX"). Observed in the v1/v2 comparison: v1 produced
+  "minimum salary of 1200€ is uncompetitive for that seniority", v2 produced "Excellent written
+  and oral communication skills required", which is a requirement, not a flag. The list is more
+  complete and less pointed than it was. If this matters, the fix is a separate
+  `unmetRequirements` field rather than prompt tuning — but that is a schema change and it would
+  invalidate the v1/v2 comparison again, so it waits for a milestone that wants it.
+
+- **A production build is indistinguishable from a deployment by NODE_ENV alone.** The mock LLM
+  provider first guarded itself with `NODE_ENV !== "production"`, which refused the end-to-end
+  suite — that runs `next start` deliberately, because dev-server overlays and recompiles are the
+  usual source of flake. It now requires `ALLOW_MOCK_LLM=true` *and* the absence of `VERCEL`.
+  Worth remembering for any other test seam: "is this production?" is not a question NODE_ENV
+  answers.
+
 - **The auth rate limit is keyed on IP, which is both evadable and over-broad.** A determined
   attacker rotates addresses; a shared exit (an office, a university, CGNAT on a mobile
   network) puts many real people behind one key. That is why the login window is generous and
@@ -102,20 +119,12 @@ Deliberately not started before M9. Recorded now so the list doesn't get rebuilt
   truncated — but those tokens are billed and counted, so cover letters cost more against the
   budget than their length suggests. Groq exposes `reasoning_effort` for these models; worth
   measuring whether "low" changes letter quality before setting it. Same shape as the Gemini
-  3.x thinking problem from M4, which was solved by disabling thinking on `stream()` only.
+  3.x thinking problem from M4, solved by disabling thinking on `stream()` only.
 
+  **Resolved in M9**: 824 reasoning tokens of 972 completion tokens by default, against 36 at
+  `reasoning_effort: "low"` — 46% fewer tokens end to end, a third of the latency, no quality
+  loss on the letter. Set to `low` on `stream()` only.
 
-- **`gaps[].skill` is often a requirement sentence, not a skill.** Surfaced by M7: aggregating
-  the real analyses in my account produced entries like *"3-5 years of web development
-  experience"*, *"pixijs, webpack, gulp, webaudio"* and *"moodle or other educational platforms
-  (lms)"*. Each is a faithful reading of the ad, but they never repeat across postings, so every
-  count is 1 and the gap chart degrades into a flat list. The aggregation is doing the right
-  thing; the input granularity is wrong.
-
-  The fix belongs in `analyze.v1` (one skill per gap entry; years-of-experience demands belong
-  in `redFlags`, which already exists for exactly this), and changing the prompt invalidates
-  comparisons against earlier `Analysis` rows — so it is M9 work, alongside the evals, not a
-  quiet edit now. Deliberately not fixed in M7.
 
 - **Dates render in a fixed English format, not the viewer's locale.** `lib/format.ts` uses a
   pinned `en-GB` formatter with `timeZone: "UTC"`. A Server Component can't see the viewer's

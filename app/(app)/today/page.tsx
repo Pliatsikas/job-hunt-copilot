@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { markActionDone, snoozeApplication } from "@/lib/applications/reminders";
 import { getTodayData, type TodayItem } from "@/lib/applications/today";
@@ -9,6 +10,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ItemActions } from "./item-actions";
 
 // Reads "today" per request; a cached page would go stale at local midnight.
+export const metadata: Metadata = {
+  title: "Today",
+  description:
+    "What needs chasing today — overdue follow-ups, applications due a nudge, and anything gone quiet.",
+};
+
 export const dynamic = "force-dynamic";
 
 export default async function TodayPage() {

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { githubEnabled, signIn } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,11 @@ import {
 } from "@/components/ui/card";
 import { LoginForm } from "./login-form";
 
+export const metadata: Metadata = {
+  title: "Sign in",
+  description: "Sign in to Job Hunt Copilot.",
+};
+
 export default async function LoginPage({
   searchParams,
 }: {
@@ -20,7 +26,12 @@ export default async function LoginPage({
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Sign in</CardTitle>
+        {/* CardTitle renders a div, so the h1 goes inside it: without this the
+            page has no heading at all, and Tailwind's reset means it inherits
+            the card's type scale rather than fighting it. */}
+        <CardTitle>
+          <h1>Sign in</h1>
+        </CardTitle>
         <CardDescription>
           {registered ? "Account created — sign in below." : "Welcome back."}
         </CardDescription>

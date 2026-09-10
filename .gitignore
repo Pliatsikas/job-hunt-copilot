@@ -44,3 +44,12 @@ next-env.d.ts
 # Scratch exports that may contain personal data (CV text, etc). This repo is
 # public — keep them out of it.
 Claude outputs/
+
+# The eval CV is real and this repo is public — see evals/README.md
+evals/fixtures/_candidate.json
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

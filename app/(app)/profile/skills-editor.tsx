@@ -4,6 +4,9 @@ import { useState, type KeyboardEvent } from "react";
 import { normalizeSkills } from "@/lib/schemas/profile";
 import { Input } from "@/components/ui/input";
 
+/** Shared with profile-form.tsx, which renders the visible label. */
+export const SKILLS_INPUT_ID = "skills-input";
+
 /**
  * Chips are a convenience — the server normalizes again on submit, so a
  * pasted list or a stray capital can't get through unnormalized.
@@ -57,15 +60,22 @@ export function SkillsEditor({ initial }: { initial: string[] }) {
         ))}
       </div>
 
+      {/*
+        Labelled by the visible "Skills" label in profile-form.tsx via this id,
+        rather than by an aria-label saying something else. A visible label and
+        a differing accessible name breaks voice control, where the user says
+        what they can see.
+      */}
       <Input
+        id={SKILLS_INPUT_ID}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={handleKeyDown}
         onBlur={commitDraft}
         placeholder="Type a skill and press Enter"
-        aria-label="Add a skill"
+        aria-describedby={`${SKILLS_INPUT_ID}-hint`}
       />
-      <p className="text-xs text-muted-foreground">
+      <p id={`${SKILLS_INPUT_ID}-hint`} className="text-xs text-muted-foreground">
         Stored lowercase and de-duplicated. Comma-separated pastes are split automatically.
       </p>
     </div>

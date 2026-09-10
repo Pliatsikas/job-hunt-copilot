@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CvTextarea } from "./cv-textarea";
-import { SkillsEditor } from "./skills-editor";
+import { SKILLS_INPUT_ID, SkillsEditor } from "./skills-editor";
 
 export type ProfileDefaults = {
   headline: string;
@@ -56,7 +56,7 @@ export function ProfileForm({ defaults }: { defaults: ProfileDefaults }) {
       <CvTextarea initial={defaults.cvText} />
 
       <div className="flex flex-col gap-2">
-        <Label>Skills</Label>
+        <Label htmlFor={SKILLS_INPUT_ID}>Skills</Label>
         <SkillsEditor initial={defaults.skills} />
       </div>
 

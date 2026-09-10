@@ -27,7 +27,9 @@ export const envSchema = z.object({
   AUTH_GITHUB_ID: optionalEnvString(),
   AUTH_GITHUB_SECRET: optionalEnvString(),
 
-  LLM_PROVIDER: z.enum(["gemini", "groq", "ollama", "anthropic"]).default("gemini"),
+  // "mock" is a test seam for the end-to-end suite; lib/llm/providers/mock.ts
+  // refuses to construct it when NODE_ENV is production.
+  LLM_PROVIDER: z.enum(["gemini", "groq", "ollama", "anthropic", "mock"]).default("gemini"),
   LLM_MODEL: z.string().min(1).default("gemini-3.5-flash"),
   GEMINI_API_KEY: optionalEnvString(),
   GROQ_API_KEY: optionalEnvString(),

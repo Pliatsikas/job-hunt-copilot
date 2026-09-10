@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { analysisResultSchema } from "../schemas/analysis";
 import { VALID_RESULT } from "./fixtures";
 import { AnalysisError, completeWithRepair, extractJson } from "./repair";
-import { NO_USAGE, type LlmProvider, type LlmResult } from "./types";
+import { LlmSchemaError, NO_USAGE, type LlmProvider, type LlmResult } from "./types";
 
 function reply(text: string, tokens = 10): LlmResult {
   return { text, usage: { inputTokens: tokens, outputTokens: tokens }, latencyMs: 100 };
@@ -114,5 +114,121 @@ describe("completeWithRepair", () => {
     await completeWithRepair(provider, request, analysisResultSchema, onCall);
 
     expect(onCall).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("provider-side schema rejection", () => {
+  const rejection = () =>
+    new LlmSchemaError("groq", "Groq rejected the model's output", '{"matchScore": 45, "gaps": [');
+
+  it("repairs once instead of retrying the identical request", async () => {
+    // Groq's strict mode validates before returning, so bad output arrives as
+    // a 400. Backing off and repeating the same prompt would reproduce it;
+    // the repair attempt carries the complaint and can succeed.
+    let call = 0;
+    const provider: LlmProvider = {
+      name: "groq",
+      model: "test",
+      async complete() {
+        call += 1;
+        if (call === 1) throw rejection();
+        return reply(JSON.stringify(VALID_RESULT));
+      },
+      async *stream() {
+        yield "";
+        return NO_USAGE;
+      },
+    };
+
+    const out = await completeWithRepair(provider, request, analysisResultSchema);
+
+    expect(call).toBe(2);
+    expect(out.attempts).toBe(2);
+    expect(analysisResultSchema.safeParse(out.data).success).toBe(true);
+  });
+
+  it("quotes the rejected partial output back in the repair prompt", async () => {
+    const prompts: string[] = [];
+    let call = 0;
+    const provider: LlmProvider = {
+      name: "groq",
+      model: "test",
+      async complete(req) {
+        call += 1;
+        prompts.push(req.user);
+        if (call === 1) throw rejection();
+        return reply(JSON.stringify(VALID_RESULT));
+      },
+      async *stream() {
+        yield "";
+        return NO_USAGE;
+      },
+    };
+
+    await completeWithRepair(provider, request, analysisResultSchema);
+
+    expect(prompts[1]).toContain("It stopped here");
+    expect(prompts[1]).toContain('"matchScore": 45');
+    expect(prompts[1]).toContain("fewer, better entries");
+  });
+
+  it("counts the rejected call — the provider billed for it", async () => {
+    const counted: unknown[] = [];
+    let call = 0;
+    const provider: LlmProvider = {
+      name: "groq",
+      model: "test",
+      async complete() {
+        call += 1;
+        if (call === 1) throw rejection();
+        return reply(JSON.stringify(VALID_RESULT));
+      },
+      async *stream() {
+        yield "";
+        return NO_USAGE;
+      },
+    };
+
+    await completeWithRepair(provider, request, analysisResultSchema, async (usage) => {
+      counted.push(usage);
+    });
+
+    expect(counted).toHaveLength(2);
+  });
+
+  it("gives up after one repair and saves nothing", async () => {
+    const provider: LlmProvider = {
+      name: "groq",
+      model: "test",
+      async complete() {
+        throw rejection();
+      },
+      async *stream() {
+        yield "";
+        return NO_USAGE;
+      },
+    };
+
+    await expect(completeWithRepair(provider, request, analysisResultSchema)).rejects.toThrow(
+      LlmSchemaError,
+    );
+  });
+
+  it("lets a genuine transport failure through to the retry layer", async () => {
+    const provider: LlmProvider = {
+      name: "groq",
+      model: "test",
+      async complete() {
+        throw new Error("socket hang up");
+      },
+      async *stream() {
+        yield "";
+        return NO_USAGE;
+      },
+    };
+
+    await expect(completeWithRepair(provider, request, analysisResultSchema)).rejects.toThrow(
+      "socket hang up",
+    );
   });
 });

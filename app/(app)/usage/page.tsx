@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import { requireUser } from "@/lib/auth";
 import { DEFAULT_TIME_ZONE } from "@/lib/dates";
 import { getUsageToday, type UsageSnapshot } from "@/lib/llm/usage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+export const metadata: Metadata = {
+  title: "Usage",
+  description:
+    "What you have spent against today's model budget, and when it resets.",
+};
 
 export const dynamic = "force-dynamic";
 

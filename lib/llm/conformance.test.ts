@@ -5,7 +5,7 @@ import { FIXTURE_CV, FIXTURE_JOB_DESCRIPTION, FIXTURE_SKILLS } from "./fixtures"
 import { stripUnsupportedKeywords, toJsonSchema } from "./json-schema";
 import { createGeminiProvider } from "./providers/gemini";
 import { createGroqProvider } from "./providers/groq";
-import * as analyzePrompt from "./prompts/analyze.v1";
+import * as analyzePrompt from "./prompts/analyze.v2";
 import { completeWithRepair } from "./repair";
 import { drainStream, type LlmProvider } from "./types";
 

@@ -47,6 +47,14 @@ const eslintConfig = [
     rules: { "no-restricted-syntax": "off" },
   },
   {
+    // The end-to-end spec asserts on the database directly — checking that the
+    // right row was written, with the right userId, is the point of the
+    // assertion, and routing it through the guarded query layer would test the
+    // layer against itself.
+    files: ["e2e/**/*.ts"],
+    rules: { "no-restricted-syntax": "off" },
+  },
+  {
     // The seed is not request-handling code: it runs offline against a user
     // it just created, so there is no session to filter by and nothing for
     // the ownership guard to protect. Scoped to this one file rather than to

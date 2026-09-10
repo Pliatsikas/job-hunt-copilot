@@ -1,12 +1,14 @@
 import { env } from "../env";
 import { createGeminiProvider } from "./providers/gemini";
 import { createGroqProvider } from "./providers/groq";
+import { createMockProvider } from "./providers/mock";
 import type { LlmProvider } from "./types";
 
 /** Default model per provider, used when LLM_MODEL isn't overridden. */
 const DEFAULT_MODELS: Record<string, string> = {
   gemini: "gemini-3.5-flash",
   groq: "openai/gpt-oss-120b",
+  mock: "mock-1",
 };
 
 /**
@@ -31,6 +33,8 @@ export function getProvider(): LlmProvider {
       }
       return createGroqProvider(env.GROQ_API_KEY, model);
     }
+    case "mock":
+      return createMockProvider(model);
     default:
       // ollama/anthropic are declared in the env enum but not implemented yet;
       // failing loudly beats silently falling back to a different model.

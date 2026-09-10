@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "../db";
 import { getProvider } from "../llm";
 import { groundAnalysis } from "../llm/grounding";
-import * as analyzePrompt from "../llm/prompts/analyze.v1";
+import * as analyzePrompt from "../llm/prompts/analyze.v2";
 import { AnalysisError, completeWithRepair } from "../llm/repair";
 import { assertWithinBudget, recordProviderCall, UsageLimitError } from "../llm/usage";
 import { LlmAuthError, LlmQuotaError } from "../llm/types";

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   countApplications,
@@ -25,6 +26,12 @@ const SORT_LABELS: Record<(typeof SORT_FIELDS)[number], string> = {
   applied: "Applied",
   nextAction: "Next action",
   role: "Role",
+};
+
+export const metadata: Metadata = {
+  title: "Applications",
+  description:
+    "Every application you are tracking, filtered by status, company or keyword.",
 };
 
 export default async function ApplicationsPage({

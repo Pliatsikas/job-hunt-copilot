@@ -1,9 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getInsights, MIN_ANALYSES_FOR_INSIGHTS } from "@/lib/applications/insights";
 import { GapBarChart } from "@/components/gap-bar-chart";
 import { ScoreTrendChart } from "@/components/score-trend-chart";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+export const metadata: Metadata = {
+  title: "Insights",
+  description:
+    "Patterns across your analyses — recurring skill gaps, how your match score is moving, and which sources are worth your time.",
+};
 
 export const dynamic = "force-dynamic";
 

@@ -1,0 +1,13 @@
+{
+  "id": "kebab-case-and-unique",
+  "kind": "analysis",
+  "notes": "Why this ad earns a place in the set — what it tests that the others don't.",
+  "roleTitle": "Fullstack Developer",
+  "companyName": null,
+  "source": "jobfind.gr",
+  "language": "en",
+  "jobDescription": "Paste the whole ad here, verbatim. Minimum 120 characters — a summary evaluates the summary, not the model.",
+  "expectedScoreRange": [35, 60],
+  "mustFindSkills": ["react", "typescript"],
+  "mustFlagGaps": ["kubernetes"]
+}

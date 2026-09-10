@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   Card,
@@ -8,11 +9,18 @@ import {
 } from "@/components/ui/card";
 import { RegisterForm } from "./register-form";
 
+export const metadata: Metadata = {
+  title: "Create an account",
+  description: "Create a Job Hunt Copilot account.",
+};
+
 export default function RegisterPage() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Create an account</CardTitle>
+        <CardTitle>
+          <h1>Create an account</h1>
+        </CardTitle>
         <CardDescription>Track applications and analyze job descriptions.</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">

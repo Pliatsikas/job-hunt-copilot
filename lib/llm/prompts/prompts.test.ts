@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { VALID_RESULT } from "../fixtures";
+import * as analyzeV1 from "./analyze.v1";
+import * as analyzeV2 from "./analyze.v2";
 import * as coverLetter from "./cover-letter.v1";
 import * as followUp from "./follow-up.v1";
 import { topGap } from "./shared";
@@ -14,8 +16,53 @@ const base = {
 
 describe("versioning", () => {
   it("each prompt exports a version, which is what gets stored", () => {
+    expect(analyzeV1.version).toBe("analyze@1");
+    expect(analyzeV2.version).toBe("analyze@2");
     expect(coverLetter.version).toBe("cover-letter@1");
     expect(followUp.version).toBe("follow-up@1");
+  });
+
+  it("keeps v1 around so old Analysis rows stay explicable", () => {
+    // Every stored row records the version that produced it. Deleting a
+    // prompt would leave those rows referring to something that no longer
+    // exists, and the v1/v2 comparison is the artifact M9 is here to produce.
+    expect(analyzeV1.system).not.toBe(analyzeV2.system);
+    expect(typeof analyzeV1.buildUserPrompt).toBe("function");
+  });
+});
+
+describe("analyze@2 gap rules", () => {
+  const prompt = analyzeV2.system;
+
+  it("says a gap is one skill, not a sentence or a list", () => {
+    expect(prompt).toMatch(/ONE skill/);
+    expect(prompt).toMatch(/four separate\s+gap entries/);
+  });
+
+  it("routes years-of-experience demands to redFlags", () => {
+    // The v1 failure: "3-5 years of web development experience" arrived as a
+    // gap skill, so it could never repeat across postings and never counted.
+    expect(prompt).toMatch(/redFlags, never gaps/);
+    expect(prompt).toMatch(/years of experience/i);
+  });
+
+  it("keeps the grounding rule v1 established", () => {
+    expect(prompt).toMatch(/verbatim quote/);
+    expect(analyzeV2.buildUserPrompt({ cvText: "cv", skills: [], jobDescription: "jd" })).toContain(
+      "verbatim quote",
+    );
+  });
+
+  it("names the skills the candidate declared, or says none", () => {
+    const withSkills = analyzeV2.buildUserPrompt({
+      cvText: "cv",
+      skills: ["react", "docker"],
+      jobDescription: "jd",
+    });
+    expect(withSkills).toContain("react, docker");
+    expect(
+      analyzeV2.buildUserPrompt({ cvText: "cv", skills: [], jobDescription: "jd" }),
+    ).toContain("(none listed)");
   });
 });
 

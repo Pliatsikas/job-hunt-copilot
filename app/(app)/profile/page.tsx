@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import { getProfile } from "@/lib/profile/get";
 import { ProfileForm } from "./profile-form";
+
+export const metadata: Metadata = {
+  title: "Profile",
+  description:
+    "Your CV and skills — the source of truth every analysis and letter is grounded in.",
+};
 
 export default async function ProfilePage() {
   const profile = await getProfile();

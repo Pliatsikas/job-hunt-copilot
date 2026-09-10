@@ -59,3 +59,34 @@ export function isQuotaExhausted(error: unknown): boolean {
   const message = (error instanceof Error ? error.message : String(error ?? "")).toLowerCase();
   return QUOTA_MARKERS.some((marker) => message.includes(marker));
 }
+
+/**
+ * Groq's strict `json_schema` mode validates before returning, so a model that
+ * runs out of output tokens mid-array comes back as an HTTP 400 rather than as
+ * a truncated body with `finish_reason: "length"`. That makes it look like a
+ * transport failure when it is really the model failing to satisfy the schema
+ * — which is precisely what the one repair attempt exists for.
+ */
+export function isSchemaValidationFailure(error: unknown): boolean {
+  if (httpStatusOf(error) !== 400) return false;
+  const message = (error instanceof Error ? error.message : String(error ?? "")).toLowerCase();
+  return (
+    message.includes("json_validate_failed") ||
+    message.includes("does not match the expected schema")
+  );
+}
+
+/**
+ * The partial output the provider rejected. Worth surfacing: the repair prompt
+ * can say what was wrong with the previous attempt instead of asking blind.
+ */
+export function failedGenerationOf(error: unknown): string | null {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  const match = message.match(/"failed_generation"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  if (!match) return null;
+  try {
+    return JSON.parse(`"${match[1]}"`) as string;
+  } catch {
+    return null;
+  }
+}

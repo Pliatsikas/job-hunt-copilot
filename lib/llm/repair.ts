@@ -1,5 +1,12 @@
 import type { z } from "zod";
-import type { LlmProvider, LlmRequest, LlmUsage } from "./types";
+import {
+  LlmSchemaError,
+  NO_USAGE,
+  type LlmProvider,
+  type LlmRequest,
+  type LlmResult,
+  type LlmUsage,
+} from "./types";
 
 /** User-facing failure. Nothing is persisted when this is thrown. */
 export class AnalysisError extends Error {
@@ -65,8 +72,20 @@ export async function completeWithRepair<T extends z.ZodType>(
 ): Promise<ParsedCompletion<z.infer<T>>> {
   // Counted after the call returns, not before: a provider that never
   // answered shouldn't consume the user's daily budget.
-  const first = await provider.complete({ ...request, schema });
-  await onProviderCall?.(first.usage);
+  //
+  // A provider that validates before returning (Groq's strict mode) rejects
+  // bad output as a 400 instead of handing it over. That is still a schema
+  // failure, so it earns the same single repair rather than a backoff — but
+  // the call happened and is billed, so it is counted either way.
+  let first: LlmResult;
+  try {
+    first = await provider.complete({ ...request, schema });
+    await onProviderCall?.(first.usage);
+  } catch (error) {
+    if (!(error instanceof LlmSchemaError)) throw error;
+    await onProviderCall?.(NO_USAGE);
+    return repairAfterProviderRejection(provider, request, schema, error, onProviderCall);
+  }
 
   const firstParse = trySafeParse(schema, first.text);
   if (firstParse.success) {
@@ -127,4 +146,44 @@ function trySafeParse<T extends z.ZodType>(schema: T, text: string): ParseOutcom
   return parsed.success
     ? { success: true, data: parsed.data }
     : { success: false, error: parsed.error };
+}
+
+/**
+ * The repair path for a provider that refused to return its model's output.
+ * There is no text to quote back, so the prompt gets the provider's complaint
+ * and — when it reports one — the partial generation it rejected.
+ */
+async function repairAfterProviderRejection<T extends z.ZodType>(
+  provider: LlmProvider,
+  request: Omit<LlmRequest, "schema">,
+  schema: T,
+  rejection: LlmSchemaError,
+  onProviderCall?: (usage: LlmUsage) => Promise<void>,
+): Promise<ParsedCompletion<z.infer<T>>> {
+  const truncatedAt = rejection.failedGeneration
+    ? `\n\nIt stopped here:\n${rejection.failedGeneration.slice(-400)}`
+    : "";
+
+  const retry = await provider.complete({
+    ...request,
+    schema,
+    user: `${request.user}
+
+## Your previous reply was rejected
+${rejection.message}${truncatedAt}
+
+Return the complete JSON object this time, with every required field present. Be more
+selective: fewer, better entries in the arrays, so the answer fits.`,
+  });
+  await onProviderCall?.(retry.usage);
+
+  const parsed = trySafeParse(schema, retry.text);
+  if (parsed.success) {
+    return { data: parsed.data, usage: retry.usage, latencyMs: retry.latencyMs, attempts: 2 };
+  }
+
+  throw new AnalysisError(
+    "The model's answer didn't fit the required format, twice. Nothing was saved — try again, or shorten the job description.",
+    parsed.error,
+  );
 }

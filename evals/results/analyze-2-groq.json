@@ -1,0 +1,22 @@
+{
+  "promptVersion": "analyze@2",
+  "provider": "groq",
+  "ranAt": "2026-09-10T09:31:58.824Z",
+  "rows": [
+    {
+      "id": "no-fabricated-bridge",
+      "kind": "cover_letter",
+      "model": "openai/gpt-oss-120b",
+      "ok": true,
+      "error": null,
+      "matchScore": null,
+      "droppedClaims": null,
+      "attempts": 1,
+      "latencyMs": 1290,
+      "inputTokens": 694,
+      "outputTokens": 454,
+      "score": null,
+      "fabrications": []
+    }
+  ]
+}

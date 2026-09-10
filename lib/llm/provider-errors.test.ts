@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { httpStatusOf, isAuthFailure, isQuotaExhausted } from "./provider-errors";
+import { failedGenerationOf, httpStatusOf, isAuthFailure, isQuotaExhausted, isSchemaValidationFailure } from "./provider-errors";
 
 const GEMINI_BAD_KEY = new Error(
   '{"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"reason":"API_KEY_INVALID"}]}}',
@@ -82,5 +82,44 @@ describe("retry interaction", () => {
 
     expect(isTransient(quota)).toBe(false);
     expect(isTransient(spike)).toBe(true);
+  });
+});
+
+describe("isSchemaValidationFailure", () => {
+  const groq400 = (body: string) => Object.assign(new Error(body), { status: 400 });
+
+  it("recognises Groq rejecting its own model's truncated output", () => {
+    // The real shape, from a v2 run that overran max_tokens mid-array.
+    const error = groq400(
+      '400 {"error":{"message":"Generated JSON does not match the expected schema. ' +
+        "Error: jsonschema: '' does not validate with /required: missing properties: " +
+        "'keywordsToMirror', 'redFlags', 'likelyQuestions'\",\"code\":\"json_validate_failed\"}}",
+    );
+    expect(isSchemaValidationFailure(error)).toBe(true);
+  });
+
+  it("does not claim a rejected key as a schema problem", () => {
+    const error = groq400('400 {"error":{"message":"Invalid API key","code":"invalid_api_key"}}');
+    expect(isSchemaValidationFailure(error)).toBe(false);
+    expect(isAuthFailure(error)).toBe(true);
+  });
+
+  it("ignores a 429, which is about rate rather than shape", () => {
+    const error = Object.assign(new Error("json_validate_failed"), { status: 429 });
+    expect(isSchemaValidationFailure(error)).toBe(false);
+  });
+});
+
+describe("failedGenerationOf", () => {
+  it("unescapes the partial output so it can be quoted back in a repair", () => {
+    const error = Object.assign(
+      new Error('400 {"error":{"failed_generation":"{\\n  \\"matchScore\\": 45,\\n  \\"gaps\\": ["}}'),
+      { status: 400 },
+    );
+    expect(failedGenerationOf(error)).toBe('{\n  "matchScore": 45,\n  "gaps": [');
+  });
+
+  it("returns null when the provider reports no partial output", () => {
+    expect(failedGenerationOf(new Error("plain failure"))).toBeNull();
   });
 });
