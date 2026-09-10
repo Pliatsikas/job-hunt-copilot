@@ -61,12 +61,12 @@ export async function completeWithRepair<T extends z.ZodType>(
   provider: LlmProvider,
   request: Omit<LlmRequest, "schema">,
   schema: T,
-  onProviderCall?: () => Promise<void>,
+  onProviderCall?: (usage: LlmUsage) => Promise<void>,
 ): Promise<ParsedCompletion<z.infer<T>>> {
   // Counted after the call returns, not before: a provider that never
   // answered shouldn't consume the user's daily budget.
   const first = await provider.complete({ ...request, schema });
-  await onProviderCall?.();
+  await onProviderCall?.(first.usage);
 
   const firstParse = trySafeParse(schema, first.text);
   if (firstParse.success) {
@@ -85,7 +85,7 @@ Return corrected JSON only. Same task, same rules — fix the structure.`,
   };
 
   const second = await provider.complete({ ...repairRequest, schema });
-  await onProviderCall?.();
+  await onProviderCall?.(second.usage);
 
   const usage = sumUsage(first.usage, second.usage);
   const latencyMs = first.latencyMs + second.latencyMs;

@@ -46,6 +46,14 @@ const eslintConfig = [
     files: ["lib/applications/**/*.ts"],
     rules: { "no-restricted-syntax": "off" },
   },
+  {
+    // The seed is not request-handling code: it runs offline against a user
+    // it just created, so there is no session to filter by and nothing for
+    // the ownership guard to protect. Scoped to this one file rather than to
+    // prisma/**, so a future script there still has to justify itself.
+    files: ["prisma/seed.ts"],
+    rules: { "no-restricted-syntax": "off" },
+  },
 ];
 
 export default eslintConfig;

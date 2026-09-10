@@ -3,8 +3,12 @@ import { getProvider } from "@/lib/llm";
 import * as coverLetterPrompt from "@/lib/llm/prompts/cover-letter.v1";
 import * as followUpPrompt from "@/lib/llm/prompts/follow-up.v1";
 import { AnalysisError } from "@/lib/llm/repair";
-import { LlmAuthError, LlmQuotaError } from "@/lib/llm/types";
-import { assertUnderDailyLimit, recordProviderCall } from "@/lib/llm/usage";
+import { drainStream, LlmAuthError, LlmQuotaError } from "@/lib/llm/types";
+import {
+  assertWithinBudget,
+  recordProviderCall,
+  UsageLimitError,
+} from "@/lib/llm/usage";
 import {
   getLatestAnalysisResult,
   saveGeneratedDocument,
@@ -50,7 +54,7 @@ export async function POST(request: Request) {
       );
     }
 
-    await assertUnderDailyLimit(application.userId);
+    await assertWithinBudget(application.userId);
 
     // The newest analysis grounds the letter; absent one, the prompt says so
     // and tells the model to stay conservative rather than improvise.
@@ -87,17 +91,24 @@ export async function POST(request: Request) {
     const stream = new ReadableStream<Uint8Array>({
       async start(controller) {
         try {
-          for await (const chunk of provider.stream({
-            system,
-            user,
-            temperature: GENERATION_TEMPERATURE,
-            maxTokens: GENERATION_MAX_TOKENS,
-          })) {
-            full += chunk;
-            controller.enqueue(encoder.encode(chunk));
-          }
+          // drainStream, not `for await`: the generator's *return* value is
+          // the token usage, and a for-await loop throws it away. Cover
+          // letters are the most-used path in the app, so leaving them
+          // uncounted would have made the whole budget fiction.
+          const usage = await drainStream(
+            provider.stream({
+              system,
+              user,
+              temperature: GENERATION_TEMPERATURE,
+              maxTokens: GENERATION_MAX_TOKENS,
+            }),
+            (chunk) => {
+              full += chunk;
+              controller.enqueue(encoder.encode(chunk));
+            },
+          );
 
-          await recordProviderCall(application.userId);
+          await recordProviderCall(application.userId, usage);
 
           // Persisted only once the stream completed — a truncated generation
           // shouldn't leave a half-written document behind.
@@ -119,6 +130,7 @@ export async function POST(request: Request) {
           const message =
             error instanceof LlmAuthError ||
             error instanceof LlmQuotaError ||
+            error instanceof UsageLimitError ||
             error instanceof AnalysisError
               ? error.message
               : "Generation failed partway through. Nothing was saved.";
@@ -137,6 +149,11 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    // 429 for a budget refusal, so a client can tell "come back later" from
+    // "this request was wrong".
+    if (error instanceof UsageLimitError) {
+      return NextResponse.json({ error: error.message }, { status: 429 });
+    }
     if (
       error instanceof LlmAuthError ||
       error instanceof LlmQuotaError ||

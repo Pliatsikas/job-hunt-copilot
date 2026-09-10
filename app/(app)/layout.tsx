@@ -16,6 +16,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <Link href="/today">Today</Link>
           <Link href="/applications">Applications</Link>
           <Link href="/insights">Insights</Link>
+          <Link href="/usage">Usage</Link>
           <Link href="/profile">Profile</Link>
           {session?.user?.email && (
             <span className="text-zinc-400">{session.user.email}</span>

@@ -6,7 +6,7 @@ import { getProvider } from "../llm";
 import { groundAnalysis } from "../llm/grounding";
 import * as analyzePrompt from "../llm/prompts/analyze.v1";
 import { AnalysisError, completeWithRepair } from "../llm/repair";
-import { assertUnderDailyLimit, recordProviderCall } from "../llm/usage";
+import { assertWithinBudget, recordProviderCall, UsageLimitError } from "../llm/usage";
 import { LlmAuthError, LlmQuotaError } from "../llm/types";
 import { getProfile } from "../profile/get";
 import { analysisResultSchema } from "../schemas/analysis";
@@ -32,7 +32,7 @@ export async function analyzeApplication(
       };
     }
 
-    await assertUnderDailyLimit(application.userId);
+    await assertWithinBudget(application.userId);
 
     const provider = getProvider();
 
@@ -49,7 +49,7 @@ export async function analyzeApplication(
         maxTokens: ANALYSIS_MAX_TOKENS,
       },
       analysisResultSchema,
-      () => recordProviderCall(application.userId),
+      (usage) => recordProviderCall(application.userId, usage),
     );
 
     // Grounding runs after a successful parse and never triggers a repair.
@@ -94,6 +94,11 @@ export async function analyzeApplication(
     revalidatePath("/applications");
     return { ranAt: Date.now() };
   } catch (error) {
+    // Already says which ceiling was hit and when it lifts — never rewrap it
+    // into a generic failure (SPEC.md §6.1).
+    if (error instanceof UsageLimitError) {
+      return { error: error.message };
+    }
     if (error instanceof AnalysisError) {
       return { error: error.message };
     }

@@ -84,6 +84,27 @@ Deliberately not started before M9. Recorded now so the list doesn't get rebuilt
 
 ## Open
 
+- **The auth rate limit is keyed on IP, which is both evadable and over-broad.** A determined
+  attacker rotates addresses; a shared exit (an office, a university, CGNAT on a mobile
+  network) puts many real people behind one key. That is why the login window is generous and
+  the limiter fails open. If registration abuse ever actually happens, the next lever is a
+  proof-of-work or captcha on `/register`, not a tighter IP window — tightening the window
+  punishes the shared-exit case first and the attacker last.
+
+- **`RateLimit` rows are pruned opportunistically, not on a schedule.** There is no cron in
+  this deployment, so `pruneOccasionally()` rides along with auth writes at most once an hour
+  per instance, deleting windows older than two days. On serverless that means it runs more
+  often than hourly in aggregate and never at all if nobody signs in — both acceptable, since
+  the rows are tiny and only matter under an attack that is itself generating the writes.
+
+- **gpt-oss-120b spends reasoning tokens on prose.** A 30-token completion came back with
+  `reasoning_tokens: 28`. At the 2,000-token generation budget there is room, so output is not
+  truncated — but those tokens are billed and counted, so cover letters cost more against the
+  budget than their length suggests. Groq exposes `reasoning_effort` for these models; worth
+  measuring whether "low" changes letter quality before setting it. Same shape as the Gemini
+  3.x thinking problem from M4, which was solved by disabling thinking on `stream()` only.
+
+
 - **`gaps[].skill` is often a requirement sentence, not a skill.** Surfaced by M7: aggregating
   the real analyses in my account produced entries like *"3-5 years of web development
   experience"*, *"pixijs, webpack, gulp, webaudio"* and *"moodle or other educational platforms

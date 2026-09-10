@@ -35,8 +35,39 @@ export interface LlmProvider {
   readonly name: string;
   readonly model: string;
   complete(request: LlmRequest): Promise<LlmResult>;
-  /** Yields text chunks as they arrive. */
-  stream(request: LlmStreamRequest): AsyncIterable<string>;
+  /**
+   * Yields text chunks as they arrive and *returns* what the call cost.
+   *
+   * The generator's return value carries the usage rather than a callback or
+   * a second method: a `for await` consumer that doesn't care ignores it for
+   * free, and one that does care cannot forget to read it, because the type
+   * says the iteration ends with an LlmUsage. Both providers only know the
+   * token counts after the final chunk, so there is nowhere earlier to put it.
+   *
+   * Cover letters are the most-used path in the app; leaving them out of the
+   * budget would have made the budget fiction (SPEC.md §6.1).
+   */
+  stream(request: LlmStreamRequest): AsyncGenerator<string, LlmUsage, void>;
+}
+
+/** No usage reported — a provider may decline, and a request still counts. */
+export const NO_USAGE: LlmUsage = { inputTokens: null, outputTokens: null };
+
+/**
+ * Drains a provider stream, forwarding text to `onChunk` and returning the
+ * usage the generator ended with. `for await` discards a generator's return
+ * value, so the manual loop is the only way to see it.
+ */
+export async function drainStream(
+  stream: AsyncGenerator<string, LlmUsage, void>,
+  onChunk: (text: string) => void,
+): Promise<LlmUsage> {
+  const iterator = stream[Symbol.asyncIterator]();
+  for (;;) {
+    const next = await iterator.next();
+    if (next.done) return next.value ?? NO_USAGE;
+    onChunk(next.value);
+  }
 }
 
 /** Thrown when a provider itself fails (network, auth, quota). */

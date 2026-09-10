@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { analysisResultSchema } from "../schemas/analysis";
 import { VALID_RESULT } from "./fixtures";
 import { AnalysisError, completeWithRepair, extractJson } from "./repair";
-import type { LlmProvider, LlmResult } from "./types";
+import { NO_USAGE, type LlmProvider, type LlmResult } from "./types";
 
 function reply(text: string, tokens = 10): LlmResult {
   return { text, usage: { inputTokens: tokens, outputTokens: tokens }, latencyMs: 100 };
@@ -21,6 +21,7 @@ function providerReturning(...replies: LlmResult[]): LlmProvider & { calls: numb
     // Unused here — repair only concerns the non-streaming path.
     async *stream() {
       yield "";
+      return NO_USAGE;
     },
   };
   return provider;

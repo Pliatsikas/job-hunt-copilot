@@ -10,6 +10,8 @@ import {
   type LlmRequest,
   type LlmResult,
   type LlmStreamRequest,
+  type LlmUsage,
+  NO_USAGE,
 } from "../types";
 
 // Gemini's responseSchema is an OpenAPI subset: these annotations make it
@@ -78,7 +80,7 @@ export function createGeminiProvider(apiKey: string, model: string): LlmProvider
       }
     },
 
-    async *stream(request: LlmStreamRequest) {
+    async *stream(request: LlmStreamRequest): AsyncGenerator<string, LlmUsage, void> {
       try {
         const response = await withTransientRetry(() =>
           client.models.generateContentStream({
@@ -99,10 +101,19 @@ export function createGeminiProvider(apiKey: string, model: string): LlmProvider
         );
 
         let truncated = false;
+        // usageMetadata is cumulative and repeated on chunks; the last one
+        // wins rather than being summed.
+        let usage: LlmUsage = NO_USAGE;
         for await (const chunk of response) {
           const text = chunk.text;
           if (text) yield text;
           if (chunk.candidates?.[0]?.finishReason === "MAX_TOKENS") truncated = true;
+          if (chunk.usageMetadata) {
+            usage = {
+              inputTokens: chunk.usageMetadata.promptTokenCount ?? null,
+              outputTokens: chunk.usageMetadata.candidatesTokenCount ?? null,
+            };
+          }
         }
         if (truncated) {
           throw new LlmProviderError(
@@ -110,6 +121,7 @@ export function createGeminiProvider(apiKey: string, model: string): LlmProvider
             "Gemini hit its output limit before finishing this document.",
           );
         }
+        return usage;
       } catch (error) {
         if (isQuotaExhausted(error)) throw new LlmQuotaError("gemini", model, error);
         if (isAuthFailure(error)) throw new LlmAuthError("gemini", "GEMINI_API_KEY", error);

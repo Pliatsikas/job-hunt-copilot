@@ -1,9 +1,10 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import type { DefaultSession, NextAuthConfig } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import Credentials, { type CredentialsConfig } from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { z } from "zod";
+import { checkLoginLimit } from "./auth-limits";
 import { db } from "./db";
 import { env } from "./env";
 import { verifyPassword } from "./password";
@@ -20,12 +21,30 @@ const credentialsSchema = z.object({
   password: z.string().min(1),
 });
 
+/**
+ * Distinguishable from a bad password so the sign-in form can say which it
+ * was. Auth.js turns anything thrown here into a CredentialsSignin, and
+ * carries `code` through to the caller.
+ */
+export const LOGIN_RATE_LIMITED_CODE = "rate_limited";
+
+class LoginRateLimited extends CredentialsSignin {
+  code = LOGIN_RATE_LIMITED_CODE;
+}
+
 const providers: NextAuthConfig["providers"] = [
   Credentials({
     credentials: { email: {}, password: {} },
-    async authorize(raw) {
+    // The second parameter is the actual HTTP request, which is why the rate
+    // limit lives here: both the sign-in server action and a direct POST to
+    // /api/auth/callback/credentials arrive through this function, and only
+    // one of those goes near the action.
+    authorize: (async (raw, request: Request) => {
       const parsed = credentialsSchema.safeParse(raw);
       if (!parsed.success) return null;
+
+      const verdict = await checkLoginLimit(request.headers);
+      if (!verdict.allowed) throw new LoginRateLimited();
 
       const user = await db.user.findUnique({ where: { email: parsed.data.email } });
       if (!user?.passwordHash) return null;
@@ -34,7 +53,7 @@ const providers: NextAuthConfig["providers"] = [
       if (!valid) return null;
 
       return user;
-    },
+    }) as CredentialsConfig["authorize"],
   }),
 ];
 

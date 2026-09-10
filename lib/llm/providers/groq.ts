@@ -1,4 +1,8 @@
 import Groq from "groq-sdk";
+import type {
+  ChatCompletionChunk,
+  ChatCompletionCreateParamsStreaming,
+} from "groq-sdk/resources/chat/completions";
 import { toJsonSchema } from "../json-schema";
 import { isAuthFailure, isQuotaExhausted } from "../provider-errors";
 import { withTransientRetry } from "../retry";
@@ -10,7 +14,18 @@ import {
   type LlmRequest,
   type LlmResult,
   type LlmStreamRequest,
+  type LlmUsage,
+  NO_USAGE,
 } from "../types";
+
+/**
+ * The usage-bearing final chunk, which groq-sdk's `ChatCompletionChunk` does
+ * not describe. Declaring the shape we actually receive keeps the read typed;
+ * both fields stay optional because only the last chunk carries them.
+ */
+type ChunkWithUsage = ChatCompletionChunk & {
+  usage?: { prompt_tokens?: number; completion_tokens?: number } | null;
+};
 
 export function createGroqProvider(apiKey: string, model: string): LlmProvider {
   const client = new Groq({ apiKey });
@@ -75,26 +90,49 @@ export function createGroqProvider(apiKey: string, model: string): LlmProvider {
       }
     },
 
-    async *stream(request: LlmStreamRequest) {
+    async *stream(request: LlmStreamRequest): AsyncGenerator<string, LlmUsage, void> {
       try {
+        // `stream_options` is accepted by the API (verified against the live
+        // endpoint: the final chunk comes back with a usage object) but is
+        // missing from groq-sdk's request type, which trails the service. The
+        // intersection adds the field without reaching for `any` — and the
+        // day the SDK catches up, this narrows to a no-op rather than
+        // silently masking a real type error.
+        const params: ChatCompletionCreateParamsStreaming & {
+          stream_options?: { include_usage?: boolean };
+        } = {
+          model,
+          temperature: request.temperature,
+          max_tokens: request.maxTokens,
+          stream: true,
+          // Without this the stream reports no usage at all and every
+          // generated letter would cost the budget nothing.
+          stream_options: { include_usage: true },
+          messages: [
+            { role: "system", content: request.system },
+            { role: "user", content: request.user },
+          ],
+        };
+
         const response = await withTransientRetry(() =>
-          client.chat.completions.create({
-            model,
-            temperature: request.temperature,
-            max_tokens: request.maxTokens,
-            stream: true,
-            messages: [
-              { role: "system", content: request.system },
-              { role: "user", content: request.user },
-            ],
-          }),
+          client.chat.completions.create(params),
         );
 
         let truncated = false;
+        let usage: LlmUsage = NO_USAGE;
         for await (const chunk of response) {
+          // The usage chunk arrives last and carries `choices: []`, so the
+          // optional chaining below is load-bearing, not defensive habit.
           const text = chunk.choices[0]?.delta?.content;
           if (text) yield text;
           if (chunk.choices[0]?.finish_reason === "length") truncated = true;
+          const reported = (chunk as ChunkWithUsage).usage;
+          if (reported) {
+            usage = {
+              inputTokens: reported.prompt_tokens ?? null,
+              outputTokens: reported.completion_tokens ?? null,
+            };
+          }
         }
         if (truncated) {
           throw new LlmProviderError(
@@ -102,6 +140,7 @@ export function createGroqProvider(apiKey: string, model: string): LlmProvider {
             "Groq hit its output limit before finishing this document.",
           );
         }
+        return usage;
       } catch (error) {
         if (isQuotaExhausted(error)) throw new LlmQuotaError("groq", model, error);
         if (isAuthFailure(error)) throw new LlmAuthError("groq", "GROQ_API_KEY", error);

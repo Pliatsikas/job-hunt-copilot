@@ -14,7 +14,7 @@ describe("envSchema", () => {
     const parsed = envSchema.parse(validBase);
     expect(parsed.LLM_PROVIDER).toBe("gemini");
     expect(parsed.LLM_MODEL).toBe("gemini-3.5-flash");
-    expect(parsed.DAILY_LLM_CALL_LIMIT).toBe(50);
+    expect(parsed.USER_DAILY_REQUESTS).toBe(12);
   });
 
   it("rejects a missing DATABASE_URL", () => {
@@ -33,9 +33,9 @@ describe("envSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("coerces DAILY_LLM_CALL_LIMIT from a string", () => {
-    const parsed = envSchema.parse({ ...validBase, DAILY_LLM_CALL_LIMIT: "25" });
-    expect(parsed.DAILY_LLM_CALL_LIMIT).toBe(25);
+  it("coerces a numeric limit from a string", () => {
+    const parsed = envSchema.parse({ ...validBase, USER_DAILY_REQUESTS: "25" });
+    expect(parsed.USER_DAILY_REQUESTS).toBe(25);
   });
 
   it("accepts LLM vars left empty, the way .env.example writes them", () => {
