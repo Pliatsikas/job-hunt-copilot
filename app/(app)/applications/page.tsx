@@ -9,6 +9,7 @@ import { applicationFiltersSchema, SORT_FIELDS, STATUSES } from "@/lib/schemas/a
 import { formatDate } from "@/lib/format";
 import { STATUS_LABELS, StatusBadge } from "@/components/status-badge";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { SELECT_FOCUS } from "@/components/ui/select-focus";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -19,7 +20,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const selectClass = "h-9 rounded-lg border border-border bg-background px-2.5 text-sm";
+const selectClass =
+  "h-9 rounded-lg border border-border bg-background px-2.5 text-sm" + SELECT_FOCUS;
 
 const SORT_LABELS: Record<(typeof SORT_FIELDS)[number], string> = {
   created: "Added",

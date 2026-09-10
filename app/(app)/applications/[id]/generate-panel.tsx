@@ -6,9 +6,11 @@ import { CONTEXT_LABELS, FOLLOW_UP_CONTEXTS } from "@/lib/llm/prompts/follow-up.
 import { LANGUAGES, LENGTHS, TONES } from "@/lib/llm/prompts/shared";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { SELECT_FOCUS } from "@/components/ui/select-focus";
 import { DocumentActions } from "./document-actions";
 
-const selectClass = "h-9 w-full rounded-lg border border-border bg-background px-2.5 text-sm";
+const selectClass =
+  "h-9 w-full rounded-lg border border-border bg-background px-2.5 text-sm" + SELECT_FOCUS;
 
 const KIND_LABELS = { COVER_LETTER: "Cover letter", FOLLOW_UP_EMAIL: "Follow-up email" } as const;
 const LANGUAGE_LABELS: Record<string, string> = { en: "English", el: "Ελληνικά" };

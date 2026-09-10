@@ -8,6 +8,7 @@ import { STATUS_LABELS } from "@/components/status-badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SELECT_FOCUS } from "@/components/ui/select-focus";
 import { Textarea } from "@/components/ui/textarea";
 
 export type ApplicationFormDefaults = {
@@ -25,7 +26,11 @@ export type ApplicationFormDefaults = {
 };
 
 const selectClass =
-  "h-9 w-full rounded-lg border border-border bg-background px-2.5 text-sm";
+  "h-9 w-full rounded-lg border border-border bg-background px-2.5 text-sm" +
+  // Matches the focus ring on Input/Textarea. A native select keeps the
+  // browser default otherwise, which differs per platform and is the one
+  // control in a form that looks unfocusable next to the others.
+  SELECT_FOCUS;
 
 export function ApplicationForm({
   action,
