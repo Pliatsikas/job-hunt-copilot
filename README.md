@@ -164,10 +164,19 @@ says "resets at midnight", and it has to be the user's midnight or the sentence 
 
 ## Eval results
 
-Ten real job ads against one real CV, run against a pinned prompt version so a prompt change
-produces a comparison rather than an impression. `pnpm eval` reports schema validity, score
-deviation from a human-set band, recall on skills the analysis must find, dropped claims, latency
-and tokens. See [evals/README.md](evals/README.md) for the fixture format.
+Job ads against one real CV, run against a pinned prompt version so a prompt change produces a
+comparison rather than an impression. `pnpm eval` reports schema validity, score deviation from a
+human-set band, recall on skills the analysis must find, dropped claims, latency and tokens. See
+[evals/README.md](evals/README.md) for the fixture format.
+
+The CV those numbers come from is committed at
+[`evals/fixtures/_candidate.json`](evals/fixtures/_candidate.json), so the run is reproducible
+rather than something you have to take on trust.
+
+**What is not here yet:** the intended set of ten real job ads. The harness, the metrics and the
+CV are in place, but only the regression fixture below is committed, so the analysis metrics
+currently have nothing to score. The before/after comparison in the next section comes from
+re-running real applications through the database, not from the fixture suite.
 
 ### `analyze@1` → `analyze@2`: the gap-granularity fix
 

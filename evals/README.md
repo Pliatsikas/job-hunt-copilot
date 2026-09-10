@@ -1,7 +1,13 @@
 # Evals
 
-Ten real job ads against one real CV, run against a pinned prompt version so that
-changing the prompt produces a comparison rather than a vibe.
+Job ads against one real CV, run against a pinned prompt version so that changing
+the prompt produces a comparison rather than a vibe.
+
+**Current state:** the harness, the metrics and the shared CV are in place; the set
+of ten real ads is not. Only `no-fabricated-bridge` — the M5 regression case — is
+committed, so `pnpm eval` today reports on that one fixture and the analysis
+metrics have nothing to score. Adding the ads is the remaining work, and the format
+below is what they need to be in.
 
 ## Adding a fixture
 
@@ -48,9 +54,19 @@ Spread them, so the set can fail in different ways:
 
 ## The shared CV
 
-`_candidate.json` holds the one CV every analysis fixture is judged against. It is
-**gitignored** by default, because this repository is public and a CV carries a
-phone number. `_candidate.example.json` is the committed stand-in.
+`_candidate.json` holds the one CV every analysis fixture is judged against, and it
+is **committed**: it is the real CV the published eval numbers were produced
+against, so a reader can re-run them and get the same table. That is worth more
+than withholding technical prose which is already public on the CV itself and on
+the profiles it links to.
+
+It carries no contact details — no phone, no email, no street address. It was
+written that way before it ever reached this repository, which is the only reason
+committing it is a reasonable thing to do. If you fork this, do not assume the same
+of your own CV: read it first.
+
+`_candidate.example.json` is the synthetic template. Copy it to `_candidate.json`
+and replace the contents with your own.
 
 ## Running
 
