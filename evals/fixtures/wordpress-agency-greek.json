@@ -1,7 +1,7 @@
 {
   "id": "wordpress-agency-greek",
   "kind": "analysis",
-  "notes": "Greek-language ad, and a partial mismatch of a common kind: the candidate has PHP from a course but no WordPress ecosystem experience. Tests that a Greek posting is analysed as competently as an English one, and that a course-level skill is not inflated into working experience.",
+  "notes": "Greek-language ad, and a partial mismatch of a common kind: the candidate has PHP from a course but no WordPress ecosystem experience. Tests that a Greek posting is analysed as competently as an English one, and that a course-level skill is not inflated into working experience. Band tightened from 18-48 to 18-40 after the first live runs: Groq scored 45 and Gemini 65 (identically across three runs), and 65 for a WordPress agency role held by someone with no WordPress, WooCommerce or MySQL is not defensible. This band is expected to fail against a generous model — that is the disagreement it exists to record, not a target to be met.",
   "roleTitle": "WordPress Developer",
   "companyName": null,
   "source": "synthetic",
@@ -9,7 +9,7 @@
   "jobDescription": "Προγραμματιστής WordPress — Θεσσαλονίκη\n\nΔιαφημιστική εταιρεία με πελατολόγιο στον χώρο του τουρισμού και του λιανεμπορίου αναζητά προγραμματιστή για την ομάδα ανάπτυξης ιστοσελίδων.\n\nΑρμοδιότητες:\n- Κατασκευή και συντήρηση ιστοσελίδων σε WordPress\n- Ανάπτυξη custom themes και plugins σε PHP\n- Υλοποίηση ηλεκτρονικών καταστημάτων με WooCommerce\n- Βελτιστοποίηση ταχύτητας και βασικό τεχνικό SEO\n- Επικοινωνία με πελάτες για τεχνικά θέματα και υποστήριξη\n\nΑπαραίτητα προσόντα:\n- Καλή γνώση PHP και MySQL\n- Εμπειρία με WordPress σε παραγωγικά έργα\n- Γνώση HTML, CSS και JavaScript\n- Άριστη γνώση ελληνικών και καλή γνώση αγγλικών\n\nΘα εκτιμηθεί: εμπειρία με Elementor, γνώση Git, προϋπηρεσία σε διαφημιστική εταιρεία.",
   "expectedScoreRange": [
     18,
-    48
+    40
   ],
   "mustFindSkills": [
     "php",

@@ -42,14 +42,21 @@ export const envSchema = z.object({
 
   // Daily budgets. Defaults are the Groq profile — see lib/limits.ts for how
   // they were measured, and .env.example for the Gemini alternative.
+  //
+  // The token ceilings were corrected in M9 after an eval sweep hit a limit
+  // that is not in the response headers: Groq enforces 200,000 tokens per day
+  // as well as 1,000 requests. At a measured ~4,500 tokens per analysis the
+  // real ceiling is ~44 analyses a day, not 1,000, and the old global of
+  // 2,250,000 was eleven times a wall it could never reach — the same shape
+  // of error as M8's per-user cap being 2.5x the project's capacity.
   USER_DAILY_REQUESTS: positiveInt(12),
   USER_DAILY_TOKENS: positiveInt(40_000),
   ADMIN_DAILY_REQUESTS: positiveInt(150),
-  ADMIN_DAILY_TOKENS: positiveInt(400_000),
+  ADMIN_DAILY_TOKENS: positiveInt(120_000),
   GLOBAL_DAILY_REQUESTS: positiveInt(900),
-  GLOBAL_DAILY_TOKENS: positiveInt(2_250_000),
+  GLOBAL_DAILY_TOKENS: positiveInt(180_000),
   GLOBAL_USER_SHARE_REQUESTS: positiveInt(600),
-  GLOBAL_USER_SHARE_TOKENS: positiveInt(1_500_000),
+  GLOBAL_USER_SHARE_TOKENS: positiveInt(120_000),
 
   // IP rate limits on the auth endpoints. Registration is priced highest:
   // each new account mints a fresh daily budget, which is the cheapest abuse.

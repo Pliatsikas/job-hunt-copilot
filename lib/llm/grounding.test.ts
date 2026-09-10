@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { groundAnalysis, groundMatchedSkills, MIN_EVIDENCE_CHARS } from "./grounding";
+import {
+  capGaps,
+  groundAnalysis,
+  groundMatchedSkills,
+  MAX_GAPS,
+  MIN_EVIDENCE_CHARS,
+} from "./grounding";
+import type { Severity } from "../schemas/analysis";
 import { FIXTURE_CV, VALID_RESULT } from "./fixtures";
 
 describe("groundMatchedSkills", () => {
@@ -97,5 +104,70 @@ describe("groundAnalysis", () => {
     // Everything else passes through untouched.
     expect(result.gaps).toEqual(VALID_RESULT.gaps);
     expect(result.matchScore).toBe(VALID_RESULT.matchScore);
+  });
+});
+
+describe("capGaps", () => {
+  const gap = (skill: string, severity: Severity) => ({
+    skill,
+    severity,
+    howToBridge: "bridge",
+  });
+
+  it("puts every blocker ahead of every lesser gap", () => {
+    const { gaps } = capGaps([
+      gap("slack", "nice_to_have"),
+      gap("aws", "blocker"),
+      gap("agile", "important"),
+      gap("kubernetes", "blocker"),
+    ]);
+
+    expect(gaps.map((g) => g.severity)).toEqual([
+      "blocker",
+      "blocker",
+      "important",
+      "nice_to_have",
+    ]);
+  });
+
+  it("never discards a blocker to make room for trivia", () => {
+    // The DevOps fixture produced exactly ten entries and `aws` — a real
+    // blocker — was not among them, because nice-to-haves had filled the list
+    // before the cap applied. Sorting first makes that impossible.
+    const trivia = Array.from({ length: 20 }, (_, i) => gap(`tool-${i}`, "nice_to_have"));
+    const { gaps, droppedGaps } = capGaps([...trivia, gap("aws", "blocker")]);
+
+    expect(gaps[0].skill).toBe("aws");
+    expect(gaps).toHaveLength(12);
+    expect(droppedGaps).toBe(9);
+  });
+
+  it("preserves the model's own order within one severity", () => {
+    // Stable sort: inside a severity the model's ranking is the best signal
+    // available about what matters most.
+    const { gaps } = capGaps([
+      gap("first", "blocker"),
+      gap("second", "blocker"),
+      gap("third", "blocker"),
+    ]);
+
+    expect(gaps.map((g) => g.skill)).toEqual(["first", "second", "third"]);
+  });
+
+  it("leaves a short list alone and reports nothing dropped", () => {
+    const { gaps, droppedGaps } = capGaps([gap("aws", "blocker")]);
+    expect(gaps).toHaveLength(1);
+    expect(droppedGaps).toBe(0);
+  });
+
+  it("is applied by groundAnalysis, not left to the caller", () => {
+    const many = Array.from({ length: 15 }, (_, i) => gap(`skill-${i}`, "important"));
+    const { result, droppedGaps } = groundAnalysis(
+      { ...VALID_RESULT, gaps: many },
+      "some cv text that is long enough to quote from",
+    );
+
+    expect(result.gaps).toHaveLength(MAX_GAPS);
+    expect(droppedGaps).toBe(3);
   });
 });

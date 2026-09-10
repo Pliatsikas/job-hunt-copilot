@@ -1,7 +1,7 @@
 {
   "id": "data-engineer-spark",
   "kind": "analysis",
-  "notes": "Second clear mismatch, in a different direction from the DevOps one: data engineering shares the word 'pipeline' with the candidate's RAG work without sharing anything technical. Tests that vocabulary overlap does not become a match.",
+  "notes": "Second clear mismatch, in a different direction from the DevOps one: data engineering shares the word 'pipeline' with the candidate's RAG work without sharing anything technical. Tests that vocabulary overlap does not become a match. Band deliberately NOT tightened. Tightening 0-22 to 0-15 was considered and rejected on measurement: Groq's spread at temperature 0 reached 13 points on one fixture, so a 15-point band would fail or pass on sampling noise rather than on prompt quality. Both models do sit near the ceiling here — Groq 20, Gemini 10-15 — which is itself the finding: neither produces genuinely low scores.",
   "roleTitle": "Data Engineer",
   "companyName": null,
   "source": "synthetic",

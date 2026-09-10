@@ -164,78 +164,134 @@ says "resets at midnight", and it has to be the user's midnight or the sentence 
 
 ## Eval results
 
-Job ads against one real CV, run against a pinned prompt version so a prompt change produces a
-comparison rather than an impression. `pnpm eval` reports schema validity, score deviation from a
-human-set band, recall on skills the analysis must find, dropped claims, latency and tokens. See
-[evals/README.md](evals/README.md) for the fixture format.
+Ten job ads against one real CV, on a pinned prompt version, so a prompt change produces a
+comparison rather than an impression. `pnpm eval` reports schema validity, distance outside a
+human-set score band, recall on skills the analysis must find, dropped claims, latency and
+tokens. The CV is committed at [`evals/fixtures/_candidate.json`](evals/fixtures/_candidate.json)
+so the run is reproducible. The ads are **synthetic** — written to a deliberate spread rather
+than collected, because republishing third-party ad copy is not mine to do. The real postings
+live in the app database, which is where the `analyze@1` → `analyze@2` comparison further down
+came from.
 
-The CV those numbers come from is committed at
-[`evals/fixtures/_candidate.json`](evals/fixtures/_candidate.json), so the run is reproducible
-rather than something you have to take on trust. The ten ads are **synthetic** — written to a
-deliberate spread rather than collected, because republishing third-party ad copy is not mine
-to do. The real postings live in the app database, which is where the `analyze@1` → `analyze@2`
-comparison below came from.
+Three things came out of running it. None of them is the pass rate.
 
-### `analyze@2`, 10 fixtures + 1 regression case
+### 1. The measurement is noisier than the thing it measures — and only on one provider
 
-| | groq / gpt-oss-120b | gemini (3 sibling models) |
+The first sweep scored 10/10 inside their bands, which looked like a result and was not. Running
+the identical fixtures again moved five of ten scores, the largest by 15 points. A band that a
+model can pass or fail depending on the sample is not measuring the prompt.
+
+So the runner moved to **temperature 0** and grew `--runs N`, which reports the median and the
+spread per fixture. The app stays at 0.2: it is writing prose for a person, where slight
+variation reads as natural. An eval exists to answer "did this change anything", and cannot
+if prompt effects and sampling noise arrive in the same number.
+
+Temperature 0 did not fix it. It fixed one provider:
+
+| | spread across 3 runs at temperature 0 |
+|---|---|
+| Gemini, all 10 fixtures | **0** — every fixture returned an identical score three times |
+| Groq, `ai-engineer-rag-python` | **13** (55, 68, 65) |
+| Groq, `data-engineer-spark` | 5 |
+| Groq, `backend-node-greek-startup` | 0 |
+
+`gpt-oss-120b` is a mixture-of-experts model and is not deterministic at temperature 0 the way
+Gemini is. That is a property of the provider, not a knob to turn.
+
+**What this means for anyone quoting eval numbers, mine included:** a single-run score from Groq
+carries roughly ±13 points of noise, so no band narrower than about 26 points can be honest
+there. Two of my fixtures were deliberately left un-tightened for exactly this reason — the
+measurement does not support the precision the tighter band would imply. Quote a median over
+several runs, quote the spread beside it, and treat any single number as an anecdote.
+
+### 2. Groq and Gemini disagree about whether the CV contains C#
+
+`dotnet-senior-five-years` exists to test one thing: the CV lists Unity and C# under game
+development, and the ad wants C# for enterprise backend work. The right answer credits the
+language and still names the missing ASP.NET and Azure ecosystem.
+
+| | matched | score |
 |---|---|---|
-| Schema-valid, of answers received | 10/10 | 6/6 |
-| Completed at all | 10/10 | 6/10 — four 503s |
-| Score inside its band | 10/10 | 3/6 |
-| Mean distance outside band | 0.0 | 3.8 |
-| `mustFindSkills` recall | 83% | 75% |
-| `mustFlagGaps` recall | 83% | 100% |
-| Dropped claims | 0 | 1 |
-| Repairs needed | 0 | 0 |
-| Gap entries that were phrases, not skills | 2 | 0 |
-| Mean latency | 26.8s | 17.4s |
-| Mean tokens | 4,502 | 1,714 |
-| Fabrication check | clean | clean |
+| Groq | `[]` — nothing at all | 15 |
+| Gemini | `['C#']` | 15–25 |
 
-Per fixture, Groq, with where the score landed inside the band the author set:
+Groq returned an empty `matchedSkills` array and listed C# as a gap. Gemini credited it. Same
+CV, same prompt, same temperature.
 
-| fixture | band | score | position |
-|---|---|---|---|
-| `junior-fullstack-next-node` — the clear fit | 70–92 | 85 | 68% |
-| `backend-node-greek-startup` — Greek, genuine fit | 65–90 | 85 | 80% |
-| `frontend-react-testing-heavy` | 55–80 | 65 | 40% |
-| `ai-engineer-rag-python` | 45–75 | 55 | 33% |
-| `enterprise-fullstack-long-posting` | 25–55 | 45 | 67% |
-| `wordpress-agency-greek` — Greek, partial | 18–48 | 45 | **90%** |
-| `react-native-mobile-adjacent` | 28–58 | 30 | 7% |
-| `dotnet-senior-five-years` | 8–35 | 15 | 26% |
-| `data-engineer-spark` — clear mismatch | 0–22 | 20 | **91%** |
-| `senior-devops-kubernetes` — clear mismatch | 0–22 | 20 | **91%** |
+This is a **provider-quality datapoint, not a prompt bug**, and it is deliberately not being
+fixed with an `analyze@3`. A prompt rewritten until one provider stops making one mistake is a
+prompt fitted to that provider, and the conformance suite exists precisely so the layer does not
+quietly depend on one model's habits. It is recorded here instead.
 
-**Ten out of ten in range is not the finding.** Both deliberate mismatches landed at 20 against a
-ceiling of 22, and they did so on separate runs. The model has a floor: it does not produce
-genuinely low scores, and a band ending at 15 would have failed both. A pass rate this clean
-mostly measures how wide the bands are.
+The reverse case exists too, and it favours Groq. Gemini dropped 8 evidence quotes across 30
+samples where Groq dropped 0 — quotes that read plausibly but were not verbatim in the CV, so
+the grounding check discarded them. On two fixtures that is exactly why `react` shows as missed:
+the skill was matched, its evidence was invented, and grounding removed it. Cheaper and more
+deterministic, but looser with quotations.
 
-The disagreements are the useful output:
+### 3. Neither model produces a genuinely low score
 
-- **Groq missed C# entirely** on the .NET fixture — `matchedSkills` came back empty — although
-  the CV lists Unity and C# under game development. Gemini credited it. The fixture was written
-  to catch exactly this, and the model is wrong, not the band.
-- **Gemini scored the Greek WordPress ad 65 against a band of 18–48**, for a candidate with no
-  WordPress, WooCommerce or MySQL. Here the band is right and the model is too generous.
-- **`ai-engineer-rag-python` assumes Python is a gap**, but the CV mentions Python in the thesis
-  line. Gemini found it and scored 78 against a ceiling of 75. That is a miscalibrated fixture,
-  not a model error.
-- **Four of ten Groq runs hit the 10-gap cap**, and `senior-devops-kubernetes` missed `aws` from
-  `mustFlagGaps` because the cap cut it. The cap that stopped truncation now costs recall.
-- **The same CV was scored inconsistently across fixtures**: `data-engineer-spark` matched SQL
-  while `junior-fullstack-next-node` listed SQL as a gap.
+Both deliberate mismatches — a Spark data-engineering role and a senior Kubernetes role, against
+a junior fullstack CV with no overlap in either — land near the top of a 0–22 band:
 
-Two of the three "missed" skills are the metric being strict rather than the model being wrong:
-`CSS3` was answered as `CSS`, and `accessibility` as `WCAG 2.2 AA`. Token-boundary matching
-cannot see that, and loosening it would reintroduce the bug where `go` matches `mongodb`.
+| fixture | Groq | Gemini |
+|---|---|---|
+| `data-engineer-spark` | 20 | 15 |
+| `senior-devops-kubernetes` | 20 | 10 |
 
-**Run-to-run variance at temperature 0.2 reaches 15 points** on identical input — measured across
-two Groq runs, where five of ten fixtures moved and the largest jump was 30 → 45. Any band
-narrower than about twenty points would flake for reasons that have nothing to do with the
-prompt. Evals arguably want temperature 0; the app wants 0.2. Not silently reconciled.
+A band ending at 15 would have failed both on Groq. The floor appears to sit around 20: the
+model finds *something* creditable — Docker, SQL, "REST API design" — in a posting that shares
+essentially nothing with the CV. For a tool whose job is to tell someone not to bother applying,
+that is the number that matters, and it is the one the scoring prompt should be judged on next.
+
+### The table
+
+Gemini, 3 runs per fixture at temperature 0, from
+[`evals/results/analyze-2-gemini.json`](evals/results/analyze-2-gemini.json):
+
+Bands shown are the current ones. The saved run predates two of them being adjusted
+(`ai-engineer-rag-python` 45–75 → 50–85, `wordpress-agency-greek` 18–48 → 18–40); neither change
+moves a verdict, and the reasoning for each is in the fixture's own `notes`.
+
+| fixture | band | median | spread | in band |
+|---|---|---|---|---|
+| `junior-fullstack-next-node` — the clear fit | 70–92 | 90 | 0 | yes |
+| `backend-node-greek-startup` — Greek, genuine fit | 65–90 | 90 | 0 | yes |
+| `frontend-react-testing-heavy` | 55–80 | 75 | 0 | yes |
+| `ai-engineer-rag-python` | 50–85 | 68 | 0 | yes |
+| `react-native-mobile-adjacent` | 28–58 | 45 | 0 | yes |
+| `enterprise-fullstack-long-posting` | 25–55 | 25 | 0 | yes, at the floor |
+| `dotnet-senior-five-years` | 8–35 | 25 | 0 | yes |
+| `data-engineer-spark` — clear mismatch | 0–22 | 15 | 0 | yes |
+| `senior-devops-kubernetes` — clear mismatch | 0–22 | 10 | 0 | yes |
+| `wordpress-agency-greek` — Greek, partial | 18–40 | 65 | 0 | **no** |
+
+| | Gemini, 3 runs, temp 0 |
+|---|---|
+| Schema-valid, of answers received | 28/28 |
+| Median inside band | 9/10 |
+| `mustFindSkills` recall | 77% |
+| `mustFlagGaps` recall | 96% |
+| Dropped evidence quotes | 8 |
+| Samples that never answered | 2 (quota) |
+| Repairs needed | 0 |
+| Gap entries that were phrases, not skills | 0 |
+| Mean latency / tokens | 11.7s / 2,509 |
+| Fabrication regression case | clean |
+
+The one failure is the intended kind. `wordpress-agency-greek` scores 65 against a band of
+18–40 — a WordPress agency role held by someone with no WordPress, WooCommerce or MySQL. The
+band was tightened *after* seeing that score, not to accommodate it. It records a disagreement
+with the model rather than a target the model met.
+
+The Greek pair is the language control: a Greek ad that genuinely fits scored 90, a Greek ad
+that partly fits scored 65, both in line with their English counterparts. Language is not the
+variable.
+
+**Not in this table:** a complete Groq sweep at temperature 0. Groq enforces a 200,000
+tokens-per-day ceiling that appears in no response header — it announced itself by rejecting the
+three-run sweep partway through, after 8 of 30 samples. The Groq column above is drawn from
+those 8 plus an earlier complete run at temperature 0.2. Finishing it needs another day's quota.
 
 ### `analyze@1` → `analyze@2`: the gap-granularity fix
 

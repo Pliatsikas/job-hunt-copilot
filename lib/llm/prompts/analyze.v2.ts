@@ -19,13 +19,19 @@ export type AnalyzeInput = {
  * So: one skill per entry, and requirements that are not skills belong in
  * redFlags, which already exists for exactly that.
  *
- * The cap of 10 is part of the same change rather than a separate tidy-up.
+ * The cap is part of the same change rather than a separate tidy-up.
  * Splitting a bullet like "PixiJS, Webpack, Gulp and WebAudio" into four
  * entries multiplies the list, and the first v2 run overran max_tokens
  * mid-array on a WordPress ad that produced sixteen gaps — Groq's strict mode
  * rejected the truncated JSON outright. The schema stays permissive, because
  * Analysis rows written under v1 are re-parsed by the UI and one of them has
  * fifteen gaps; capping the schema would stop those rendering.
+ *
+ * The cap is enforced again in code, by severity, in lib/llm/grounding.ts.
+ * Asking the model to order and truncate correctly is necessary but not
+ * sufficient: four of ten fixtures hit the old cap of 10 exactly, and on the
+ * DevOps posting `aws` — a genuine blocker — was the entry that fell off.
+ * A cap that can silently discard a blocker is worse than no cap.
  */
 export const system = `You compare a candidate's CV against a job description and return a structured assessment.
 
@@ -57,11 +63,12 @@ Rules for gaps — read these carefully, they are the most common source of bad 
 - gaps[].howToBridge must be concrete and achievable: what to say in an interview, or what
   could realistically be learned soon. No filler.
 - Do not list the same skill twice.
-- At most 10 gaps, ranked with blockers first. Splitting requirements into individual skills
-  makes it easy to produce thirty entries; a list that long is not advice, and the trivia at
-  the bottom ("Slack", "FileZilla", "Postman") crowds out the two things that actually decide
-  the application. If more than 10 are genuinely missing, keep the 10 that matter and let the
-  rest go.
+- At most 12 gaps, and they MUST be ordered by severity: every blocker first, then every
+  important, then nice_to_have. Splitting requirements into individual skills makes it easy to
+  produce thirty entries; a list that long is not advice, and the trivia at the bottom
+  ("Slack", "FileZilla", "Postman") crowds out the two things that actually decide the
+  application. If more than 12 are genuinely missing, drop from the bottom — never leave out a
+  blocker to make room for a nice_to_have.
 
 Remaining rules:
 - redFlags are about the posting, not the candidate (unrealistic experience demands for the

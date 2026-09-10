@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { VALID_RESULT } from "../lib/llm/fixtures";
 import type { AnalysisResult } from "../lib/schemas/analysis";
 import type { AnalysisFixture } from "../lib/schemas/eval";
-import { isWordyGap, recall, scoreDeviation, scoreFixture, skillMatches } from "./metrics";
+import { SKILL_ALIASES, isWordyGap, recall, scoreDeviation, scoreFixture, skillMatches } from "./metrics";
 
 describe("scoreDeviation", () => {
   it("is zero anywhere inside the band", () => {
@@ -161,5 +161,63 @@ describe("skillMatches token boundaries", () => {
   it("does not blow up on regex metacharacters in a skill name", () => {
     expect(skillMatches("c++", "c++ and rust")).toBe(true);
     expect(skillMatches("a.b", "axb")).toBe(false);
+  });
+});
+
+describe("SKILL_ALIASES", () => {
+  it("resolves the misses the first live run produced", () => {
+    // Both were the metric being strict, not the model being wrong: the
+    // fixture asked for css3 and the model answered CSS; the fixture asked
+    // for accessibility and the model answered WCAG 2.2 AA.
+    expect(skillMatches("css3", "CSS")).toBe(true);
+    expect(skillMatches("accessibility", "WCAG 2.2 AA")).toBe(true);
+    expect(skillMatches("llm evaluation", "RAG evaluation")).toBe(true);
+  });
+
+  it("is symmetric, whichever side the fixture names", () => {
+    expect(skillMatches("CSS", "css3")).toBe(true);
+    expect(skillMatches("WCAG 2.2 AA", "accessibility")).toBe(true);
+  });
+
+  it("does not make unrelated skills equivalent", () => {
+    // The point of a table over a looser regex: nothing leaks between groups.
+    expect(skillMatches("css3", "html5")).toBe(false);
+    expect(skillMatches("accessibility", "typescript")).toBe(false);
+    expect(skillMatches("react native", "react")).toBe(false);
+    expect(skillMatches("go", "mongodb")).toBe(false);
+  });
+
+  it("keeps every alias group internally consistent", () => {
+    // A name in two groups would silently make those groups equivalent.
+    const seen = new Map<string, number>();
+    SKILL_ALIASES.forEach((group, index) => {
+      for (const name of group) {
+        const previous = seen.get(name);
+        expect(
+          previous === undefined,
+          `"${name}" appears in alias groups ${previous} and ${index}`,
+        ).toBe(true);
+        seen.set(name, index);
+      }
+    });
+  });
+});
+
+describe("skillMatches directionality", () => {
+  it("accepts an answer more specific than the fixture asked for", () => {
+    expect(skillMatches("react", "React 18")).toBe(true);
+    expect(skillMatches("azure", "Azure App Service")).toBe(true);
+  });
+
+  it("rejects an answer less specific than the fixture asked for", () => {
+    // "react" does not satisfy "react native" — that distinction is the whole
+    // point of the adjacent-but-not-aligned fixture.
+    expect(skillMatches("react native", "React")).toBe(false);
+    expect(skillMatches("asp.net core web api", "web")).toBe(false);
+  });
+
+  it("still resolves abbreviations, via the table rather than the regex", () => {
+    expect(skillMatches("node.js", "Node")).toBe(true);
+    expect(skillMatches("postgresql", "Postgres")).toBe(true);
   });
 });

@@ -84,6 +84,46 @@ Deliberately not started before M9. Recorded now so the list doesn't get rebuilt
 
 ## Open
 
+- **Groq enforces a tokens-per-day ceiling that appears in no response header.** The headers
+  advertise `x-ratelimit-limit-requests: 1000` (per day) and `x-ratelimit-limit-tokens: 8000`
+  (per minute). There is also a 200,000 **tokens per day** limit, which announced itself only
+  by rejecting an M9 eval sweep partway through: `on tokens per day (TPD): Limit 200000`. At
+  ~4,500 tokens per `analyze@2` call that is roughly 44 analyses a day — so tokens bind, and
+  the 1,000-request ceiling is never reached.
+
+  Budgets were corrected in the same change (`GLOBAL_DAILY_TOKENS` 2,250,000 → 180,000, admin
+  400,000 → 120,000). The old global was eleven times a wall it could never hit, which is the
+  same shape of error as M8's per-user cap being 2.5× the project's whole capacity — found
+  twice now, in two different metrics, both times by running into the wall rather than by
+  reading documentation. Recovery is slow and gradual, not a midnight reset: forty minutes
+  after exhaustion only ~2,200 tokens had freed.
+
+- **`gpt-oss-120b` is not deterministic at temperature 0.** Three runs of the same fixture at
+  temperature 0 returned 55, 68 and 65. Gemini returned identical scores on all ten fixtures
+  under the same conditions. Mixture-of-experts routing is the likely cause; whatever the
+  cause, the consequence is that a Groq eval number carries ~±13 points of noise and no band
+  narrower than ~26 points means anything there. Recorded because it is easy to assume
+  temperature 0 buys reproducibility, and on this provider it does not.
+
+
+- **The same CV is scored inconsistently across postings, within one run.** Observed on the
+  first live eval run (`analyze@2`, groq/gpt-oss-120b, 2026-09-10): `data-engineer-spark`
+  listed SQL under `matchedSkills`, while `junior-fullstack-next-node` listed SQL as a *gap* —
+  same CV, same prompt version, same provider, same run. Both cannot be right.
+
+  The CV's only SQL evidence is a Scrimba certification line, so it is a genuinely borderline
+  call; what is wrong is making it differently in two places without anything in the input
+  changing. Deliberately **not** fixed with a prompt change now. A tweak aimed at one symptom,
+  applied without a way to tell improvement from the ±15-point run-to-run noise, is how prompt
+  files accumulate rules nobody can later justify. The eval harness now measures that noise
+  (`pnpm eval --runs N`), so the honest order is: establish the floor, then change one thing,
+  then check whether the change cleared it.
+
+  Worth noting the shape of the bug for whoever picks it up: it is not a grounding failure —
+  the evidence quote passed the substring check — it is the model's threshold for "does a
+  course count as a skill" moving with the surrounding context.
+
+
 - **`redFlags` now carries two different kinds of thing.** `analyze@2` routes non-skill
   requirements there — years of experience, degrees, location — alongside what `redFlags` already
   held: judgements about whether the posting is a bad deal ("no salary range", "one developer

@@ -1,7 +1,7 @@
 {
   "id": "senior-devops-kubernetes",
   "kind": "analysis",
-  "notes": "Clear mismatch. A high score here would mean the analysis is generous to anything technical. Docker is the only genuine overlap, and it should be credited as exactly that and no more.",
+  "notes": "Clear mismatch. A high score here would mean the analysis is generous to anything technical. Docker is the only genuine overlap, and it should be credited as exactly that and no more. Band deliberately NOT tightened. Tightening 0-22 to 0-15 was considered and rejected on measurement: Groq's spread at temperature 0 reached 13 points on one fixture, so a 15-point band would fail or pass on sampling noise rather than on prompt quality. Both models do sit near the ceiling here — Groq 20, Gemini 10-15 — which is itself the finding: neither produces genuinely low scores.",
   "roleTitle": "Senior DevOps Engineer",
   "companyName": null,
   "source": "synthetic",

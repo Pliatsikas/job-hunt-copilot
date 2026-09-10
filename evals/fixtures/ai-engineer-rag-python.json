@@ -1,20 +1,21 @@
 {
   "id": "ai-engineer-rag-python",
   "kind": "analysis",
-  "notes": "The candidate's differentiator is RAG and LLM evaluation, but this ad is Python-first with a specific vector stack. Tests whether genuinely relevant AI experience is credited while the ecosystem gap is still named.",
+  "notes": "The candidate's differentiator is RAG and LLM evaluation, and the CV does mention Python in the thesis line — the original band of 45-75 wrongly assumed Python was absent, and Gemini found it and scored 78, outside a ceiling that should never have been there. Widened to 50-85 and Python added to mustFindSkills, so the disagreement between providers is measured rather than mistaken for a model error. FastAPI and the vector stack remain genuine gaps.",
   "roleTitle": "AI Engineer (RAG)",
   "companyName": null,
   "source": "synthetic",
   "language": "en",
   "jobDescription": "AI Engineer — Retrieval Augmented Generation\n\nWe build document intelligence tooling for legal teams. You will own retrieval quality end to end.\n\nWhat the role involves:\n- Design and improve RAG pipelines: chunking strategies, embeddings, hybrid retrieval, reranking\n- Build evaluation harnesses that measure retrieval quality rather than vibes\n- Work in Python with FastAPI for serving\n- Operate a vector store (we use pgvector today, evaluating Qdrant)\n- Integrate LLM providers and manage prompt versioning and cost\n\nWhat we expect:\n- Practical experience building a RAG system, including the parts that go wrong\n- Comfort with Python and its data tooling\n- An evaluation mindset: you should be able to explain how you know a change helped\n- Awareness of prompt injection and grounding failures\n\nNice to have: LangChain or LlamaIndex, experience with OCR pipelines, published benchmarks or a thesis in the area.",
   "expectedScoreRange": [
-    45,
-    75
+    50,
+    85
   ],
   "mustFindSkills": [
     "rag pipelines",
     "llm integration",
-    "llm evaluation"
+    "llm evaluation",
+    "python"
   ],
   "mustFlagGaps": [
     "fastapi"

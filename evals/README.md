@@ -94,6 +94,29 @@ saved file, not a fresh call. Each row stores the full grounded analysis, so a
 result can be audited — "was the score in range?" is answerable from the summary,
 but "is the model wrong or is the band wrong?" needs the reasoning.
 
+### Temperature, and the noise floor
+
+Evals run at **temperature 0**; the app runs analysis at 0.2. Different jobs: the app
+writes for a person, where slight variation reads as natural, while an eval has to
+be repeatable or prompt effects and sampling noise arrive in the same number.
+
+Temperature 0 is not the whole answer. Measured across three runs of each fixture:
+
+| provider | spread |
+|---|---|
+| Gemini, all 10 fixtures | 0 — identical scores every run |
+| Groq `gpt-oss-120b` | up to 13 points (`ai-engineer-rag-python`: 55, 68, 65) |
+
+`gpt-oss-120b` is mixture-of-experts and is not deterministic at temperature 0 the
+way Gemini is. So the noise floor is a property of the provider, and on Groq it is
+about ±13 — meaning **no band narrower than roughly 26 points is honest there**. Set
+bands with that in mind, quote the median over several runs, and put the spread
+beside it.
+
+`--runs N` (default 3) reports both. Note that it holds the model fixed for all runs
+of one fixture: rotating per call gave each fixture three different siblings, and
+the resulting "spread" was model-to-model difference mislabelled as sampling noise.
+
 ### On the metrics
 
 `schema-valid` is counted against **answers received**, not fixtures attempted. A
