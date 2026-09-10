@@ -21,6 +21,17 @@ The demo account is seeded with a profile, three applications, a stored analysis
 letter, so you can see the product without spending any of the shared model budget. Registration
 is open if you would rather use your own CV — you get 12 model calls a day.
 
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/today.png" alt="The Today page: two applications overdue for a follow-up, one due today, and one gone quiet for eleven days, each with a snooze and a done action"></td>
+<td width="50%"><img src="docs/screenshots/insights.png" alt="The Insights page: a sentence naming the most common blocking gap, a bar chart of recurring skill gaps with counts printed beside each bar, and a line chart of average match score by month"></td>
+</tr>
+<tr>
+<td><strong>Today</strong> — what needs chasing, computed from the last activity on each application rather than from its created date.</td>
+<td><strong>Insights</strong> — the patterns across every analysis. Below five analyses it says how many more are needed instead of drawing a line through noise.</td>
+</tr>
+</table>
+
 ## The problem
 
 I applied to 12 jobs over six weeks. The applications lived in a spreadsheet, the job ads lived
