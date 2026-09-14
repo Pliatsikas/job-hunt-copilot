@@ -98,12 +98,20 @@ Deliberately not started before M9. Recorded now so the list doesn't get rebuilt
   reading documentation. Recovery is slow and gradual, not a midnight reset: forty minutes
   after exhaustion only ~2,200 tokens had freed.
 
-- **`gpt-oss-120b` is not deterministic at temperature 0.** Three runs of the same fixture at
-  temperature 0 returned 55, 68 and 65. Gemini returned identical scores on all ten fixtures
-  under the same conditions. Mixture-of-experts routing is the likely cause; whatever the
-  cause, the consequence is that a Groq eval number carries ~±13 points of noise and no band
-  narrower than ~26 points means anything there. Recorded because it is easy to assume
-  temperature 0 buys reproducibility, and on this provider it does not.
+- **`gpt-oss-120b` is not deterministic at temperature 0.** The full three-run sweep
+  (2026-09-14): 8 of 10 fixtures had non-zero spread, median 7 points, worst 20
+  (`senior-devops-kubernetes`: 10, 25, 30 — and the `matchedSkills` list went from empty to
+  five entries across those runs, so the judgement moves, not just the score). Gemini returned
+  identical scores on all ten fixtures under the same conditions. Mixture-of-experts routing is
+  the likely cause. Consequence: a Groq eval number carries up to ±20 points of noise, and a
+  band has to be at least twice its fixture's spread to mean anything. Recorded because it is
+  easy to assume temperature 0 buys reproducibility, and on this provider it does not.
+
+  The same noise retracted a finding. On 10 Sep a single Groq run returned an empty
+  `matchedSkills` on the C#/Unity fixture and it went into the README as "Groq misses Unity
+  C#, Gemini finds it". The three-run sweep credited C# on every run. Corrected in the README
+  to what it actually was: one sample. A possible contributor worth naming — the provider may
+  have changed the deployed model between the two dates; there is no way to tell from here.
 
 
 - **The same CV is scored inconsistently across postings, within one run.** Observed on the
@@ -154,17 +162,6 @@ Deliberately not started before M9. Recorded now so the list doesn't get rebuilt
   often than hourly in aggregate and never at all if nobody signs in — both acceptable, since
   the rows are tiny and only matter under an attack that is itself generating the writes.
 
-- **gpt-oss-120b spends reasoning tokens on prose.** A 30-token completion came back with
-  `reasoning_tokens: 28`. At the 2,000-token generation budget there is room, so output is not
-  truncated — but those tokens are billed and counted, so cover letters cost more against the
-  budget than their length suggests. Groq exposes `reasoning_effort` for these models; worth
-  measuring whether "low" changes letter quality before setting it. Same shape as the Gemini
-  3.x thinking problem from M4, solved by disabling thinking on `stream()` only.
-
-  **Resolved in M9**: 824 reasoning tokens of 972 completion tokens by default, against 36 at
-  `reasoning_effort: "low"` — 46% fewer tokens end to end, a third of the latency, no quality
-  loss on the letter. Set to `low` on `stream()` only.
-
 
 - **Dates render in a fixed English format, not the viewer's locale.** `lib/format.ts` uses a
   pinned `en-GB` formatter with `timeZone: "UTC"`. A Server Component can't see the viewer's
@@ -173,6 +170,13 @@ Deliberately not started before M9. Recorded now so the list doesn't get rebuilt
   (SPEC.md), so this is consistent for now. Revisit if the app ever needs real localisation.
 
 ## Done
+
+- **`reasoning_effort: "low"` on prose (M9).** `gpt-oss-120b` reasons before answering, and
+  on a cover letter that reasoning was most of the bill: 824 of 972 completion tokens by
+  default, against 36 at `low`. Same letter, 46% fewer tokens end to end, a third of the
+  latency, clean of fabricated claims both ways. Set on `stream()` only; `complete()` keeps
+  full reasoning because the structured analysis is where deliberation earns its cost — the
+  same split as disabling Gemini's thinking budget for prose in M4.
 
 - ~~ESLint rule confining `db.analysis.*` / `db.document.*` / `db.event.*` to
   `lib/applications/`~~ — landed in M2 as a `no-restricted-syntax` selector in

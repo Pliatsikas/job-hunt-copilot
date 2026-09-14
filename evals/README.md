@@ -102,16 +102,21 @@ be repeatable or prompt effects and sampling noise arrive in the same number.
 
 Temperature 0 is not the whole answer. Measured across three runs of each fixture:
 
-| provider | spread |
-|---|---|
-| Gemini, all 10 fixtures | 0 — identical scores every run |
-| Groq `gpt-oss-120b` | up to 13 points (`ai-engineer-rag-python`: 55, 68, 65) |
+| provider | fixtures with spread 0 | median spread | worst |
+|---|---|---|---|
+| Gemini | 10 of 10 | 0 | 0 |
+| Groq `gpt-oss-120b` | 2 of 10 | 7 | 20 (`senior-devops-kubernetes`: 10, 25, 30) |
 
 `gpt-oss-120b` is mixture-of-experts and is not deterministic at temperature 0 the
-way Gemini is. So the noise floor is a property of the provider, and on Groq it is
-about ±13 — meaning **no band narrower than roughly 26 points is honest there**. Set
-bands with that in mind, quote the median over several runs, and put the spread
-beside it.
+way Gemini is. So the noise floor is a property of the provider. On Groq it is ±7 on
+a typical fixture and ±20 on the worst — and it is not score jitter on a fixed
+judgement: the Kubernetes fixture credited nothing on one run and five skills on
+another. A band has to be at least twice its fixture's spread to mean anything.
+Quote the median over several runs and put the spread beside it.
+
+The same noise ate one of my own findings. A single run had Groq returning an empty
+`matchedSkills` on the C#/Unity fixture; the three-run sweep four days later credited
+C# every time. What looked like a provider-quality datapoint was one sample.
 
 `--runs N` (default 3) reports both. Note that it holds the model fixed for all runs
 of one fixture: rotating per call gave each fixture three different siblings, and

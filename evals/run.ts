@@ -350,8 +350,12 @@ async function main() {
       `                 spread over ${models.length} sibling models, ~${Math.ceil(calls / models.length)} each against a measured 20/day per model`,
     );
   } else {
+    // Tokens, not requests, are what run out on Groq: 200,000/day, a limit
+    // that appears in no header and stopped the first three-run sweep at
+    // 8 of 30 samples. Estimated from measured means under analyze@2.
+    const estTokens = analyses * args.runs * 4_500 + (fixtures.length - analyses) * args.runs * 900;
     console.log(
-      `                 against a measured 1,000/day; roughly ${((calls / 1000) * 100).toFixed(1)}% of the daily budget`,
+      `                 ~${estTokens.toLocaleString("en-GB")} tokens against a measured 200,000/day (${((estTokens / 200_000) * 100).toFixed(0)}%); requests are not the binding limit`,
     );
   }
 
