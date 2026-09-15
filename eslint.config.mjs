@@ -17,9 +17,11 @@ const compat = new FlatCompat({
 // instead of relying on memory. `no-restricted-imports` is the wrong lever —
 // lib/db is legitimately imported all over for User/Application access — so the
 // restriction is on the property access itself.
+// `tx` too: a transaction client is the same surface, and the first code
+// that reached Analysis from outside lib/applications/ did it through one.
 const ownedModelAccess = {
   selector:
-    "MemberExpression[object.name='db'][property.name=/^(analysis|document|event)$/]",
+    "MemberExpression[object.name=/^(db|tx)$/][property.name=/^(analysis|document|event)$/]",
   message:
     "Reach Analysis/Document/Event through lib/applications/ — those queries must filter by userId AND applicationId (CLAUDE.md rule 1).",
 };

@@ -13,7 +13,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/today", "/applications", "/insights", "/usage", "/profile", "/api/"],
+      disallow: ["/today", "/applications", "/leads", "/insights", "/usage", "/profile", "/api/"],
     },
   };
 }

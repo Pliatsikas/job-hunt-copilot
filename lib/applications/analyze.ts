@@ -2,20 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "../db";
-import { getProvider } from "../llm";
-import { groundAnalysis } from "../llm/grounding";
-import * as analyzePrompt from "../llm/prompts/analyze.v2";
-import { AnalysisError, completeWithRepair } from "../llm/repair";
-import { assertWithinBudget, recordProviderCall, UsageLimitError } from "../llm/usage";
+import { AnalysisError } from "../llm/repair";
+import { UsageLimitError } from "../llm/usage";
 import { LlmAuthError, LlmQuotaError } from "../llm/types";
+import { runAnalysis } from "../analysis/run";
 import { getProfile } from "../profile/get";
-import { analysisResultSchema } from "../schemas/analysis";
 import { requireOwnedApplication } from "./guards";
 
 export type AnalyzeState = { error?: string; ranAt?: number };
-
-const ANALYSIS_TEMPERATURE = 0.2;
-const ANALYSIS_MAX_TOKENS = 4096;
 
 export async function analyzeApplication(
   applicationId: string,
@@ -32,28 +26,13 @@ export async function analyzeApplication(
       };
     }
 
-    await assertWithinBudget(application.userId);
-
-    const provider = getProvider();
-
-    const completion = await completeWithRepair(
-      provider,
-      {
-        system: analyzePrompt.system,
-        user: analyzePrompt.buildUserPrompt({
-          cvText: profile.cvText,
-          skills: profile.skills,
-          jobDescription: application.jobDescription,
-        }),
-        temperature: ANALYSIS_TEMPERATURE,
-        maxTokens: ANALYSIS_MAX_TOKENS,
-      },
-      analysisResultSchema,
-      (usage) => recordProviderCall(application.userId, usage),
-    );
-
-    // Grounding runs after a successful parse and never triggers a repair.
-    const { result, droppedClaims } = groundAnalysis(completion.data, profile.cvText);
+    const run = await runAnalysis({
+      userId: application.userId,
+      cvText: profile.cvText,
+      skills: profile.skills,
+      jobDescription: application.jobDescription,
+    });
+    const { result, droppedClaims } = run;
 
     // The Analysis row, its event, and the denormalized fields on Application
     // land together — Application.latestMatchScore has exactly one writer and
@@ -63,15 +42,15 @@ export async function analyzeApplication(
         data: {
           applicationId: application.id,
           userId: application.userId,
-          provider: provider.name,
-          model: provider.model,
-          promptVersion: analyzePrompt.version,
+          provider: run.provider,
+          model: run.model,
+          promptVersion: run.promptVersion,
           matchScore: result.matchScore,
           result,
           droppedClaims,
-          inputTokens: completion.usage.inputTokens,
-          outputTokens: completion.usage.outputTokens,
-          latencyMs: completion.latencyMs,
+          inputTokens: run.inputTokens,
+          outputTokens: run.outputTokens,
+          latencyMs: run.latencyMs,
         },
       });
 
@@ -80,7 +59,7 @@ export async function analyzeApplication(
           applicationId: application.id,
           userId: application.userId,
           type: "ANALYSIS_RUN",
-          body: `Match score ${result.matchScore} · ${provider.name}/${provider.model}`,
+          body: `Match score ${result.matchScore} · ${run.provider}/${run.model}`,
         },
       });
 

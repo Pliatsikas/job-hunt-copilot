@@ -180,6 +180,16 @@ an edit, but as a whole line, character for character after the same normalisati
 uses. Anything that differs is discarded and shown to the user as left out rather than hidden.
 The owner asked for this after trying the PDF import: their words, or nothing.
 
+**87 inserts in one transaction blew a 5-second timeout over a pooled connection.** The first
+run of a saved search against a real Greenhouse board pulled 87 postings and inserted them one
+by one inside an interactive transaction — fine locally, dead on Neon. One `createMany` with
+`skipDuplicates` replaced the loop and, as a side effect, let the unique `(userId, dedupeKey)`
+constraint do the deduplication itself instead of a read-then-write that could race. The
+sources are four documented public APIs and nothing else: each adapter is pinned to one API host
+in code, so the "no scraping" rule is a refused request rather than a convention — and the
+reasons it is a rule at all are in the spec, the last of them being that "I scraped LinkedIn" is
+not something to say in an interview.
+
 ## Eval results
 
 Ten job ads against one real CV, on a pinned prompt version, so a prompt change produces a

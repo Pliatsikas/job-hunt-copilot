@@ -520,3 +520,21 @@ GitHub είναι απόδειξη, όχι κανάλι επικοινωνίας
 όχι εύρημα. Export σε PDF μέσω print stylesheet και του διαλόγου εκτύπωσης του browser: μηδέν
 dependencies, και το έγγραφο είναι απλό κείμενο σε sections, που ένα print stylesheet το
 αποδίδει καλύτερα από οποιοδήποτε generated layout.
+
+**Α14 — Το ingestion διαβάζει μόνο δημόσια JSON APIs, με allowlist hosts στον κώδικα, και το
+score στην άφιξη είναι η ίδια ανάλυση με περιορισμένο αριθμό.** Τέσσερις πηγές (Greenhouse,
+Lever, Arbeitnow, Remotive), καθεμία adapter καρφωμένος σε έναν API host — το
+`lib/ingest/sources/fetch.ts` αρνείται κάθε άλλο host και κάθε μη-https URL, ώστε ο κανόνας #4
+να είναι μηχανισμός και όχι σύμβαση. Τα Leads είναι ξεχωριστό μοντέλο από τα Applications: το
+triage είναι ακριβώς το βήμα «αξίζει;», και ένα απορριφθέν lead δεν γεμίζει το pipeline.
+Dedupe με `(userId, dedupeKey)` unique constraint, όπου το key είναι company+title με
+αφαιρεμένους τόνους, παρενθέσεις και m/w/d — η ίδια θέση από δύο πηγές είναι ένα lead. Η
+ανάλυση εξήχθη σε `lib/analysis/run.ts` χωρίς γνώμη για το πού πάει το αποτέλεσμα, ώστε το
+auto-score να είναι η ίδια ανάλυση με το κουμπί και όχι φθηνότερος ξάδερφός της· ο κανόνας 8
+κρατάει γιατί το `run.ts` δεν γράφει τίποτα. Score στην άφιξη μόνο για τα 3 νεότερα leads ανά
+τρέξιμο, γιατί 87 postings σε budget 12/μέρα θα ξόδευαν τη μέρα πριν ο χρήστης δει ένα· τα
+υπόλοιπα περιμένουν click, και το μήνυμα του run λέει πόσα. Το promote φτιάχνει Application
+και μεταφέρει το score ως Analysis row στο ίδιο transaction — ζει στο `lib/applications/`
+γιατί εκεί ανήκουν οι εγγραφές Analysis/Event, και ο ESLint κανόνας τώρα πιάνει και το `tx.`,
+όχι μόνο το `db.`, αφού ο πρώτος κώδικας που έφτασε Analysis απ' έξω το έκανε μέσα από
+transaction.

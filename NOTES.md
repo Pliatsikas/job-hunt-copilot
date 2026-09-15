@@ -84,6 +84,38 @@ Deliberately not started before M9. Recorded now so the list doesn't get rebuilt
 
 ## Open
 
+- **Score-on-arrival picks the newest three, not the most likely.** On the Vercel board that
+  meant three sales roles scored 30/10/10 against a developer CV while 83 engineering postings
+  waited. A cheap pre-filter — title or description overlap with the profile's skills, no
+  model call — should choose which leads spend the budget. Worth doing before any cron exists,
+  since a scheduled run would compound it.
+- **Lever's adapter is written to the documented format but has not run against a live
+  board.** The slugs tried had moved off Lever. The not-found shape (`{ ok: false }` with a
+  200) is handled and tested; the happy path is tested against the documented JSON only.
+- **No scheduler.** Saved searches run on a click. Vercel cron is available on this plan if
+  it ever matters; the budget cap on arrival scoring is what makes that safe to add.
+
+
+- **M11 follow-ups from the owner, 2026-09-15 — deferred until after M12, by their call.**
+  1. **Language choice for the tailored CV.** Today the CV keeps the language it was written
+     in (Α13). The owner wants to pick Greek or English per tailoring. That conflicts with
+     "no rewriting" only on the surface: the honest shape is a *translated* CV as a separate
+     document type or a separate version, every line still traceable to one line of the
+     source, with the translation grounding done line-by-line (source line ↔ target line)
+     rather than by substring. Needs its own decision entry before it is built.
+  2. **The print view should look like the real CV.** Plain sections in a print stylesheet
+     is functional, not attractive. The owner's actual CV is the reference layout. Keep the
+     no-dependency print-to-PDF approach; invest in the stylesheet (two-column header, name
+     block, tighter type), not in a PDF library.
+  3. **Skills selection when they do not all fit.** The owner's CV lists 31 skills. The
+     model should pick the most relevant to the posting when the full list would not fit,
+     rather than dropping the line or keeping all 31. Under exact-line grounding a skills
+     line is atomic ("Frontend: React, Next.js, …" is one line), so this needs a deliberate
+     exception: a skills line may be *subsetted* — every skill kept must appear in the
+     original line, in the original order, none added. Any other line stays exact. Record
+     as a decision when built; it is the one place selection goes below line level.
+
+
 - **M10 feedback from the owner, 2026-09-15: the import should not rewrite the CV.** Tried
   against the real CV. The objection is not to extraction or redaction but to the cleanup
   pass itself — the owner does not want a model producing text that then stands in for

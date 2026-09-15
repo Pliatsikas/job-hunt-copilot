@@ -34,6 +34,8 @@ model User {
   documents     Document[]
   events        Event[]
   usageCounters UsageCounter[]
+  savedSearches SavedSearch[]
+  leads         Lead[]
 }
 
 model Profile {
@@ -268,4 +270,73 @@ enum FollowUpContext {
   AFTER_APPLYING
   AFTER_INTERVIEW
   NUDGE
+}
+
+/// Πηγές ingestion. Μόνο δημόσια, τεκμηριωμένα APIs φτιαγμένα γι' αυτή τη χρήση —
+/// ποτέ HTML (SPEC.md §6.4, CLAUDE.md #4). Η λίστα είναι enum ώστε μια νέα πηγή
+/// να είναι migration + adapter, όχι ένα string που εμφανίστηκε από πουθενά.
+enum LeadSource {
+  GREENHOUSE
+  LEVER
+  ARBEITNOW
+  REMOTIVE
+}
+
+enum LeadStatus {
+  NEW
+  DISMISSED
+  PROMOTED
+}
+
+/// Μια αποθηκευμένη αναζήτηση: πηγή + ερώτημα (company slug για τα board APIs,
+/// λέξη-κλειδί για τα job APIs). Τρέχει χειροκίνητα· δεν υπάρχει cron.
+model SavedSearch {
+  id        String     @id @default(cuid())
+  userId    String
+  name      String
+  source    LeadSource
+  query     String
+  lastRunAt DateTime?
+  createdAt DateTime   @default(now())
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  leads Lead[]
+
+  @@index([userId])
+}
+
+/// Ένα εισερχόμενο posting. Ξεχωριστό από το Application: το triage είναι
+/// ακριβώς το βήμα «αξίζει να γίνει αίτηση;» και ένα lead που απορρίφθηκε δεν
+/// πρέπει να γεμίζει το pipeline. Το promote φτιάχνει Application.
+///
+/// dedupeKey = normalized(company) + normalized(title), unique ανά χρήστη:
+/// η ίδια θέση από δύο πηγές (ή δύο τρεξίματα) είναι ένα lead.
+model Lead {
+  id             String     @id @default(cuid())
+  userId         String
+  savedSearchId  String?
+  source         LeadSource
+  externalId     String
+  dedupeKey      String
+  companyName    String
+  roleTitle      String
+  location       String?
+  jobUrl         String?
+  jobDescription String     @db.Text
+  postedAt       DateTime?
+  status         LeadStatus @default(NEW)
+  // Auto-score στην άφιξη: η ίδια ανάλυση με το κουμπί, αποθηκευμένη εδώ και
+  // όχι σε Application (rule 8: Application.latestMatchScore έχει έναν writer).
+  matchScore     Int?
+  analysis       Json?
+  droppedClaims  Int?
+  scoredAt       DateTime?
+  applicationId  String?    @unique
+  createdAt      DateTime   @default(now())
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  savedSearch SavedSearch? @relation(fields: [savedSearchId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, status, createdAt])
 }

@@ -15,6 +15,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <nav className="flex items-center gap-4 text-sm text-zinc-600">
           <Link href="/today">Today</Link>
           <Link href="/applications">Applications</Link>
+          <Link href="/leads">Leads</Link>
           <Link href="/insights">Insights</Link>
           <Link href="/usage">Usage</Link>
           <Link href="/profile">Profile</Link>

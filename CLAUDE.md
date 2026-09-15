@@ -39,7 +39,12 @@ Single developer, portfolio project. Ship small, ship deployed.
    stream *is* the product — `app/api/generate/route.ts`, for cover letters and follow-ups.
    Analysis is not streamed (a partial JSON object can't be validated mid-stream): it's a server
    action with a pending state.
-4. **No scraping.** The user pastes job descriptions. Never fetch a job board URL server-side.
+4. **No scraping.** The user pastes job descriptions. Never fetch a job board's *web pages*
+   server-side. M12's ingestion reads only documented public JSON APIs built for the purpose
+   (Greenhouse and Lever board APIs, Arbeitnow, Remotive), each adapter pinned to one API host
+   by `lib/ingest/sources/fetch.ts` — a request to any other host is refused in code, not by
+   convention. Adding a source means an enum value, a migration and an adapter; HTML is never
+   an input. Reasons in SPEC.md §6.4.
 5. **No secrets in client code.** All LLM calls happen server-side. `NEXT_PUBLIC_*` is for
    non-secrets only.
 6. **Migrations, not `db push`.** Every schema change is a named migration committed to git.
@@ -72,12 +77,14 @@ Single developer, portfolio project. Ship small, ship deployed.
 ```
 app/
   (auth)/login  (auth)/register
-  (app)/today  (app)/applications  (app)/applications/[id]  (app)/insights  (app)/profile
+  (app)/today  (app)/applications  (app)/applications/[id]  (app)/leads  (app)/insights  (app)/profile
   api/generate/route.ts       # streaming endpoint — cover letters & follow-ups only
 lib/
   auth.ts  db.ts  env.ts
   applications/               # queries + server actions + ownership helpers (analyze, tailor)
   cv-import/                  # PDF → text → redaction → cleanup pass → review draft (M10)
+  ingest/                     # saved searches, source adapters (API-only), dedupe, triage (M12)
+  analysis/run.ts             # the analysis pipeline with no opinion about where the result goes
   llm/
     index.ts types.ts repair.ts usage.ts
     providers/{gemini,groq,ollama,anthropic}.ts
