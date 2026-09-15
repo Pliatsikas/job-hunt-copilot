@@ -162,6 +162,15 @@ transitions, 23:59 versus 00:01 local, and an application created in one offset 
 another. The same reasoning decided that usage counters roll over at Athens midnight: the message
 says "resets at midnight", and it has to be the user's midnight or the sentence is a small lie.
 
+**"Text came out" is not the success criterion for a PDF import.** A two-column CV comes out
+of extraction with the sidebar interleaved into the prose, sentences split at the margin and
+words hyphenated across lines — and every one of those breaks a verbatim quote, which is the
+only thing the analysis can use. So the import is judged by what happens *next*: a two-column
+PDF, one cleanup pass that rewrites it one sentence per line, then an analysis against it that
+finds five matched skills and drops zero claims. Email and phone number are cut in code before
+the text reaches any model; a street address is left to the mandatory review screen, because a
+rule that reliably found "Egnatia 42" would also eat "Node 22".
+
 ## Eval results
 
 Ten job ads against one real CV, on a pinned prompt version, so a prompt change produces a

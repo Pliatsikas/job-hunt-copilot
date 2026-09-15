@@ -100,6 +100,34 @@ test("register, analyse and generate", async ({ page }) => {
     await expect(page.getByLabel(/cv/i)).toHaveValue(/Fullstack developer/);
   });
 
+  await test.step("import a two-column PDF, review it, replace the CV", async () => {
+    // The fixture is a two-column layout printed to PDF — the shape SPEC.md
+    // §6.2 names as the real problem — with a fake email and phone number in
+    // the sidebar. Both must be gone before the draft reaches the screen,
+    // and the draft must not touch the profile until the reviewer says so.
+    await page.goto("/profile/import");
+    await page.setInputFiles("#pdf", "e2e/fixtures/two-column-cv.pdf");
+    await page.getByRole("button", { name: /extract text/i }).click();
+    await expect(page.getByText("Review before saving")).toBeVisible({ timeout: 60_000 });
+
+    const draft = await page.locator("#cvText").inputValue();
+    expect(draft).not.toMatch(/@/);
+    expect(draft).not.toContain("4567");
+    expect(draft).toContain("github.com/demo-candidate");
+    expect(draft).toContain("RAG-based AI copilot");
+
+    // Not yet saved: the CV from the previous step is still the profile.
+    const before = await db.profile.findFirst({ where: { user: { email: EMAIL } } });
+    expect(before?.cvText).toContain("Fullstack developer with two years");
+
+    await page.getByRole("button", { name: /replace my cv/i }).click();
+    await page.waitForURL(/\/profile\?imported=1/);
+
+    const after = await db.profile.findFirst({ where: { user: { email: EMAIL } } });
+    expect(after?.cvText).toContain("RAG-based AI copilot");
+    expect(after?.cvText).not.toMatch(/@/);
+  });
+
   let applicationUrl = "";
 
   await test.step("add an application", async () => {
@@ -162,12 +190,13 @@ test("register, analyse and generate", async ({ page }) => {
     expect(document?.content).toContain("Kind regards");
   });
 
-  await test.step("the budget counted both calls, with tokens", async () => {
+  await test.step("the budget counted every call, with tokens", async () => {
     await page.goto("/usage");
-    await expect(page.getByText(/2\s*\/\s*12/)).toBeVisible();
+    // Import, analysis, cover letter: three calls against the budget.
+    await expect(page.getByText(/3\s*\/\s*12/)).toBeVisible();
 
     const counter = await db.usageCounter.findFirst({ where: { user: { email: EMAIL } } });
-    expect(counter?.calls).toBe(2);
+    expect(counter?.calls).toBe(3);
     // The streaming path reports usage too — M8's "budget would be fiction"
     // fix, asserted rather than assumed.
     expect((counter?.inputTokens ?? 0) + (counter?.outputTokens ?? 0)).toBeGreaterThan(0);

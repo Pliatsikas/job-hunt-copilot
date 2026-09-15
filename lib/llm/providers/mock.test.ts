@@ -45,3 +45,19 @@ describe("the mock's evidence", () => {
     expect(JSON.parse(out.text).matchedSkills[0].evidenceFromCv).toBe(cvLine);
   });
 });
+
+describe("the mock's cleanup path", () => {
+  it("answers a lines schema with one sentence per line and rejoins hyphenation", async () => {
+    process.env.ALLOW_MOCK_LLM = "true";
+    delete process.env.VERCEL;
+    const { cvCleanupSchema } = await import("../../schemas/cv-import");
+    const raw = "I build React front-\nends. I design schemas.\nSkills: Docker";
+    const out = await createMockProvider().complete({
+      system: "s",
+      user: `## Raw text extracted from the PDF\n${raw}\n\n## Task\nrewrite`,
+      schema: cvCleanupSchema,
+    });
+    const parsed = JSON.parse(out.text) as { lines: string[] };
+    expect(parsed.lines).toEqual(["I build React frontends.", "I design schemas.", "Skills: Docker"]);
+  });
+});

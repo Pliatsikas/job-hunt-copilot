@@ -1,3 +1,4 @@
+import { toJsonSchema } from "../json-schema";
 import type { LlmProvider, LlmRequest, LlmResult, LlmStreamRequest, LlmUsage } from "../types";
 
 /**
@@ -33,6 +34,36 @@ function quoteFromCv(userPrompt: string): string {
   return line ?? "no CV line long enough to quote";
 }
 
+/**
+ * The mock answers by the shape it is asked for, not by guessing at the
+ * prompt. A schema with a top-level `lines` array is the CV cleanup pass;
+ * anything else is the analysis.
+ */
+function wantsCleanup(request: LlmRequest): boolean {
+  try {
+    const schema = toJsonSchema(request.schema) as { properties?: Record<string, unknown> };
+    return Boolean(schema.properties && "lines" in schema.properties);
+  } catch {
+    // A test may hand in a stand-in that is not a Zod schema; that is the
+    // analysis path, not a reason to fail.
+    return false;
+  }
+}
+
+/**
+ * Deterministic "cleanup": one line per sentence of the raw text, so the
+ * end-to-end test exercises the real extraction, redaction, budget and save
+ * path while the model itself stays out of the network.
+ */
+function cleanupLines(userPrompt: string): string[] {
+  const raw = userPrompt.split("## Raw text extracted from the PDF")[1]?.split("## Task")[0] ?? "";
+  return raw
+    .replace(/-\n(?=\p{Ll})/gu, "")
+    .split(/(?<=[.!?])\s+|\n+/u)
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
+}
+
 export function createMockProvider(model = "mock-1"): LlmProvider {
   // 1. An explicit opt-in, which nothing sets by accident.
   if (process.env.ALLOW_MOCK_LLM !== "true") {
@@ -53,6 +84,10 @@ export function createMockProvider(model = "mock-1"): LlmProvider {
     model,
 
     async complete(request: LlmRequest): Promise<LlmResult> {
+      if (wantsCleanup(request)) {
+        return { text: JSON.stringify({ lines: cleanupLines(request.user) }), usage, latencyMs: 5 };
+      }
+
       const evidence = quoteFromCv(request.user);
 
       return {

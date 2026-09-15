@@ -77,10 +77,11 @@ app/
 lib/
   auth.ts  db.ts  env.ts
   applications/               # queries + server actions + ownership helpers (incl. the analyze action)
+  cv-import/                  # PDF → text → redaction → cleanup pass → review draft (M10)
   llm/
     index.ts types.ts repair.ts usage.ts
     providers/{gemini,groq,ollama,anthropic}.ts
-    prompts/{analyze.v1.ts,cover-letter.v1.ts,follow-up.v1.ts}
+    prompts/{analyze.v2.ts,cover-letter.v1.ts,follow-up.v1.ts,cv-cleanup.v1.ts}
   schemas/                    # Zod schemas shared by prompts, forms and types
 components/
 prisma/schema.prisma  prisma/seed.ts

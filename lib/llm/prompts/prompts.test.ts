@@ -3,6 +3,7 @@ import { VALID_RESULT } from "../fixtures";
 import * as analyzeV1 from "./analyze.v1";
 import * as analyzeV2 from "./analyze.v2";
 import * as coverLetter from "./cover-letter.v1";
+import * as cvCleanup from "./cv-cleanup.v1";
 import * as followUp from "./follow-up.v1";
 import { topGap } from "./shared";
 import type { AnalysisResult } from "../../schemas/analysis";
@@ -20,6 +21,7 @@ describe("versioning", () => {
     expect(analyzeV2.version).toBe("analyze@2");
     expect(coverLetter.version).toBe("cover-letter@1");
     expect(followUp.version).toBe("follow-up@1");
+    expect(cvCleanup.version).toBe("cv-cleanup@1");
   });
 
   it("keeps v1 around so old Analysis rows stay explicable", () => {
@@ -229,5 +231,28 @@ describe("gap framing (regression: fabricated progress)", () => {
   it("spells the failure mode out in the system prompt", () => {
     expect(coverLetter.system).toMatch(/I am currently building X/);
     expect(coverLetter.system).toMatch(/Express intent as intent/i);
+  });
+});
+
+describe("cv-cleanup@1", () => {
+  it("asks for one sentence per line and forbids invention", () => {
+    expect(cvCleanup.system).toMatch(/ONE complete sentence per line/);
+    expect(cvCleanup.system).toMatch(/do not add anything/i);
+    expect(cvCleanup.system).toMatch(/hyphenated/);
+  });
+
+  it("keeps the author's language rather than translating", () => {
+    expect(cvCleanup.system).toMatch(/Greek CV stays Greek/);
+  });
+
+  it("drops residual contact details but keeps links to work", () => {
+    expect(cvCleanup.system).toMatch(/street addresses/);
+    expect(cvCleanup.system).toMatch(/Keep links to code or portfolio/);
+  });
+
+  it("wraps the raw text in a section the mock provider can also find", () => {
+    const prompt = cvCleanup.buildUserPrompt("raw");
+    expect(prompt).toContain("## Raw text extracted from the PDF");
+    expect(prompt).toContain("## Task");
   });
 });
