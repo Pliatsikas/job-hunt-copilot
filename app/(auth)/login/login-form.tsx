@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { loginUser, type LoginState } from "@/lib/login";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,12 +10,23 @@ const initialState: LoginState = {};
 
 export function LoginForm() {
   const [state, formAction, pending] = useActionState(loginUser, initialState);
+  // Controlled, so a wrong password does not also wipe the email — React 19
+  // resets uncontrolled fields when the action returns.
+  const [email, setEmail] = useState("");
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" name="email" type="email" required autoComplete="email" />
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          required
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="password">Password</Label>

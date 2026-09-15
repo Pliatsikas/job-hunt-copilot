@@ -15,7 +15,8 @@ import { db } from "../lib/db";
 
 const RUN = Date.now();
 const EMAIL = `e2e-${RUN}@example.com`;
-const PASSWORD = "e2e-password-1234";
+// Meets every rule in lib/password-rules.ts — the register form enforces them.
+const PASSWORD = "E2e-password-2026!";
 
 const CV_TEXT = [
   "Fullstack developer with two years of professional experience.",
@@ -49,6 +50,14 @@ test("register, analyse and generate", async ({ page }) => {
   await test.step("register through the real form", async () => {
     await page.goto("/register");
     await page.getByLabel("Email").fill(EMAIL);
+
+    // The checklist flips as the password is typed, and a weak one is refused
+    // by the server with the same rule the empty checkbox shows.
+    await page.getByLabel("Password", { exact: true }).fill("weakpassword");
+    await expect(page.getByText("An uppercase letter")).toBeVisible();
+    await page.getByRole("button", { name: /create account|register|sign up/i }).click();
+    await expect(page.locator('form p[role="alert"]')).toContainText(/uppercase/i);
+
     await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
     await page.getByRole("button", { name: /create account|register|sign up/i }).click();
 
