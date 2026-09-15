@@ -61,7 +61,7 @@ mail may land in spam, so the UI must say to check there.
 
 ## Verify
 
-Preview URL: _(filled in when pushed)_
+Preview URL: https://job-hunt-copilot-eb6hb6lcb-pliatsikas-projects.vercel.app · PR: https://github.com/Pliatsikas/job-hunt-copilot/pull/2
 
 1. Register with your own email and a strong password → "check your inbox" screen, with the
    spam note. Email arrives (spam folder counts). Link opens `/verify?token=…` → "verified,
