@@ -2,9 +2,17 @@ import { describe, expect, it } from "vitest";
 import { loginSchema, registerSchema } from "./auth";
 
 describe("registerSchema", () => {
-  it("accepts a valid email and an 8+ character password", () => {
-    const result = registerSchema.safeParse({ email: "a@b.com", password: "password123" });
+  it("accepts a valid email and a password that meets every rule", () => {
+    const result = registerSchema.safeParse({ email: "a@b.com", password: "Kalimera2026!" });
     expect(result.success).toBe(true);
+  });
+
+  it("names the first unmet rule, so the error matches the empty checkbox", () => {
+    const result = registerSchema.safeParse({ email: "a@b.com", password: "password123" });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe("Password needs: an uppercase letter");
+    }
   });
 
   it("rejects an invalid email", () => {
@@ -12,7 +20,7 @@ describe("registerSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects a password under 8 characters", () => {
+  it("rejects a short password", () => {
     const result = registerSchema.safeParse({ email: "a@b.com", password: "short" });
     expect(result.success).toBe(false);
   });
