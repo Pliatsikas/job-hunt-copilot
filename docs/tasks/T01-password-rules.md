@@ -37,7 +37,7 @@ an uppercase letter, a number, and so on.
 
 ## Verify
 
-Preview URL: _(filled in when pushed)_
+Preview URL: https://job-hunt-copilot-gl3vl22yc-pliatsikas-projects.vercel.app · PR: https://github.com/Pliatsikas/job-hunt-copilot/pull/1
 
 1. `/register` — type a weak password; every rule shows unmet, submitting is refused with
    the first unmet rule named.
