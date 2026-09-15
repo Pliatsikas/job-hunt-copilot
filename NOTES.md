@@ -84,6 +84,25 @@ Deliberately not started before M9. Recorded now so the list doesn't get rebuilt
 
 ## Open
 
+- **M10 feedback from the owner, 2026-09-15: the import should not rewrite the CV.** Tried
+  against the real CV. The objection is not to extraction or redaction but to the cleanup
+  pass itself — the owner does not want a model producing text that then stands in for
+  their CV, even one sentence per line. They want the extracted text taken as it is, and
+  to fix what extraction broke by hand on the review screen.
+
+  Deferred by the owner's own call: finish M11 and M12 first, then revisit. When it comes
+  back, the likely shape is: make the cleanup pass optional (off by default), keep
+  redaction and the review screen mandatory, and let the quality panel say "N lines look
+  fragmented" so the person knows where to look. The §6.2 success criterion still holds —
+  the next analysis has to find quotes — so the review screen should probably offer a
+  "join with next line" affordance rather than leaving it to raw textarea editing.
+
+  This preference is general, not M10-specific: **the owner does not want a model
+  rewriting their own words.** M11 (tailored CV) is scoped in SPEC.md §6.3 as reordering
+  existing content only, with grounding on every line — that scope is now also a hard
+  constraint from the owner, not just a design choice.
+
+
 - **Groq enforces a tokens-per-day ceiling that appears in no response header.** The headers
   advertise `x-ratelimit-limit-requests: 1000` (per day) and `x-ratelimit-limit-tokens: 8000`
   (per minute). There is also a 200,000 **tokens per day** limit, which announced itself only

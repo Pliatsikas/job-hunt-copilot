@@ -21,10 +21,16 @@ export async function getLatestAnalysisResult(
   return parsed.success ? parsed.data : null;
 }
 
+export const DOC_LABEL = {
+  COVER_LETTER: "Cover letter",
+  FOLLOW_UP_EMAIL: "Follow-up email",
+  CV_TAILORED: "Tailored CV",
+} as const;
+
 export type SaveDocumentInput = {
   applicationId: string;
   userId: string;
-  type: "COVER_LETTER" | "FOLLOW_UP_EMAIL";
+  type: "COVER_LETTER" | "FOLLOW_UP_EMAIL" | "CV_TAILORED";
   /** Follow-ups only — which situation produced this draft. */
   context?: "AFTER_APPLYING" | "AFTER_INTERVIEW" | "NUDGE" | null;
   language: string;
@@ -61,10 +67,18 @@ export async function saveGeneratedDocument(input: SaveDocumentInput) {
         applicationId: input.applicationId,
         userId: input.userId,
         type: "DOCUMENT_CREATED",
-        body: `${input.type === "COVER_LETTER" ? "Cover letter" : "Follow-up email"} v${version} (${input.language})`,
+        body: `${DOC_LABEL[input.type]} v${version} (${input.language})`,
       },
     });
   });
 
   return version;
+}
+
+/** One tailored CV version, scoped by both ids (CLAUDE.md rule 1). */
+export async function getTailoredCv(applicationId: string, userId: string, version: number) {
+  if (!Number.isInteger(version) || version < 1) return null;
+  return db.document.findFirst({
+    where: { applicationId, userId, type: "CV_TAILORED", version },
+  });
 }

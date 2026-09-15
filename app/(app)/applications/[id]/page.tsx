@@ -16,6 +16,9 @@ import {
 } from "@/components/ui/card";
 import { AnalysisView } from "./analysis-view";
 import { AnalyzeButton } from "./analyze-button";
+import { TailorButton } from "./tailor-button";
+import { tailorCv } from "@/lib/applications/tailor";
+import { DOC_LABEL } from "@/lib/applications/documents";
 import { DocumentActions } from "./document-actions";
 import { GeneratePanel } from "./generate-panel";
 import { NoteForm } from "./note-form";
@@ -105,6 +108,19 @@ export default async function ApplicationDetailPage({
 
           <Card>
             <CardHeader>
+              <CardTitle>Tailored CV</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TailorButton
+                action={tailorCv.bind(null, application.id)}
+                hasAnalysis={analyses.length > 0}
+                hasPrevious={documents.some((d) => d.type === "CV_TAILORED")}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Details</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-2 text-sm">
@@ -180,7 +196,7 @@ export default async function ApplicationDetailPage({
             {documents.map((doc) => (
               <details key={doc.id} className="rounded-lg border p-4">
                 <summary className="cursor-pointer text-sm">
-                  {doc.type === "COVER_LETTER" ? "Cover letter" : "Follow-up email"}
+                  {DOC_LABEL[doc.type]}
                   {doc.context ? ` (${DB_TO_CONTEXT_LABEL[doc.context]})` : ""} · v{doc.version} ·{" "}
                   {doc.language} · {formatDateTime(doc.createdAt)}
                 </summary>
@@ -188,10 +204,20 @@ export default async function ApplicationDetailPage({
                   <div className="rounded-lg bg-muted/30 p-3 text-sm whitespace-pre-wrap">
                     {doc.content}
                   </div>
-                  <DocumentActions
-                    content={doc.content}
-                    filename={`${doc.type === "COVER_LETTER" ? "cover-letter" : "follow-up"}-v${doc.version}-${doc.language}.md`}
-                  />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <DocumentActions
+                      content={doc.content}
+                      filename={`${doc.type === "COVER_LETTER" ? "cover-letter" : doc.type === "CV_TAILORED" ? "cv" : "follow-up"}-v${doc.version}-${doc.language}.md`}
+                    />
+                    {doc.type === "CV_TAILORED" && (
+                      <Link
+                        href={`/applications/${application.id}/cv/${doc.version}`}
+                        className="text-sm underline"
+                      >
+                        Open print view (PDF)
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </details>
             ))}

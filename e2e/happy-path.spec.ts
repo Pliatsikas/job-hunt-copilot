@@ -190,13 +190,39 @@ test("register, analyse and generate", async ({ page }) => {
     expect(document?.content).toContain("Kind regards");
   });
 
+  await test.step("tailor the CV: every saved line is the CV's own", async () => {
+    await page.goto(applicationUrl);
+    await page.getByRole("button", { name: /tailor cv to this posting/i }).click();
+    await expect(page.getByText(/Saved as Tailored CV v1/)).toBeVisible({ timeout: 30_000 });
+
+    const doc = await db.document.findFirst({
+      where: { user: { email: EMAIL }, type: "CV_TAILORED" },
+    });
+    expect(doc).not.toBeNull();
+    // The document's lines minus its headings must all be lines of the CV
+    // that was imported earlier — nothing rephrased, nothing added.
+    const profile = await db.profile.findFirst({ where: { user: { email: EMAIL } } });
+    const cvLines = new Set(profile!.cvText.split("\n").map((l) => l.trim()));
+    const savedLines = doc!.content
+      .split("\n")
+      .map((l) => l.trim())
+      .filter((l) => l && l !== l.toUpperCase());
+    expect(savedLines.length).toBeGreaterThan(3);
+    for (const line of savedLines) expect(cvLines.has(line), line).toBe(true);
+
+    await page.goto(`${applicationUrl}/cv/1`);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Tailored CV v1");
+    await expect(page.getByRole("button", { name: /print/i })).toBeVisible();
+  });
+
   await test.step("the budget counted every call, with tokens", async () => {
     await page.goto("/usage");
-    // Import, analysis, cover letter: three calls against the budget.
-    await expect(page.getByText(/3\s*\/\s*12/)).toBeVisible();
+    // Import, analysis, cover letter, tailored CV: four calls against the budget.
+    await page.goto("/usage");
+    await expect(page.getByText(/4\s*\/\s*12/)).toBeVisible();
 
     const counter = await db.usageCounter.findFirst({ where: { user: { email: EMAIL } } });
-    expect(counter?.calls).toBe(3);
+    expect(counter?.calls).toBe(4);
     // The streaming path reports usage too — M8's "budget would be fiction"
     // fix, asserted rather than assumed.
     expect((counter?.inputTokens ?? 0) + (counter?.outputTokens ?? 0)).toBeGreaterThan(0);

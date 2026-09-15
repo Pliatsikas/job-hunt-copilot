@@ -4,6 +4,7 @@ import * as analyzeV1 from "./analyze.v1";
 import * as analyzeV2 from "./analyze.v2";
 import * as coverLetter from "./cover-letter.v1";
 import * as cvCleanup from "./cv-cleanup.v1";
+import * as tailorCv from "./tailor-cv.v1";
 import * as followUp from "./follow-up.v1";
 import { topGap } from "./shared";
 import type { AnalysisResult } from "../../schemas/analysis";
@@ -22,6 +23,7 @@ describe("versioning", () => {
     expect(coverLetter.version).toBe("cover-letter@1");
     expect(followUp.version).toBe("follow-up@1");
     expect(cvCleanup.version).toBe("cv-cleanup@1");
+    expect(tailorCv.version).toBe("tailor-cv@1");
   });
 
   it("keeps v1 around so old Analysis rows stay explicable", () => {
@@ -254,5 +256,25 @@ describe("cv-cleanup@1", () => {
     const prompt = cvCleanup.buildUserPrompt("raw");
     expect(prompt).toContain("## Raw text extracted from the PDF");
     expect(prompt).toContain("## Task");
+  });
+});
+
+describe("tailor-cv@1", () => {
+  it("forbids rephrasing and adding, in those words", () => {
+    expect(tailorCv.system).toMatch(/character-for-character/);
+    expect(tailorCv.system).toMatch(/Do not rephrase/);
+    expect(tailorCv.system).toMatch(/You may NOT add anything/);
+  });
+
+  it("numbers the CV lines so the model can copy rather than retype", () => {
+    const prompt = tailorCv.buildUserPrompt({
+      cvLines: ["I build React frontends.", "I design schemas."],
+      jobDescription: "jd",
+      roleTitle: "Dev",
+      analysis: { ...VALID_RESULT, keywordsToMirror: ["React"], gaps: [] },
+    });
+    expect(prompt).toContain("  1| I build React frontends.");
+    expect(prompt).toContain("  2| I design schemas.");
+    expect(prompt).toContain("Keywords the posting uses");
   });
 });

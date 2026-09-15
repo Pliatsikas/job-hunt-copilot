@@ -171,6 +171,15 @@ finds five matched skills and drops zero claims. Email and phone number are cut 
 the text reaches any model; a street address is left to the mandatory review screen, because a
 rule that reliably found "Egnatia 42" would also eat "Node 22".
 
+**A CV reads as fact, so the model is not allowed to write one.** A cover letter is an
+argument; an inflated one is bad style. A CV is a record; an inflated one is a lie on a formal
+document that the interview will expose. So the tailored CV lets the model do exactly two
+things — choose which of the CV's own lines to show, and order them for the posting — and every
+line it returns is matched against the CV *in full*: not as a substring, since half a sentence is
+an edit, but as a whole line, character for character after the same normalisation the analysis
+uses. Anything that differs is discarded and shown to the user as left out rather than hidden.
+The owner asked for this after trying the PDF import: their words, or nothing.
+
 ## Eval results
 
 Ten job ads against one real CV, on a pinned prompt version, so a prompt change produces a

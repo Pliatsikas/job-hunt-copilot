@@ -39,6 +39,39 @@ function quoteFromCv(userPrompt: string): string {
  * prompt. A schema with a top-level `lines` array is the CV cleanup pass;
  * anything else is the analysis.
  */
+function schemaHas(request: LlmRequest, key: string): boolean {
+  try {
+    const schema = toJsonSchema(request.schema) as { properties?: Record<string, unknown> };
+    return Boolean(schema.properties && key in schema.properties);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Deterministic "tailoring": every numbered CV line the prompt carries, in
+ * order, under one heading — verbatim, which is the only thing the grounding
+ * pass will accept. It exercises the exact-line check, the save and the print
+ * view without a model in the loop.
+ */
+function tailorFromPrompt(userPrompt: string): { sections: unknown[]; keywordsAddressed: string[] } {
+  const block = userPrompt.split("## The candidate's CV")[1]?.split("## The posting")[0] ?? "";
+  const lines = block
+    .split("\n")
+    .map((l) => l.replace(/^\s*\d+\|\s?/, "").trim())
+    .filter((l) => l.length >= 3 && !l.startsWith("one line per row"));
+  // At least two sections and at most 40 lines in each, which is what the
+  // schema demands of a real answer; the rest spill into further sections.
+  const [first, ...rest] = lines;
+  const headings = ["EXPERIENCE", "PROJECTS", "SKILLS", "EDUCATION", "OTHER"] as const;
+  const sections: { heading: string; lines: string[] }[] = [{ heading: "PROFILE", lines: [first] }];
+  for (let i = 0; i < Math.max(rest.length, 1); i += 40) {
+    const chunk = rest.slice(i, i + 40);
+    sections.push({ heading: headings[Math.min(i / 40, headings.length - 1)], lines: chunk.length ? chunk : [first] });
+  }
+  return { sections, keywordsAddressed: ["TypeScript"] };
+}
+
 function wantsCleanup(request: LlmRequest): boolean {
   try {
     const schema = toJsonSchema(request.schema) as { properties?: Record<string, unknown> };
@@ -84,6 +117,9 @@ export function createMockProvider(model = "mock-1"): LlmProvider {
     model,
 
     async complete(request: LlmRequest): Promise<LlmResult> {
+      if (schemaHas(request, "sections")) {
+        return { text: JSON.stringify(tailorFromPrompt(request.user)), usage, latencyMs: 5 };
+      }
       if (wantsCleanup(request)) {
         return { text: JSON.stringify({ lines: cleanupLines(request.user) }), usage, latencyMs: 5 };
       }

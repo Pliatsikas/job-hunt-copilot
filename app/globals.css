@@ -128,3 +128,18 @@
     @apply font-sans;
   }
 }
+/* Print view for the tailored CV: the app chrome goes, the document stays. */
+@media print {
+  header,
+  nav,
+  .print\:hidden {
+    display: none !important;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+  @page {
+    margin: 18mm;
+  }
+}
