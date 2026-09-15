@@ -34,6 +34,12 @@ export const envSchema = z.object({
   GEMINI_API_KEY: optionalEnvString(),
   GROQ_API_KEY: optionalEnvString(),
 
+  // Transactional email (T02). Optional: without a key, verification links
+  // are written to the server log instead of sent, so local dev and CI work.
+  BREVO_API_KEY: optionalEnvString(),
+  EMAIL_FROM: z.preprocess((v) => (v === "" ? undefined : v), z.email().optional()),
+  EMAIL_FROM_NAME: z.string().trim().min(1).default("Job Hunt Copilot"),
+
   // Kill switch, independent of every counter below: it stops spend now,
   // without waiting for a budget to fill or a limit to be redeployed.
   LLM_ENABLED: z

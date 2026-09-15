@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { loginUser, type LoginState } from "@/lib/login";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,17 @@ export function LoginForm() {
       {state.error && (
         <p role="alert" className="text-sm text-destructive">
           {state.error}
+          {state.unverifiedEmail && (
+            <>
+              {" "}
+              <Link
+                href={`/verify/sent?email=${encodeURIComponent(state.unverifiedEmail)}`}
+                className="underline"
+              >
+                Resend the link
+              </Link>
+            </>
+          )}
         </p>
       )}
       <Button type="submit" disabled={pending} className="w-full">

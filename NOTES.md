@@ -84,6 +84,14 @@ Deliberately not started before M9. Recorded now so the list doesn't get rebuilt
 
 ## Open
 
+- **Intermittent React #418 (hydration mismatch) seen once on the 360px layout sweep,
+  2026-09-15.** Not reproducible on the next run (5/5 widths clean). The layout spec now
+  tags every console error with the route it came from, so the next occurrence names the
+  page. Likely candidates when it does: something rendering a `Date` or locale-dependent
+  string in a client component, or a first-request race after a cold start. Not from T02
+  — it appeared on routes T02 does not touch.
+
+
 - **Score-on-arrival picks the newest three, not the most likely.** On the Vercel board that
   meant three sales roles scored 30/10/10 against a developer CV while 83 engineering postings
   waited. A cheap pre-filter — title or description overlap with the profile's skills, no

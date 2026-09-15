@@ -2,10 +2,10 @@
 
 import { AuthError } from "next-auth";
 import { loginLimitMessage, loginRetryAfterMs } from "./auth-limits";
-import { LOGIN_RATE_LIMITED_CODE, signIn } from "./auth";
+import { LOGIN_RATE_LIMITED_CODE, LOGIN_UNVERIFIED_CODE, signIn } from "./auth";
 import { loginSchema } from "./schemas/auth";
 
-export type LoginState = { error?: string };
+export type LoginState = { error?: string; unverifiedEmail?: string };
 
 export async function loginUser(
   _prevState: LoginState,
@@ -30,7 +30,14 @@ export async function loginUser(
       // The limit is enforced in authorize() so that a direct POST to the
       // Auth.js endpoint is covered too; this only translates the code back
       // into the message.
-      if ((error as { code?: string }).code === LOGIN_RATE_LIMITED_CODE) {
+      const code = (error as { code?: string }).code;
+      if (code === LOGIN_UNVERIFIED_CODE) {
+        return {
+          error: "Confirm your email first — the link is in your inbox (or spam).",
+          unverifiedEmail: parsed.data.email,
+        };
+      }
+      if (code === LOGIN_RATE_LIMITED_CODE) {
         return {
           error: loginLimitMessage({ allowed: false, retryAfterMs: loginRetryAfterMs() }),
         };
