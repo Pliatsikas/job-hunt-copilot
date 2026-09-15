@@ -1,6 +1,6 @@
 # T02 — Email verification on sign-up
 
-**Status:** in progress · **Branch:** `task/02-email-verification`
+**Status:** done 2026-09-15 · merged in PR #2 · verified by the owner on the preview
 
 ## Asked (owner, 2026-09-15)
 

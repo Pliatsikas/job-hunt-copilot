@@ -30,4 +30,4 @@ reset.
 | # | Task | Status | Branch / PR |
 |---|---|---|---|
 | T01 | Stronger passwords with a live checklist | **done** 2026-09-15 | PR #1 |
-| T02 | Email verification on sign-up (Brevo) | in progress | `task/02-email-verification` |
+| T02 | Email verification on sign-up (Brevo) | **done** 2026-09-15 | PR #2 |

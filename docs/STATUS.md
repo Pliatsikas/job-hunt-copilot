@@ -19,7 +19,7 @@ known failure modes in `NOTES.md`.
 
 | Area | Where | Notes |
 |---|---|---|
-| Auth | `lib/auth.ts`, `lib/register.ts`, `lib/login.ts` | Credentials + optional GitHub. IP rate limits in `authorize()` and the register action. |
+| Auth | `lib/auth.ts`, `lib/register.ts`, `lib/login.ts`, `lib/email/` | Credentials + optional GitHub. Password rules (`lib/password-rules.ts`). Email verification via Brevo (T02): unverified accounts cannot sign in; links hashed, one use, 24h. IP rate limits in `authorize()` and the register action. |
 | Applications pipeline | `lib/applications/`, `app/(app)/applications` | CRUD, status events, notes, filters. |
 | Profile / CV | `lib/profile/`, `app/(app)/profile` | CV text is the source of truth for every prompt. PDF import in `lib/cv-import/`. |
 | Analysis | `lib/analysis/run.ts`, `lib/llm/` | Groq default, Gemini fallback. Grounding drops unquotable claims. Prompt `analyze@2`. |
