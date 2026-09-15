@@ -23,5 +23,5 @@ Nothing goes to `main` before step 4. `main` is production.
 
 | # | Task | Status | Branch / PR |
 |---|---|---|---|
-| T01 | Stronger passwords with a live checklist | in progress | `task/01-password-rules` |
-| T02 | Email verification on sign-up | planned — needs an email provider decision | — |
+| T01 | Stronger passwords with a live checklist | **done** 2026-09-15 | PR #1 |
+| T02 | Email verification on sign-up (Brevo) | in progress | `task/02-email-verification` |

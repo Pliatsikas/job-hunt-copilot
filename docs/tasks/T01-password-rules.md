@@ -1,6 +1,6 @@
 # T01 — Stronger passwords with a live checklist
 
-**Status:** in progress · **Branch:** `task/01-password-rules`
+**Status:** done 2026-09-15 · merged in PR #1
 
 ## Asked (owner, 2026-09-15)
 
