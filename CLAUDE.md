@@ -122,14 +122,25 @@ evals/fixtures/*.json  evals/run.ts
 - Enforce `DAILY_LLM_CALL_LIMIT` per user through `UsageCounter` before calling the provider.
 - Temperature: 0.2 for analysis, 0.7 for generated letters.
 
+## Session start
+
+Read `docs/STATUS.md` first — it is the map of what exists and what is in flight — then the
+task marked **in progress** in `docs/tasks/README.md`. Report to the owner in Greek; keep
+code, comments, commits and docs in English.
+
 ## Workflow
 
-- Work milestone by milestone (see SPEC.md §5). Do not start the next milestone's work.
-- Anything outside the current milestone goes to `NOTES.md` as a follow-up, not into the diff.
+- The milestones (SPEC.md §5, M0–M12) are all shipped. Work now proceeds **one task at a
+  time**, each with a file in `docs/tasks/` (see `docs/tasks/README.md` for the flow).
+- **`main` is production.** Build on a `task/<nn>-<slug>` branch, push for a Vercel preview,
+  hand the preview URL to the owner, and merge only after they have verified it. Never push
+  task work straight to `main`.
+- Anything outside the current task goes to `NOTES.md` as a follow-up, not into the diff.
 - Run `pnpm typecheck && pnpm lint && pnpm test` before saying a milestone is done.
 - Small commits, conventional style: `feat(applications): add status filter`.
-- After each milestone: push, confirm the Vercel deploy is green, note anything surprising in
-  the README's "what was hard" section while it's fresh.
+- After a task ships: confirm the Vercel production deploy is green, mark the task done in
+  `docs/tasks/README.md`, update `docs/STATUS.md` if the map changed, and note anything
+  surprising in the README's "what was hard" section while it's fresh.
 
 ## When unsure
 
