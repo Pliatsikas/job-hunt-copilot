@@ -19,6 +19,12 @@ out — so a lost chat costs nothing.
 
 Nothing goes to `main` before step 4. `main` is production.
 
+Preview deployments are **not** behind Vercel Authentication (project setting
+`ssoProtection: null`, changed 2026-09-15 after the owner was bounced to a Vercel login on
+the first preview). The app has its own auth; the preview must open for the owner without
+a second sign-in. If a preview ever asks for Vercel login again, that setting has been
+reset.
+
 ## Board
 
 | # | Task | Status | Branch / PR |
