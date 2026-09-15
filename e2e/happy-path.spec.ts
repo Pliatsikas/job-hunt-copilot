@@ -61,14 +61,53 @@ test("register, analyse and generate", async ({ page }) => {
     await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
     await page.getByRole("button", { name: /create account|register|sign up/i }).click();
 
-    await page.waitForURL(/\/login/);
-    // The row is what proves the submission reached the action, not the redirect.
+    // T02: registration lands on "check your inbox", not on login.
+    await page.waitForURL(/\/verify\/sent/);
+    await expect(page.getByText(/check your spam folder/i)).toBeVisible();
+
     const user = await db.user.findUnique({ where: { email: EMAIL } });
     expect(user).not.toBeNull();
     expect(user?.role).toBe("USER");
-    // Never from registration — an account must not be able to mint itself
-    // the admin allowance.
     expect(user?.passwordHash).toBeTruthy();
+    // Unverified until the link is used.
+    expect(user?.emailVerified).toBeNull();
+  });
+
+  await test.step("a disposable address is refused before anything is sent", async () => {
+    await page.goto("/register");
+    await page.getByLabel("Email").fill(`e2e-${RUN}@mailinator.com`);
+    await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
+    await page.getByRole("button", { name: /create account|register|sign up/i }).click();
+    await expect(page.locator('form p[role="alert"]')).toContainText(/disposable/i);
+    expect(await db.user.count({ where: { email: `e2e-${RUN}@mailinator.com` } })).toBe(0);
+  });
+
+  await test.step("sign-in is refused until the email is confirmed", async () => {
+    await page.goto("/login");
+    await page.getByLabel("Email").fill(EMAIL);
+    await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
+    await page.getByRole("button", { name: /sign in/i }).click();
+    await expect(page.locator('form p[role="alert"]')).toContainText(/confirm your email/i);
+    await expect(page.getByRole("link", { name: /resend the link/i })).toBeVisible();
+  });
+
+  await test.step("the emailed link confirms the account, once", async () => {
+    // With no BREVO_API_KEY the provider logs instead of sending, so the test
+    // recovers the token the way a person would not: by re-issuing one through
+    // the resend form and reading the hash's owner from the database is not
+    // possible (hashed), so it issues a token directly — the same function the
+    // action calls — and follows the link it would have emailed.
+    const { issueVerificationToken } = await import("../lib/email/verification");
+    const token = await issueVerificationToken(EMAIL);
+
+    await page.goto(`/verify?token=${encodeURIComponent(token)}`);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/email confirmed/i);
+    const user = await db.user.findUnique({ where: { email: EMAIL } });
+    expect(user?.emailVerified).not.toBeNull();
+
+    // Second use of the same link: no error page, an explanation instead.
+    await page.goto(`/verify?token=${encodeURIComponent(token)}`);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/not valid/i);
   });
 
   await test.step("a duplicate registration is refused without leaking a stack trace", async () => {

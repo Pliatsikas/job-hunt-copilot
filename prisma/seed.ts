@@ -82,8 +82,9 @@ async function main() {
 
   const user = await db.user.upsert({
     where: { email: DEMO_EMAIL },
-    update: {},
-    create: { email: DEMO_EMAIL, name: "Demo User", passwordHash },
+    // Verified at creation: the demo is a shop window, not a sign-up.
+    update: { emailVerified: new Date() },
+    create: { email: DEMO_EMAIL, name: "Demo User", passwordHash, emailVerified: new Date() },
   });
 
   await db.profile.upsert({

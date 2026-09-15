@@ -24,8 +24,9 @@ for (const width of WIDTHS) {
     const context = await browser.newContext({ viewport: { width, height: 800 } });
     const page = await context.newPage();
     const errors: string[] = [];
-    page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
-    page.on("pageerror", (e) => errors.push(e.message));
+    // Tagged with the route, so a failure says where, not just that.
+    page.on("console", (m) => m.type() === "error" && errors.push(`${page.url()} — ${m.text()}`));
+    page.on("pageerror", (e) => errors.push(`${page.url()} — ${e.message}`));
 
     await page.goto("/login");
     await page.getByLabel("Email").fill("demo@example.com");

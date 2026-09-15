@@ -27,9 +27,19 @@ const credentialsSchema = z.object({
  * carries `code` through to the caller.
  */
 export const LOGIN_RATE_LIMITED_CODE = "rate_limited";
+export const LOGIN_UNVERIFIED_CODE = "unverified";
 
 class LoginRateLimited extends CredentialsSignin {
   code = LOGIN_RATE_LIMITED_CODE;
+}
+
+/**
+ * Only thrown after the password checked out. Before that, an unverified
+ * account must look exactly like a wrong password — otherwise the sign-in
+ * form tells an attacker which addresses have accounts.
+ */
+class LoginUnverified extends CredentialsSignin {
+  code = LOGIN_UNVERIFIED_CODE;
 }
 
 const providers: NextAuthConfig["providers"] = [
@@ -51,6 +61,12 @@ const providers: NextAuthConfig["providers"] = [
 
       const valid = await verifyPassword(parsed.data.password, user.passwordHash);
       if (!valid) return null;
+
+      // Credentials accounts must have confirmed their address (T02). GitHub
+      // accounts have no passwordHash and never reach here; the adapter sets
+      // emailVerified for them. Existing accounts were grandfathered by the
+      // migration that introduced this check.
+      if (!user.emailVerified) throw new LoginUnverified();
 
       return user;
     }) as CredentialsConfig["authorize"],
