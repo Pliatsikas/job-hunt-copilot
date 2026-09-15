@@ -5,6 +5,8 @@ import { GapBarChart } from "@/components/gap-bar-chart";
 import { ScoreTrendChart } from "@/components/score-trend-chart";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Page } from "@/components/page";
+import { PageHeader } from "@/components/page-header";
 
 export const metadata: Metadata = {
   title: "Insights",
@@ -22,12 +24,9 @@ export default async function InsightsPage() {
   }
 
   return (
-    <div className="px-6 py-8">
-      <h1 className="text-xl font-semibold">Insights</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Across {insights.totalAnalyses} analyses of {insights.analysedApplications}{" "}
-        {insights.analysedApplications === 1 ? "application" : "applications"}.
-      </p>
+    <Page>
+      <PageHeader title="Insights" description={<>Across {insights.totalAnalyses} analyses of {insights.analysedApplications}{" "}
+        {insights.analysedApplications === 1 ? "application" : "applications"}.</>} />
 
       {insights.headline && (
         <p className="mt-4 max-w-3xl rounded-lg border bg-muted/30 p-4 text-sm leading-relaxed">
@@ -107,7 +106,7 @@ export default async function InsightsPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </Page>
   );
 }
 
@@ -120,8 +119,8 @@ function ColdStart({ total }: { total: number }) {
   const remaining = MIN_ANALYSES_FOR_INSIGHTS - total;
 
   return (
-    <div className="px-6 py-8">
-      <h1 className="text-xl font-semibold">Insights</h1>
+    <Page>
+      <PageHeader title="Insights" />
       <div className="mt-6 rounded-xl border border-dashed px-6 py-12 text-center">
         <h2 className="text-base font-medium">
           {total === 0 ? "Nothing analysed yet" : `${total} of ${MIN_ANALYSES_FOR_INSIGHTS} analyses`}
@@ -140,6 +139,6 @@ function ColdStart({ total }: { total: number }) {
           </Link>
         </div>
       </div>
-    </div>
+    </Page>
   );
 }

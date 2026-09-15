@@ -3,6 +3,8 @@ import { updateApplication } from "@/lib/applications/actions";
 import { requireOwnedApplication } from "@/lib/applications/guards";
 import { toDateInputValue } from "@/lib/format";
 import { ApplicationForm } from "../../application-form";
+import { Page } from "@/components/page";
+import { PageHeader } from "@/components/page-header";
 
 export default async function EditApplicationPage({
   params,
@@ -15,11 +17,8 @@ export default async function EditApplicationPage({
   if (!application) notFound();
 
   return (
-    <div className="px-6 py-8">
-      <h1 className="text-xl font-semibold">Edit application</h1>
-      <p className="mt-1 mb-6 text-sm text-muted-foreground">
-        Changing the status here records it on the timeline.
-      </p>
+    <Page>
+      <PageHeader title="Edit application" description={<>Changing the status here records it on the timeline.</>} />
       <div className="max-w-3xl">
         <ApplicationForm
           action={updateApplication.bind(null, application.id)}
@@ -40,6 +39,6 @@ export default async function EditApplicationPage({
           }}
         />
       </div>
-    </div>
+    </Page>
   );
 }

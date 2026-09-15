@@ -4,6 +4,8 @@ import { SOURCE_LIST } from "@/lib/ingest/sources";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeadRow } from "./lead-row";
 import { SavedSearchForm, SavedSearchRow } from "./saved-searches";
+import { Page } from "@/components/page";
+import { PageHeader } from "@/components/page-header";
 
 export const metadata: Metadata = {
   title: "Leads",
@@ -21,14 +23,11 @@ export default async function LeadsPage() {
   ]);
 
   return (
-    <div className="px-6 py-8">
-      <h1 className="text-xl font-semibold">Leads</h1>
-      <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-        Postings from public job APIs — company boards on Greenhouse and Lever, and the
+    <Page wide>
+      <PageHeader title="Leads" description={<>Postings from public job APIs — company boards on Greenhouse and Lever, and the
         Arbeitnow and Remotive job APIs. No scraping: every source is a documented API built
         for this. Each new lead is scored against your CV; you decide whether it becomes an
-        application.
-      </p>
+        application.</>} />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <Card>
@@ -109,6 +108,6 @@ export default async function LeadsPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </Page>
   );
 }

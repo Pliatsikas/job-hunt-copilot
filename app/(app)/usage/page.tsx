@@ -3,6 +3,8 @@ import { requireUser } from "@/lib/auth";
 import { DEFAULT_TIME_ZONE } from "@/lib/dates";
 import { getUsageToday, type UsageSnapshot } from "@/lib/llm/usage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Page } from "@/components/page";
+import { PageHeader } from "@/components/page-header";
 
 export const metadata: Metadata = {
   title: "Usage",
@@ -26,17 +28,18 @@ export default async function UsagePage() {
   const usage = await getUsageToday(user.id);
 
   return (
-    <div className="px-6 py-8">
-      <div className="flex flex-wrap items-baseline gap-3">
-        <h1 className="text-xl font-semibold">Usage today</h1>
-        {usage.role === "ADMIN" && (
-          <span className="rounded-full border px-2 py-0.5 text-xs font-medium">Admin</span>
-        )}
-      </div>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Resets at {RESET_TIME.format(usage.resetsAt)} Athens time. A limit is meant to be
-        visible before you hit it, not after.
-      </p>
+    <Page>
+      <PageHeader
+        title={
+          <span className="flex items-center gap-3">
+            Usage today
+            {usage.role === "ADMIN" && (
+              <span className="rounded-full border px-2 py-0.5 text-xs font-medium">Admin</span>
+            )}
+          </span>
+        }
+        description={`Resets at ${RESET_TIME.format(usage.resetsAt)} Athens time. A limit is meant to be visible before you hit it, not after.`}
+      />
 
       {!usage.enabled && (
         <p className="mt-4 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm">
@@ -73,7 +76,7 @@ export default async function UsagePage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </Page>
   );
 }
 

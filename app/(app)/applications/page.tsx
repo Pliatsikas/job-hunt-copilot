@@ -9,6 +9,9 @@ import { applicationFiltersSchema, SORT_FIELDS, STATUSES } from "@/lib/schemas/a
 import { formatDate } from "@/lib/format";
 import { STATUS_LABELS, StatusBadge } from "@/components/status-badge";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Page } from "@/components/page";
+import { PageHeader } from "@/components/page-header";
+import { ScoreBadge } from "@/components/score-badge";
 import { SELECT_FOCUS } from "@/components/ui/select-focus";
 import { Input } from "@/components/ui/input";
 import {
@@ -53,23 +56,27 @@ export default async function ApplicationsPage({
   const filtersActive = Boolean(filters.status || filters.company || filters.q);
 
   return (
-    <div className="px-6 py-8">
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">Applications</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {total === 0
-              ? "Nothing tracked yet."
-              : `${total} active ${total === 1 ? "application" : "applications"}`}
-          </p>
-        </div>
-        <Link href="/applications/new" className={buttonVariants()}>
-          Add application
-        </Link>
-      </div>
+    <Page wide>
+      <PageHeader
+        title="Applications"
+        description={
+          total === 0
+            ? "Nothing tracked yet."
+            : `${total} active ${total === 1 ? "application" : "applications"}`
+        }
+        actions={
+          <Link href="/applications/new" className={buttonVariants()}>
+            Add application
+          </Link>
+        }
+      />
 
       {total > 0 && (
-        <form method="GET" className="mb-4 flex flex-wrap items-end gap-3">
+        <details className="group mb-4 rounded-xl border bg-card open:pb-4 sm:open:pb-0" open>
+          <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium sm:hidden">
+            Filters{filtersActive ? " · active" : ""}
+          </summary>
+        <form method="GET" className="flex flex-wrap items-end gap-3 px-4 pb-4 pt-0 sm:p-4">
           <div className="flex flex-col gap-1">
             <label htmlFor="q" className="text-xs text-muted-foreground">
               Search
@@ -148,6 +155,7 @@ export default async function ApplicationsPage({
             </Link>
           )}
         </form>
+        </details>
       )}
 
       {total === 0 ? (
@@ -155,51 +163,87 @@ export default async function ApplicationsPage({
       ) : applications.length === 0 ? (
         <NoMatches />
       ) : (
-        <div className="overflow-x-auto rounded-xl ring-1 ring-foreground/10">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Role</TableHead>
-                <TableHead>Company</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Source</TableHead>
-                <TableHead>Applied</TableHead>
-                <TableHead>Next action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {applications.map((application) => (
-                <TableRow key={application.id}>
-                  <TableCell className="font-medium">
-                    <Link
-                      href={`/applications/${application.id}`}
-                      className="underline-offset-4 hover:underline"
-                    >
-                      {application.roleTitle}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {application.company?.name ?? "—"}
-                  </TableCell>
-                  <TableCell>
+        <>
+          {/* Cards under sm: six columns cannot fit 390px and a sideways-scrolling
+              table hides the column that says whether anything needs doing. */}
+          <ul className="flex flex-col gap-3 sm:hidden">
+            {applications.map((application) => (
+              <li key={application.id}>
+                <Link
+                  href={`/applications/${application.id}`}
+                  className="block rounded-xl border bg-card p-4 transition-colors hover:bg-accent/40 focus-visible:outline-2 focus-visible:outline-ring"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">{application.roleTitle}</p>
+                      <p className="truncate text-sm text-muted-foreground">
+                        {application.company?.name ?? "—"}
+                      </p>
+                    </div>
+                    <ScoreBadge score={application.latestMatchScore} />
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                     <StatusBadge status={application.status} />
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {application.source ?? "—"}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {formatDate(application.appliedAt) ?? "—"}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {formatDate(application.nextActionAt) ?? "—"}
-                  </TableCell>
+                    {application.appliedAt && <span>Applied {formatDate(application.appliedAt)}</span>}
+                    {application.nextActionAt && (
+                      <span>Next {formatDate(application.nextActionAt)}</span>
+                    )}
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <div className="hidden overflow-hidden rounded-xl border bg-card sm:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Company</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Score</TableHead>
+                  <TableHead className="hidden lg:table-cell">Source</TableHead>
+                  <TableHead className="hidden md:table-cell">Applied</TableHead>
+                  <TableHead className="hidden md:table-cell">Next action</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {applications.map((application) => (
+                  <TableRow key={application.id}>
+                    <TableCell className="font-medium">
+                      <Link
+                        href={`/applications/${application.id}`}
+                        className="underline-offset-4 hover:underline"
+                      >
+                        {application.roleTitle}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {application.company?.name ?? "—"}
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={application.status} />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <ScoreBadge score={application.latestMatchScore} />
+                    </TableCell>
+                    <TableCell className="hidden text-muted-foreground lg:table-cell">
+                      {application.source ?? "—"}
+                    </TableCell>
+                    <TableCell className="hidden text-muted-foreground md:table-cell">
+                      {formatDate(application.appliedAt) ?? "—"}
+                    </TableCell>
+                    <TableCell className="hidden text-muted-foreground md:table-cell">
+                      {formatDate(application.nextActionAt) ?? "—"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </>
       )}
-    </div>
+    </Page>
   );
 }
 

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getProfile } from "@/lib/profile/get";
 import { ProfileForm } from "./profile-form";
+import { Page } from "@/components/page";
+import { PageHeader } from "@/components/page-header";
 
 export const metadata: Metadata = {
   title: "Profile",
@@ -18,13 +20,10 @@ export default async function ProfilePage({
   const { imported } = await searchParams;
 
   return (
-    <div className="px-6 py-8">
-      <h1 className="text-xl font-semibold">Profile</h1>
-      <p className="mt-1 mb-6 max-w-2xl text-sm text-muted-foreground">
-        {profile
+    <Page>
+      <PageHeader title="Profile" description={<>{profile
           ? "Everything the analysis knows about you comes from here."
-          : "Fill this in first — the analysis compares job descriptions against your CV text, so without it there is nothing to compare."}
-      </p>
+          : "Fill this in first — the analysis compares job descriptions against your CV text, so without it there is nothing to compare."}</>} />
 
       {imported && (
         <p role="status" className="mb-4 max-w-2xl rounded-lg border bg-muted/30 p-3 text-sm">
@@ -48,6 +47,6 @@ export default async function ProfilePage({
           skills: profile?.skills ?? [],
         }}
       />
-    </div>
+    </Page>
   );
 }

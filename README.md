@@ -190,6 +190,16 @@ in code, so the "no scraping" rule is a refused request rather than a convention
 reasons it is a rule at all are in the spec, the last of them being that "I scraped LinkedIn" is
 not something to say in an interview.
 
+**Every page shipped in Times New Roman and nothing flagged it.** The theme mapped
+`--font-sans` to `var(--font-sans)` — itself — so the token resolved to nothing and the browser
+fell back to its default serif. Typecheck, lint, 300 tests and a green end-to-end suite all
+passed, because none of them look at a page. The fix was one line; finding it took
+screenshotting every route at two widths, which also showed the nav overflowing 390px on every
+page. Both are now caught by a check that walks every route at five widths and fails on
+`scrollWidth > clientWidth` or more than one `h1` — the class of bug that only a picture finds
+now has a test, and the font is Inter with the Greek subset, since Geist has no Greek glyphs and
+every Greek posting had been falling back too.
+
 ## Eval results
 
 Ten job ads against one real CV, on a pinned prompt version, so a prompt change produces a

@@ -97,7 +97,13 @@ test("register, analyse and generate", async ({ page }) => {
     await page.getByLabel(/skills/i).fill("react, typescript, postgresql, node.js");
     await page.getByRole("button", { name: /save/i }).click();
 
-    await expect(page.getByLabel(/cv/i)).toHaveValue(/Fullstack developer/);
+    // Wait for the server action to land, not for client state: the textarea
+    // holds the typed text whether or not the save happened, and navigating
+    // away before the action completes aborts it. This step passed for a while
+    // on timing alone, then the UI shell changed the timing and it stopped.
+    await expect(page.getByText("Profile saved.")).toBeVisible();
+    const profile = await db.profile.findFirst({ where: { user: { email: EMAIL } } });
+    expect(profile?.cvText).toContain("Fullstack developer");
   });
 
   await test.step("import a two-column PDF, review it, replace the CV", async () => {

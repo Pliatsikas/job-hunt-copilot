@@ -57,11 +57,12 @@ const eslintConfig = [
     rules: { "no-restricted-syntax": "off" },
   },
   {
-    // The seed is not request-handling code: it runs offline against a user
-    // it just created, so there is no session to filter by and nothing for
-    // the ownership guard to protect. Scoped to this one file rather than to
-    // prisma/**, so a future script there still has to justify itself.
-    files: ["prisma/seed.ts"],
+    // Offline scripts, not request-handling code: the seed and the README
+    // screenshot stager both run against the demo user with no session to
+    // filter by and nothing for the ownership guard to protect. Listed by
+    // file rather than by directory, so a future script still has to justify
+    // itself here.
+    files: ["prisma/seed.ts", "docs/screenshots/capture.ts"],
     rules: { "no-restricted-syntax": "off" },
   },
 ];

@@ -8,6 +8,8 @@ import { StatusBadge } from "@/components/status-badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ItemActions } from "./item-actions";
+import { Page } from "@/components/page";
+import { PageHeader } from "@/components/page-header";
 
 // Reads "today" per request; a cached page would go stale at local midnight.
 export const metadata: Metadata = {
@@ -27,15 +29,15 @@ export default async function TodayPage() {
     data.overdue.length === 0 && data.dueToday.length === 0 && data.stale.length === 0;
 
   return (
-    <div className="px-6 py-8">
-      <div className="mb-6">
-        <h1 className="text-xl font-semibold">Today</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {data.appliedThisWeek === 0
+    <Page>
+      <PageHeader
+        title="Today"
+        description={
+          data.appliedThisWeek === 0
             ? `No applications sent this week · ${data.activeTotal} active`
-            : `${data.appliedThisWeek} sent this week · ${data.activeTotal} active`}
-        </p>
-      </div>
+            : `${data.appliedThisWeek} sent this week · ${data.activeTotal} active`
+        }
+      />
 
       {nothingDue ? (
         <NothingDue appliedThisWeek={data.appliedThisWeek} />
@@ -69,7 +71,7 @@ export default async function TodayPage() {
           )}
         </div>
       )}
-    </div>
+    </Page>
   );
 }
 
@@ -136,8 +138,8 @@ function Section({
  */
 function EmptyPipeline() {
   return (
-    <div className="px-6 py-8">
-      <h1 className="text-xl font-semibold">Today</h1>
+    <Page>
+      <PageHeader title="Today" />
       <div className="mt-6 rounded-xl border border-dashed px-6 py-12 text-center">
         <h2 className="text-base font-medium">Start with one job posting</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
@@ -161,7 +163,7 @@ function EmptyPipeline() {
           anything useful.
         </p>
       </div>
-    </div>
+    </Page>
   );
 }
 
