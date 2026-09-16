@@ -63,7 +63,7 @@ Lemon.io boilerplate.
 
 ## Verify
 
-Preview URL: _(filled in when pushed)_
+Preview URL: https://job-hunt-copilot-ep2cg60ey-pliatsikas-projects.vercel.app · PR: https://github.com/Pliatsikas/job-hunt-copilot/pull/4
 
 ## Left out
 
