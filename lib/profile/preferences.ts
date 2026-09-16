@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireUser } from "../auth";
 import { db } from "../db";
 import { getProvider } from "../llm";
@@ -48,6 +49,10 @@ export async function saveJobPreferences(
 
   revalidatePath("/profile");
   revalidatePath("/leads");
+  revalidatePath("/today");
+  // The guide passes where to go next; the profile page stays put.
+  const next = formData.get("next");
+  if (typeof next === "string" && next.startsWith("/")) redirect(next);
   return { savedAt: Date.now() };
 }
 

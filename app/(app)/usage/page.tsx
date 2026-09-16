@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { requireUser } from "@/lib/auth";
+import { getT } from "@/lib/i18n/server";
+import type { T } from "@/lib/i18n/t";
 import { DEFAULT_TIME_ZONE } from "@/lib/dates";
 import { getUsageToday, type UsageSnapshot } from "@/lib/llm/usage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,7 +26,7 @@ const RESET_TIME = new Intl.DateTimeFormat("en-GB", {
 });
 
 export default async function UsagePage() {
-  const user = await requireUser();
+  const [t, user] = await Promise.all([getT(), requireUser()]);
   const usage = await getUsageToday(user.id);
 
   return (
@@ -32,47 +34,45 @@ export default async function UsagePage() {
       <PageHeader
         title={
           <span className="flex items-center gap-3">
-            Usage today
+            {t("usage.title")}
             {usage.role === "ADMIN" && (
-              <span className="rounded-full border px-2 py-0.5 text-xs font-medium">Admin</span>
+              <span className="rounded-full border px-2 py-0.5 text-xs font-medium">{t("usage.admin")}</span>
             )}
           </span>
         }
-        description={`Resets at ${RESET_TIME.format(usage.resetsAt)} Athens time. A limit is meant to be visible before you hit it, not after.`}
+        description={t("usage.resets", { time: RESET_TIME.format(usage.resetsAt) })}
       />
 
       {!usage.enabled && (
         <p className="mt-4 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm">
-          Model calls are switched off right now. Nothing you have already generated is
-          affected.
+          {t("usage.disabled")}
         </p>
       )}
 
       <div className="mt-6 grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Your budget</CardTitle>
+            <CardTitle>{t("usage.yours")}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <Meter
-              label="Analyses and letters"
+              label={t("usage.calls")}
               used={usage.requests}
               limit={usage.limits.requests}
             />
-            <Meter label="Tokens" used={usage.tokens} limit={usage.limits.tokens} />
+            <Meter label={t("usage.tokens")} used={usage.tokens} limit={usage.limits.tokens} />
             <p className="text-xs text-muted-foreground">
-              Whichever runs out first stops the next call. Requests bind first on a normal
-              day; a long job description spends tokens faster than requests.
+              {t("usage.whichever")}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Shared budget</CardTitle>
+            <CardTitle>{t("usage.shared")}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            <SharedBudget usage={usage} />
+            <SharedBudget usage={usage} t={t} />
           </CardContent>
         </Card>
       </div>
@@ -85,26 +85,24 @@ export default async function UsagePage() {
  * against the whole project ceiling — showing each role the number that will
  * actually stop it, rather than one that never will.
  */
-function SharedBudget({ usage }: { usage: UsageSnapshot }) {
+function SharedBudget({ usage, t }: { usage: UsageSnapshot; t: T }) {
   const { global, role } = usage;
   const isAdmin = role === "ADMIN";
 
   return (
     <>
       <Meter
-        label={isAdmin ? "Project requests" : "Visitor requests"}
+        label={isAdmin ? t("usage.projectRequests") : t("usage.visitorRequests")}
         used={isAdmin ? global.requests : global.userShareRequests}
         limit={isAdmin ? global.limits.requests : global.limits.userShareRequests}
       />
       <Meter
-        label={isAdmin ? "Project tokens" : "Visitor tokens"}
+        label={isAdmin ? t("usage.projectTokens") : t("usage.visitorTokens")}
         used={isAdmin ? global.tokens : global.userShareTokens}
         limit={isAdmin ? global.limits.tokens : global.limits.userShareTokens}
       />
       <p className="text-xs text-muted-foreground">
-        {isAdmin
-          ? `Visitors share ${global.limits.userShareRequests.toLocaleString("en-GB")} of these requests between them; the rest is held back for you, so a busy day can't lock you out of your own app.`
-          : "This is a shared free-tier key, so everyone using the app draws on the same daily allowance."}
+        {isAdmin ? t("usage.adminNote", { share: global.limits.userShareRequests.toLocaleString("en-GB") }) : t("usage.sharedNote")}
       </p>
     </>
   );
@@ -129,7 +127,7 @@ function Meter({ label, used, limit }: { label: string; used: number; limit: num
         aria-valuenow={used}
         aria-valuemin={0}
         aria-valuemax={limit}
-        aria-label={`${label}: ${used} of ${limit} used`}
+        aria-label={`${label}: ${used} / ${limit}`}
       >
         <div className={`h-full rounded-full ${tone}`} style={{ width: `${pct}%` }} />
       </div>

@@ -28,6 +28,8 @@ export type TodayData = {
   activeTotal: number;
   /** Nothing tracked at all, as opposed to nothing due. */
   pipelineEmpty: boolean;
+  /** Leads found by the searches and not yet looked at. */
+  newLeads: number;
 };
 
 /**
@@ -43,14 +45,17 @@ export async function getTodayData(
 ): Promise<TodayData> {
   const user = await requireUser();
 
-  const applications = await db.application.findMany({
-    where: { userId: user.id, archivedAt: null },
-    include: {
-      company: { select: { name: true } },
-      // Scoped by the parent's userId filter; one row is all staleness needs.
-      events: { orderBy: { at: "desc" }, take: 1, select: { at: true } },
-    },
-  });
+  const [applications, newLeads] = await Promise.all([
+    db.application.findMany({
+      where: { userId: user.id, archivedAt: null },
+      include: {
+        company: { select: { name: true } },
+        // Scoped by the parent's userId filter; one row is all staleness needs.
+        events: { orderBy: { at: "desc" }, take: 1, select: { at: true } },
+      },
+    }),
+    db.lead.count({ where: { userId: user.id, status: "NEW" } }),
+  ]);
 
   const weekStart = startOfCurrentWeekUtc(now, timeZone);
 
@@ -107,5 +112,6 @@ export async function getTodayData(
     appliedThisWeek,
     activeTotal: applications.length,
     pipelineEmpty: applications.length === 0,
+    newLeads,
   };
 }

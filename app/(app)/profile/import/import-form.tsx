@@ -8,6 +8,7 @@ import {
   type ApplyState,
   type ImportResult,
 } from "@/lib/cv-import/actions";
+import { useT } from "@/lib/i18n/client";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,10 +16,14 @@ import { Textarea } from "@/components/ui/textarea";
 export function ImportForm({
   maxBytes,
   hasExistingCv,
+  next,
 }: {
   maxBytes: number;
   hasExistingCv: boolean;
+  /** Where saving goes afterwards; unset means the profile page. */
+  next?: string;
 }) {
+  const t = useT();
   const [result, importAction, importing] = useActionState<ImportResult, FormData>(
     importCvFromPdf,
     {},
@@ -37,7 +42,7 @@ export function ImportForm({
     return (
       <form action={importAction} className="flex max-w-xl flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="pdf">PDF file</Label>
+          <Label htmlFor="pdf">{t("profileImport.file")}</Label>
           <input
             id="pdf"
             name="pdf"
@@ -46,10 +51,7 @@ export function ImportForm({
             required
             className="block w-full text-sm file:mr-4 file:rounded-lg file:border file:border-border file:bg-secondary file:px-3 file:py-1.5 file:text-sm file:font-medium"
           />
-          <p className="text-xs text-muted-foreground">
-            Up to {maxBytes / 1024 / 1024} MB. Needs a text layer — a scanned image has nothing
-            to read. Uses one of your daily model calls.
-          </p>
+          <p className="text-xs text-muted-foreground">{t("profileImport.fileNote", { mb: maxBytes / 1024 / 1024 })}</p>
         </div>
 
         {result.error && (
@@ -60,13 +62,12 @@ export function ImportForm({
 
         <div>
           <Button type="submit" disabled={importing}>
-            {importing ? "Extracting and cleaning up…" : "Extract text"}
+            {importing ? t("profileImport.extracting") : t("profileImport.extract")}
           </Button>
         </div>
         {importing && (
           <p role="status" className="text-xs text-muted-foreground">
-            Reading the PDF, then asking the model to rewrite it one sentence per line. This
-            takes a little while.
+            {t("profileImport.extractingNote")}
           </p>
         )}
       </form>
@@ -77,38 +78,24 @@ export function ImportForm({
 
   return (
     <form action={applyAction} className="flex max-w-3xl flex-col gap-4">
+      {next && <input type="hidden" name="next" value={next} />}
       <div className="rounded-lg border bg-muted/30 p-4 text-sm">
-        <p className="font-medium">Review before saving</p>
+        <p className="font-medium">{t("profileImport.review")}</p>
         <ul className="mt-2 grid gap-1 text-muted-foreground sm:grid-cols-2">
-          <li>
-            {draft.pages} {draft.pages === 1 ? "page" : "pages"},{" "}
-            {draft.rawChars.toLocaleString("en-GB")} characters extracted
-          </li>
-          <li>
-            {q.lines} lines, {q.quotableLines} long enough to be quoted as evidence
-          </li>
-          <li>
-            Removed before anything left the server: {draft.redacted.emails}{" "}
-            {draft.redacted.emails === 1 ? "email" : "emails"}, {draft.redacted.phones}{" "}
-            {draft.redacted.phones === 1 ? "phone number" : "phone numbers"}
-          </li>
-          <li>
-            Still worth a look: a street address or date of birth, which no pattern catches
-            reliably
-          </li>
+          <li>{t("profileImport.pagesChars", { pages: draft.pages, chars: draft.rawChars.toLocaleString("en-GB") })}</li>
+          <li>{t("profileImport.linesQuotable", { lines: q.lines, quotable: q.quotableLines })}</li>
+          <li>{t("profileImport.removed", { emails: draft.redacted.emails, phones: draft.redacted.phones })}</li>
+          <li>{t("profileImport.stillCheck")}</li>
         </ul>
         {q.fragmented && (
           <p role="alert" className="mt-3 text-destructive">
-            Only {Math.round(q.quotableShare * 100)}% of lines are long enough to quote. This
-            reads as a fragmented extraction — a two-column layout, usually. The analysis matches
-            claims against these exact lines, so check that sentences are whole before saving,
-            or paste the CV as text instead.
+            {t("profileImport.fragmented", { percent: Math.round(q.quotableShare * 100) })}
           </p>
         )}
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="cvText">Extracted CV — edit anything that came out wrong</Label>
+        <Label htmlFor="cvText">{t("profileImport.extracted")}</Label>
         <Textarea
           id="cvText"
           name="cvText"
@@ -127,20 +114,12 @@ export function ImportForm({
 
       <div className="flex flex-wrap items-center gap-2">
         <Button type="submit" disabled={applying}>
-          {applying
-            ? "Saving…"
-            : hasExistingCv
-              ? "Replace my CV with this"
-              : "Save as my CV"}
+          {applying ? t("common.saving") : hasExistingCv ? t("profileImport.replace") : t("profileImport.saveAs")}
         </Button>
-        <Link href="/profile" className={buttonVariants({ variant: "ghost" })}>
-          Discard
+        <Link href={next ?? "/profile"} className={buttonVariants({ variant: "ghost" })}>
+          {t("common.cancel")}
         </Link>
-        {hasExistingCv && (
-          <span className="text-xs text-muted-foreground">
-            Your current CV is untouched until you click replace.
-          </span>
-        )}
+        {hasExistingCv && <span className="text-xs text-muted-foreground">{t("profileImport.subExisting")}</span>}
       </div>
     </form>
   );

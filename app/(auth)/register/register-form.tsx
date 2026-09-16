@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { registerUser, type RegisterState } from "@/lib/register";
+import { useT } from "@/lib/i18n/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +12,7 @@ import { PasswordChecklist } from "./password-checklist";
 const initialState: RegisterState = {};
 
 export function RegisterForm() {
+  const t = useT();
   const [state, formAction, pending] = useActionState(registerUser, initialState);
   // Both fields are controlled. React 19 resets uncontrolled inputs when a
   // form action completes, so after "Password needs: an uppercase letter" the
@@ -22,7 +24,7 @@ export function RegisterForm() {
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{t("auth.email")}</Label>
         <Input
           id="email"
           name="email"
@@ -34,7 +36,7 @@ export function RegisterForm() {
         />
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{t("auth.password")}</Label>
         <Input
           id="password"
           name="password"
@@ -56,7 +58,7 @@ export function RegisterForm() {
         </p>
       )}
       <Button type="submit" disabled={pending} className="w-full">
-        {pending ? "Creating account…" : "Register"}
+        {pending ? t("auth.creating") : t("auth.register")}
       </Button>
     </form>
   );

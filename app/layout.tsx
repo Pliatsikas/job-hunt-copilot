@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { I18nProvider } from "@/lib/i18n/client";
+import { getLocale, MESSAGES } from "@/lib/i18n/server";
 
 // Inter, not Geist: the CVs and the postings are partly Greek, and Geist has
 // no Greek glyphs — every Greek line was silently falling back to the system
@@ -42,13 +44,20 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const locale = await getLocale();
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${sans.variable} ${mono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/* Seeded here, above the route groups, so the error and not-found
+            boundaries can read the same messages as everything else. */}
+        <I18nProvider locale={locale} messages={MESSAGES[locale]}>
+          {children}
+        </I18nProvider>
+      </body>
     </html>
   );
 }

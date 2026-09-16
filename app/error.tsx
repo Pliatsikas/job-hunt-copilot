@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { useT } from "@/lib/i18n/client";
 import { Button, buttonVariants } from "@/components/ui/button";
 
 /**
@@ -18,6 +19,7 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useT();
   useEffect(() => {
     console.error("Unhandled error boundary:", error);
   }, [error]);
@@ -25,21 +27,19 @@ export default function Error({
   return (
     <main className="flex flex-1 items-center justify-center px-6 py-16">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold">Something broke on this page</h1>
+        <h1 className="text-xl font-semibold">{t("errors.brokeTitle")}</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Your applications, analyses and saved documents are unaffected — nothing is written
-          unless it completed. Try again, and if it keeps happening, move on to another page
-          and come back.
+          {t("errors.brokeSub")}
         </p>
         {error.digest && (
           <p className="mt-3 font-mono text-xs text-muted-foreground">
-            Reference: {error.digest}
+            {t("errors.reference", { digest: error.digest })}
           </p>
         )}
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <Button onClick={reset}>Try again</Button>
+          <Button onClick={reset}>{t("errors.tryAgain")}</Button>
           <Link href="/today" className={buttonVariants({ variant: "secondary" })}>
-            Go to Today
+            {t("errors.goToday")}
           </Link>
         </div>
       </div>

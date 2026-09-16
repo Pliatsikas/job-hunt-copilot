@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getT } from "@/lib/i18n/server";
 import { Page } from "@/components/page";
 import { PageHeader } from "@/components/page-header";
 import { CaptureForm } from "./capture-form";
@@ -14,13 +15,11 @@ export const metadata: Metadata = {
  * reads window.location.hash. That is by design: the posting text goes from
  * the person's browser to our form to our action, and nowhere else.
  */
-export default function CapturePage() {
+export default async function CapturePage() {
+  const t = await getT();
   return (
     <Page>
-      <PageHeader
-        title="Save this job"
-        description="From the page you were on. Check the title and company, then save — it joins your list ranked like the rest."
-      />
+      <PageHeader title={t("jobs.captureTitle")} description={t("jobs.captureSub")} />
       <CaptureForm />
     </Page>
   );

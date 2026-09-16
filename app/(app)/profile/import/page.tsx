@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getT } from "@/lib/i18n/server";
 import { getProfile } from "@/lib/profile/get";
 import { CV_PDF_MAX_BYTES } from "@/lib/schemas/cv-import";
 import { ImportForm } from "./import-form";
@@ -11,22 +12,26 @@ export const metadata: Metadata = {
   description: "Upload a CV as PDF, review the extracted text, then save it as your profile CV.",
 };
 
-export default async function ImportPage() {
-  const profile = await getProfile();
+export default async function ImportPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const [t, profile, { next }] = await Promise.all([getT(), getProfile(), searchParams]);
   const hasCv = Boolean(profile?.cvText.trim());
+  const safeNext = next?.startsWith("/") ? next : undefined;
 
   return (
     <Page>
-      <PageHeader title="Import CV from PDF" description={<>The text is extracted, contact details are removed before anything is sent to a model,
-        and one cleanup pass rewrites it one sentence per line so the analysis can quote from
-        it. You review the result before it replaces anything.
-        {hasCv && " Your current CV stays as it is until you save."}</>} />
+      <PageHeader title={t("profileImport.title")} description={<>{t("profileImport.sub")}{hasCv && ` ${t("profileImport.subExisting")}`}</>} />
 
-      <ImportForm maxBytes={CV_PDF_MAX_BYTES} hasExistingCv={hasCv} />
+      <ImportForm maxBytes={CV_PDF_MAX_BYTES} hasExistingCv={hasCv} next={safeNext} />
 
       <p className="mt-8 text-xs text-muted-foreground">
-        Prefer to paste? <Link href="/profile" className="underline">Edit the CV as text</Link>{" "}
-        instead.
+        {t("profileImport.preferPaste")}{" "}
+        <Link href={safeNext ? "/start/1" : "/profile"} className="underline">
+          {t("profileImport.editAsText")}
+        </Link>
       </p>
     </Page>
   );

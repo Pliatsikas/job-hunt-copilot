@@ -16,12 +16,23 @@ const ROUTES = [
   "/usage",
   "/profile",
   "/profile/import",
+  "/start/1",
+  "/start/3",
 ];
 const WIDTHS = [360, 390, 768, 1024, 1440];
+// Greek copy runs longer than English; the narrowest and widest layouts get
+// a second pass in Greek so a label that fits in English is not assumed to
+// fit in the other language.
+const PASSES: { width: number; locale: "en" | "el" }[] = [
+  ...WIDTHS.map((width) => ({ width, locale: "en" as const })),
+  { width: 360, locale: "el" },
+  { width: 1440, locale: "el" },
+];
 
-for (const width of WIDTHS) {
-  test(`no horizontal overflow and one h1 at ${width}px`, async ({ browser }) => {
+for (const { width, locale } of PASSES) {
+  test(`no horizontal overflow and one h1 at ${width}px (${locale})`, async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width, height: 800 } });
+    await context.addCookies([{ name: "locale", value: locale, url: "http://127.0.0.1:3100" }]);
     const page = await context.newPage();
     const errors: string[] = [];
     // Tagged with the route, so a failure says where, not just that.
@@ -30,8 +41,8 @@ for (const width of WIDTHS) {
 
     await page.goto("/login");
     await page.getByLabel("Email").fill("demo@example.com");
-    await page.getByLabel("Password", { exact: true }).fill("demo12345");
-    await page.getByRole("button", { name: /sign in/i }).click();
+    await page.getByLabel(locale === "el" ? "Κωδικός" : "Password", { exact: true }).fill("demo12345");
+    await page.getByRole("button", { name: locale === "el" ? /σύνδεση/i : /sign in/i }).click();
     await page.waitForURL(/\/today/);
 
     for (const route of ROUTES) {
@@ -42,7 +53,7 @@ for (const width of WIDTHS) {
         clientWidth: document.documentElement.clientWidth,
         h1: document.querySelectorAll("h1").length,
       }));
-      expect(scrollWidth, `${route} scrolls sideways at ${width}px`).toBeLessThanOrEqual(clientWidth);
+      expect(scrollWidth, `${route} scrolls sideways at ${width}px (${locale})`).toBeLessThanOrEqual(clientWidth);
       expect(h1, `${route} has ${h1} h1 elements`).toBe(1);
     }
     expect(errors).toEqual([]);

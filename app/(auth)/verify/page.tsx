@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { consumeVerificationToken } from "@/lib/email/verification";
+import { getT } from "@/lib/i18n/server";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -24,30 +25,26 @@ export default async function VerifyPage({
 }: {
   searchParams: Promise<{ token?: string }>;
 }) {
-  const { token } = await searchParams;
+  const [t, { token }] = await Promise.all([getT(), searchParams]);
   const result = token ? await consumeVerificationToken(token) : ({ ok: false, reason: "invalid" } as const);
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle>
-          <h1>{result.ok ? "Email confirmed" : result.reason === "expired" ? "That link has expired" : "That link is not valid"}</h1>
+          <h1>{result.ok ? t("auth.confirmed") : result.reason === "expired" ? t("auth.expired") : t("auth.invalid")}</h1>
         </CardTitle>
         <CardDescription>
-          {result.ok
-            ? "Your account is ready. Sign in to get started."
-            : result.reason === "expired"
-              ? "Links work for 24 hours. Request a new one and try again."
-              : "It may already have been used — if you clicked it before, your email is confirmed and you can sign in. Otherwise request a new link."}
+          {result.ok ? t("auth.confirmedSub") : result.reason === "expired" ? t("auth.expiredSub") : t("auth.invalidSub")}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         <Link href="/login" className={buttonVariants()}>
-          Sign in
+          {t("auth.signIn")}
         </Link>
         {!result.ok && (
           <Link href="/verify/sent" className={buttonVariants({ variant: "secondary" })}>
-            Send a new link
+            {t("auth.newLink")}
           </Link>
         )}
       </CardContent>

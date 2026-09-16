@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { requireOwnedApplication } from "@/lib/applications/guards";
 import { getTailoredCv } from "@/lib/applications/documents";
 import { formatDate } from "@/lib/format";
+import { getT } from "@/lib/i18n/server";
 import { PrintButton } from "./print-button";
 
 export const metadata: Metadata = {
@@ -26,6 +27,7 @@ export default async function TailoredCvPage({
   const application = await requireOwnedApplication(id);
   const doc = await getTailoredCv(application.id, application.userId, Number(version));
   if (!doc) notFound();
+  const t = await getT();
 
   const sections = doc.content.split("\n\n").map((block) => {
     const [heading, ...lines] = block.split("\n");
@@ -36,17 +38,16 @@ export default async function TailoredCvPage({
     <div className="mx-auto max-w-3xl px-6 py-8 print:max-w-none print:px-0 print:py-0">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <div>
-          <h1 className="text-xl font-semibold">Tailored CV v{doc.version}</h1>
+          <h1 className="text-xl font-semibold">{t("cvPrint.title", { version: doc.version })}</h1>
           <p className="text-sm text-muted-foreground">
-            For {application.roleTitle}
-            {application.company ? ` at ${application.company.name}` : ""} ·{" "}
-            {formatDate(doc.createdAt)}. Every line is from your CV as written.
+            {t("cvPrint.forRole", { role: application.roleTitle })}
+            {application.company ? ` · ${application.company.name}` : ""} · {formatDate(doc.createdAt)}. {t("cvPrint.everyLineYours")}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <PrintButton />
           <Link href={`/applications/${application.id}`} className="text-sm underline">
-            Back
+            {t("common.back")}
           </Link>
         </div>
       </div>

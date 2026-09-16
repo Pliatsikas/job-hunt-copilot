@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 import type { ReminderState } from "@/lib/applications/reminders";
+import { SNOOZE_DAYS } from "@/lib/applications/follow-up-policy";
+import { useT } from "@/lib/i18n/client";
 import { Button } from "@/components/ui/button";
 
 function ActionButton({
@@ -38,15 +40,11 @@ export function ItemActions({
   snooze: (state: ReminderState, formData: FormData) => Promise<ReminderState>;
   markDone: (state: ReminderState, formData: FormData) => Promise<ReminderState>;
 }) {
+  const t = useT();
   return (
     <div className="flex items-center gap-1">
-      <ActionButton
-        action={markDone}
-        label="Mark done"
-        pendingLabel="Saving…"
-        variant="secondary"
-      />
-      <ActionButton action={snooze} label="Snooze 3d" pendingLabel="Snoozing…" />
+      <ActionButton action={markDone} label={t("today.markDone")} pendingLabel={t("common.saving")} variant="secondary" />
+      <ActionButton action={snooze} label={t("today.snooze", { days: SNOOZE_DAYS })} pendingLabel={t("common.saving")} />
     </div>
   );
 }

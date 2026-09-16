@@ -3,7 +3,9 @@
 import { useActionState } from "react";
 import { dismissLead, scoreLead, type IngestState } from "@/lib/ingest/actions";
 import { promoteLead } from "@/lib/applications/promote";
-import { Button } from "@/components/ui/button";
+import { useT } from "@/lib/i18n/client";
+import { ExternalLink } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 export function LeadRow({
   lead,
@@ -23,6 +25,7 @@ export function LeadRow({
     excerpt: string;
   };
 }) {
+  const t = useT();
   const [scoreState, score, scoring] = useActionState<IngestState, FormData>(
     scoreLead.bind(null, lead.id),
     {},
@@ -37,30 +40,22 @@ export function LeadRow({
             <span className="font-normal text-muted-foreground"> · {lead.companyName}</span>
           </p>
           <p className="text-xs text-muted-foreground">
-            {lead.source === "BOOKMARKLET" ? "saved by you" : lead.source.toLowerCase()}
+            {lead.source === "BOOKMARKLET" ? t("jobs.savedByYou") : lead.source.toLowerCase()}
             {lead.location ? ` · ${lead.location}` : ""}
-            {lead.jobUrl && (
-              <>
-                {" · "}
-                <a href={lead.jobUrl} target="_blank" rel="noopener noreferrer" className="underline">
-                  posting
-                </a>
-              </>
-            )}
           </p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1 text-right">
           {lead.fitScore !== null && (
-            <p className="text-xs text-muted-foreground" title="How well the posting matches what you are looking for — no model involved">
-              fit <span className="font-semibold tabular-nums text-foreground">{lead.fitScore}</span>
+            <p className="text-xs text-muted-foreground" title={t("jobs.fitTitle")}>
+              {t("jobs.fit")} <span className="font-semibold tabular-nums text-foreground">{lead.fitScore}</span>
             </p>
           )}
           {lead.matchScore !== null ? (
-            <p className="text-2xl font-semibold tabular-nums" title="Match score from the analysis">{lead.matchScore}</p>
+            <p className="text-2xl font-semibold tabular-nums" title={t("jobs.matchTitle")}>{lead.matchScore}</p>
           ) : (
             <form action={score}>
               <Button type="submit" size="sm" variant="secondary" disabled={scoring}>
-                {scoring ? "Scoring…" : "Score"}
+                {scoring ? t("jobs.scoring") : t("jobs.score")}
               </Button>
             </form>
           )}
@@ -69,9 +64,9 @@ export function LeadRow({
 
       {lead.matchedTerms.length > 0 && (
         <ul className="mt-2 flex flex-wrap gap-1">
-          {lead.matchedTerms.slice(0, 8).map((t) => (
-            <li key={t} className="rounded-md bg-accent/60 px-1.5 py-0.5 text-[11px] text-accent-foreground">
-              {t}
+          {lead.matchedTerms.slice(0, 8).map((term) => (
+            <li key={term} className="rounded-md bg-accent/60 px-1.5 py-0.5 text-[11px] text-accent-foreground">
+              {term}
             </li>
           ))}
         </ul>
@@ -87,15 +82,27 @@ export function LeadRow({
         </p>
       )}
 
-      <div className="mt-3 flex items-center gap-2">
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         <form action={promoteLead.bind(null, lead.id)}>
           <Button type="submit" size="sm">
-            Add to applications
+            {t("jobs.interested")}
           </Button>
         </form>
+        {/* Where it was found is where you apply: the source's own page, a new tab. */}
+        {lead.jobUrl && (
+          <a
+            href={lead.jobUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ size: "sm", variant: "secondary" })}
+          >
+            <ExternalLink className="size-4" aria-hidden />
+            {t("jobs.openPosting")}
+          </a>
+        )}
         <form action={dismissLead.bind(null, lead.id)}>
           <Button type="submit" size="sm" variant="ghost">
-            Dismiss
+            {t("jobs.notInterested")}
           </Button>
         </form>
       </div>

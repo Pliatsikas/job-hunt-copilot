@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type KeyboardEvent } from "react";
+import { useT } from "@/lib/i18n/client";
 import { Input } from "@/components/ui/input";
 
 function normalize(items: string[]): string[] {
@@ -35,6 +36,7 @@ export function ChipsEditor({
   placeholder: string;
   max?: number;
 }) {
+  const t = useT();
   const [draft, setDraft] = useState("");
   const full = max !== undefined && value.length >= max;
 
@@ -59,14 +61,14 @@ export function ChipsEditor({
         <input key={item} type="hidden" name={name} value={item} />
       ))}
       <div className="flex flex-wrap gap-1.5">
-        {value.length === 0 && <span className="text-sm text-muted-foreground">None yet.</span>}
+        {value.length === 0 && <span className="text-sm text-muted-foreground">{t("common.noneYet")}</span>}
         {value.map((item) => (
           <span key={item} className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs">
             {item}
             <button
               type="button"
               onClick={() => onChange(value.filter((v) => v !== item))}
-              aria-label={`Remove ${item}`}
+              aria-label={t("common.remove", { name: item })}
               className="text-muted-foreground hover:text-foreground"
             >
               ×

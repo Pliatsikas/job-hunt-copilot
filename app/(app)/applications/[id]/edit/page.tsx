@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { updateApplication } from "@/lib/applications/actions";
 import { requireOwnedApplication } from "@/lib/applications/guards";
+import { getT } from "@/lib/i18n/server";
 import { toDateInputValue } from "@/lib/format";
 import { ApplicationForm } from "../../application-form";
 import { Page } from "@/components/page";
@@ -15,14 +16,15 @@ export default async function EditApplicationPage({
 
   const application = await requireOwnedApplication(id).catch(() => null);
   if (!application) notFound();
+  const t = await getT();
 
   return (
     <Page>
-      <PageHeader title="Edit application" description={<>Changing the status here records it on the timeline.</>} />
+      <PageHeader title={t("applications.editTitle")} />
       <div className="max-w-3xl">
         <ApplicationForm
           action={updateApplication.bind(null, application.id)}
-          submitLabel="Save changes"
+          submitLabel={t("applications.saveChanges")}
           cancelHref={`/applications/${application.id}`}
           defaults={{
             roleTitle: application.roleTitle,

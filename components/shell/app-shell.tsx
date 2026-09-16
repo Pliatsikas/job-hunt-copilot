@@ -1,6 +1,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { LogOut } from "lucide-react";
+import type { Locale } from "@/lib/i18n/locale";
+import type { T } from "@/lib/i18n/t";
+import { LanguageSwitch } from "./language-switch";
 import { MOBILE_TABS, NAV_ITEMS } from "./nav-items";
 import { NavLink } from "./nav-link";
 
@@ -14,10 +17,14 @@ import { NavLink } from "./nav-link";
 export function AppShell({
   email,
   signOut,
+  locale,
+  t,
   children,
 }: {
   email: string | null;
   signOut: () => Promise<void>;
+  locale: Locale;
+  t: T;
   children: ReactNode;
 }) {
   return (
@@ -33,7 +40,7 @@ export function AppShell({
         </div>
 
         <nav className="flex flex-1 flex-col gap-0.5 px-3" aria-label="Main">
-          {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
+          {NAV_ITEMS.map(({ href, labelKey, icon: Icon }) => (
             <NavLink
               key={href}
               href={href}
@@ -41,24 +48,25 @@ export function AppShell({
               activeClassName="bg-sidebar-accent font-medium text-sidebar-accent-foreground"
             >
               <Icon className="size-4" aria-hidden />
-              {label}
+              {t(labelKey)}
             </NavLink>
           ))}
         </nav>
 
-        <div className="border-t border-sidebar-border px-5 py-4">
+        <div className="flex flex-col gap-3 border-t border-sidebar-border px-5 py-4">
+          <LanguageSwitch current={locale} label={t("nav.language")} />
           {email && (
             <p className="truncate text-xs text-muted-foreground" title={email}>
               {email}
             </p>
           )}
-          <form action={signOut} className="mt-2">
+          <form action={signOut}>
             <button
               type="submit"
               className="flex items-center gap-2 text-sm text-sidebar-foreground/80 hover:text-sidebar-foreground focus-visible:outline-2 focus-visible:outline-ring"
             >
               <LogOut className="size-4" aria-hidden />
-              Sign out
+              {t("nav.signOut")}
             </button>
           </form>
         </div>
@@ -73,13 +81,11 @@ export function AppShell({
             Job Hunt Copilot
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/usage" className="text-sm text-muted-foreground">
-              Usage
-            </Link>
+            <LanguageSwitch current={locale} label={t("nav.language")} />
             <form action={signOut}>
               <button
                 type="submit"
-                aria-label="Sign out"
+                aria-label={t("nav.signOut")}
                 className="grid size-9 place-items-center rounded-lg text-muted-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
               >
                 <LogOut className="size-4" aria-hidden />
@@ -96,7 +102,7 @@ export function AppShell({
           className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 border-t bg-card/95 backdrop-blur md:hidden"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         >
-          {MOBILE_TABS.map(({ href, label, icon: Icon }) => (
+          {MOBILE_TABS.map(({ href, labelKey, icon: Icon }) => (
             <NavLink
               key={href}
               href={href}
@@ -104,7 +110,7 @@ export function AppShell({
               activeClassName="text-primary font-medium"
             >
               <Icon className="size-5" aria-hidden />
-              {label}
+              {t(labelKey)}
             </NavLink>
           ))}
         </nav>

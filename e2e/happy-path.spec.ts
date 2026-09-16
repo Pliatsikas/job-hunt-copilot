@@ -139,9 +139,42 @@ test("register, analyse and generate", async ({ page }) => {
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
+  await test.step("the guide: CV, preferences, first posting — one button each", async () => {
+    // A new account sees the three steps instead of an empty dashboard.
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/welcome/i);
+    await page.getByRole("link", { name: /start here/i }).click();
+    await page.waitForURL(/\/start\/1/);
+
+    await page.getByLabel("CV", { exact: true }).fill(CV_TEXT);
+    await page.getByRole("button", { name: /continue/i }).click();
+    await page.waitForURL(/\/start\/2/);
+
+    // Step 2 asks the model on arrival; the fields arrive filled, nothing saved.
+    await expect(page.getByText(/filled in where you had nothing/i)).toBeVisible({ timeout: 30_000 });
+    expect(await db.jobPreferences.count({ where: { user: { email: EMAIL } } })).toBe(0);
+    await page.getByRole("button", { name: /continue/i }).click();
+    await page.waitForURL(/\/start\/3/);
+    expect((await db.jobPreferences.findFirst({ where: { user: { email: EMAIL } } }))?.targetRoles).toEqual([
+      "fullstack developer",
+      "frontend developer",
+    ]);
+
+    await page.getByLabel(/^role$/i).fill("Guide Developer");
+    await page.getByLabel(/^company$/i).fill("Guide Labs");
+    await page.getByLabel(/the posting/i).fill(JOB_DESCRIPTION);
+    await page.getByRole("button", { name: /analyse it/i }).click();
+    // Created and analysed in one go: lands on the application with the result.
+    await page.waitForURL(/\/applications\/(?!new$)[a-z0-9]{10,}$/i, { timeout: 60_000 });
+    await expect(page.getByText("62").first()).toBeVisible();
+
+    // The guide is done; Today is the action list from now on.
+    await page.goto("/today");
+    await expect(page.getByRole("heading", { level: 1 })).not.toContainText(/welcome/i);
+  });
+
   await test.step("store a CV", async () => {
     await page.goto("/profile");
-    await page.getByLabel(/cv/i).fill(CV_TEXT);
+    await page.getByLabel("CV", { exact: true }).fill(CV_TEXT);
     await page.getByLabel(/skills/i).fill("react, typescript, postgresql, node.js");
     await page.getByRole("button", { name: /save profile/i }).click();
 
@@ -156,12 +189,12 @@ test("register, analyse and generate", async ({ page }) => {
 
   await test.step("preferences: suggested from the CV, edited, saved", async () => {
     await page.getByRole("button", { name: /suggest from my cv/i }).click();
-    await expect(page.getByText(/filled in below/i)).toBeVisible({ timeout: 30_000 });
-    // The suggestion filled the empty form; nothing is saved yet.
-    expect(await db.jobPreferences.count({ where: { user: { email: EMAIL } } })).toBe(0);
+    await expect(page.getByText(/filled in where you had nothing/i)).toBeVisible({ timeout: 30_000 });
+    // The suggestion fills the form; the row from the guide is untouched until save.
+    expect((await db.jobPreferences.findFirst({ where: { user: { email: EMAIL } } }))?.remote).toBe("ANY");
 
     await page.getByLabel("Remote").selectOption("REMOTE_OK");
-    await page.getByRole("button", { name: /save preferences/i }).click();
+    await page.getByRole("button", { name: /^save$/i }).click();
     await expect(page.getByText("Preferences saved.")).toBeVisible();
 
     const prefs = await db.jobPreferences.findFirst({ where: { user: { email: EMAIL } } });
@@ -184,7 +217,7 @@ test("register, analyse and generate", async ({ page }) => {
     await page.goto(`/leads/capture#${payload}`);
     await expect(page.getByLabel("Role")).toHaveValue("Fullstack Developer at Northwind Labs");
     await expect(page.getByLabel("Company")).toHaveValue("Northwind Labs");
-    await page.getByRole("button", { name: /save as a lead/i }).click();
+    await page.getByRole("button", { name: /^save$/i }).click();
     await page.waitForURL(/\/leads\?captured=1/);
 
     const lead = await db.lead.findFirst({ where: { user: { email: EMAIL }, source: "BOOKMARKLET" } });
@@ -230,7 +263,7 @@ test("register, analyse and generate", async ({ page }) => {
     await page.goto("/applications/new");
     await page.getByLabel(/role/i).fill("Fullstack Developer");
     await page.getByLabel(/company/i).fill("E2E Labs");
-    await page.getByLabel(/job description/i).fill(JOB_DESCRIPTION);
+    await page.getByLabel(/the posting/i).fill(JOB_DESCRIPTION);
     await page.getByRole("button", { name: /save|create|add/i }).click();
 
     // Excludes /applications/new explicitly: "new" matches [a-z0-9]+, so a
@@ -269,7 +302,7 @@ test("register, analyse and generate", async ({ page }) => {
 
   await test.step("generate a cover letter, streamed", async () => {
     await page.goto(applicationUrl);
-    await page.getByRole("button", { name: /generate cover letter/i }).click();
+    await page.getByRole("button", { name: /write my cover letter/i }).click();
 
     await expect(page.getByText(/Dear Hiring Team/)).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText(/Kind regards/)).toBeVisible();
@@ -288,8 +321,8 @@ test("register, analyse and generate", async ({ page }) => {
 
   await test.step("tailor the CV: every saved line is the CV's own", async () => {
     await page.goto(applicationUrl);
-    await page.getByRole("button", { name: /tailor cv to this posting/i }).click();
-    await expect(page.getByText(/Saved as Tailored CV v1/)).toBeVisible({ timeout: 30_000 });
+    await page.getByRole("button", { name: /make a cv for this role/i }).click();
+    await expect(page.getByText(/Saved as CV v1/)).toBeVisible({ timeout: 30_000 });
 
     const doc = await db.document.findFirst({
       where: { user: { email: EMAIL }, type: "CV_TAILORED" },
@@ -307,18 +340,19 @@ test("register, analyse and generate", async ({ page }) => {
     for (const line of savedLines) expect(cvLines.has(line), line).toBe(true);
 
     await page.goto(`${applicationUrl}/cv/1`);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Tailored CV v1");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("CV for this role v1");
     await expect(page.getByRole("button", { name: /print/i })).toBeVisible();
   });
 
   await test.step("the budget counted every call, with tokens", async () => {
     await page.goto("/usage");
-    // Suggestion, import, analysis, cover letter, tailored CV: five calls.
+    // Guide (suggestion + analysis), then suggestion, import, analysis, cover
+    // letter, tailored CV: seven calls.
     await page.goto("/usage");
-    await expect(page.getByText(/5\s*\/\s*12/)).toBeVisible();
+    await expect(page.getByText(/7\s*\/\s*12/)).toBeVisible();
 
     const counter = await db.usageCounter.findFirst({ where: { user: { email: EMAIL } } });
-    expect(counter?.calls).toBe(5);
+    expect(counter?.calls).toBe(7);
     // The streaming path reports usage too — M8's "budget would be fiction"
     // fix, asserted rather than assumed.
     expect((counter?.inputTokens ?? 0) + (counter?.outputTokens ?? 0)).toBeGreaterThan(0);

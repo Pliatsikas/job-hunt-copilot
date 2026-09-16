@@ -116,5 +116,8 @@ export async function applyImportedCv(_prev: ApplyState, formData: FormData): Pr
   });
 
   revalidatePath("/profile");
-  redirect("/profile?imported=1");
+  revalidatePath("/today");
+  // The guide sends people here from step 1 and wants them back at step 2.
+  const next = formData.get("next");
+  redirect(typeof next === "string" && next.startsWith("/") ? next : "/profile?imported=1");
 }

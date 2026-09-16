@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getT } from "@/lib/i18n/server";
 import { getProfile } from "@/lib/profile/get";
 import { ProfileForm } from "./profile-form";
 import { PreferencesForm } from "./preferences-form";
@@ -18,25 +19,21 @@ export default async function ProfilePage({
 }: {
   searchParams: Promise<{ imported?: string }>;
 }) {
-  const [profile, prefs] = await Promise.all([getProfile(), getJobPreferences()]);
-  const { imported } = await searchParams;
+  const [t, profile, prefs, { imported }] = await Promise.all([getT(), getProfile(), getJobPreferences(), searchParams]);
 
   return (
     <Page>
-      <PageHeader title="Profile" description={<>{profile
-          ? "Everything the analysis knows about you comes from here."
-          : "Fill this in first — the analysis compares job descriptions against your CV text, so without it there is nothing to compare."}</>} />
+      <PageHeader title={t("profile.title")} description={profile ? t("profile.sub") : t("profile.subEmpty")} />
 
       {imported && (
         <p role="status" className="mb-4 max-w-2xl rounded-lg border bg-muted/30 p-3 text-sm">
-          CV imported from PDF and saved. Run an analysis on an application to check it finds
-          evidence — that is the real test of an import.
+          {t("profile.imported")}
         </p>
       )}
 
       <p className="mb-6 text-sm">
         <Link href="/profile/import" className="underline">
-          Import from a PDF instead
+          {t("profile.importLink")}
         </Link>
       </p>
 

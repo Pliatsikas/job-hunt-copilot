@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { githubEnabled, signIn } from "@/lib/auth";
+import { getT } from "@/lib/i18n/server";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,7 +22,7 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ registered?: string }>;
 }) {
-  const { registered } = await searchParams;
+  const [t, { registered }] = await Promise.all([getT(), searchParams]);
 
   return (
     <Card className="w-full max-w-sm">
@@ -30,10 +31,10 @@ export default async function LoginPage({
             page has no heading at all, and Tailwind's reset means it inherits
             the card's type scale rather than fighting it. */}
         <CardTitle>
-          <h1>Sign in</h1>
+          <h1>{t("auth.signInTitle")}</h1>
         </CardTitle>
         <CardDescription>
-          {registered ? "Account created — sign in below." : "Welcome back."}
+          {registered ? t("auth.accountCreated") : t("auth.signInSub")}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
@@ -42,7 +43,7 @@ export default async function LoginPage({
           <>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="h-px flex-1 bg-border" />
-              or
+              {t("auth.or")}
               <span className="h-px flex-1 bg-border" />
             </div>
             <form
@@ -52,15 +53,15 @@ export default async function LoginPage({
               }}
             >
               <Button type="submit" variant="outline" className="w-full">
-                Continue with GitHub
+                {t("auth.github")}
               </Button>
             </form>
           </>
         )}
         <p className="text-center text-sm text-muted-foreground">
-          No account?{" "}
+          {t("auth.noAccount")}{" "}
           <Link href="/register" className="underline underline-offset-4">
-            Register
+            {t("auth.register")}
           </Link>
         </p>
       </CardContent>
