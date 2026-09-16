@@ -51,7 +51,7 @@ react. Plus a bit more motion so the interface feels alive.
 
 ## Verify
 
-_(preview URL when pushed)_ — click around on a phone: the bar and the dimming on every
+https://job-hunt-copilot-eyewe6kbw-pliatsikas-projects.vercel.app — click around on a phone: the bar and the dimming on every
 tap, the spinner on every submit, and — the real test — change a status, add a note, run
 an analysis: the button must come back and the page must show the change without a reload.
 
