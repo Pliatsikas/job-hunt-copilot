@@ -1,28 +1,20 @@
-import {
-  BarChart3,
-  Briefcase,
-  Gauge,
-  Inbox,
-  Sun,
-  UserRound,
-  type LucideIcon,
-} from "lucide-react";
+import { BarChart3, Briefcase, Inbox, Sun, UserRound, type LucideIcon } from "lucide-react";
+import type { MessageKey } from "@/lib/i18n/t";
 
-export type NavItem = { href: string; label: string; icon: LucideIcon };
+export type NavItem = { href: string; labelKey: MessageKey; icon: LucideIcon };
 
 /**
- * One list, two renderings. The sidebar shows all six; the mobile tab bar
- * shows the first five and folds Usage into the account menu, because five
- * tabs is the most a thumb can hit reliably and Usage is a check, not a
- * destination.
+ * Five destinations. Usage left the menu in T06: it is a check, not a place
+ * to go, and it now shows as a line next to whatever spends the budget.
+ * Labels are message keys so the shell renders in whichever language the
+ * viewer picked.
  */
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/today", label: "Today", icon: Sun },
-  { href: "/applications", label: "Applications", icon: Briefcase },
-  { href: "/leads", label: "Leads", icon: Inbox },
-  { href: "/insights", label: "Insights", icon: BarChart3 },
-  { href: "/profile", label: "Profile", icon: UserRound },
-  { href: "/usage", label: "Usage", icon: Gauge },
+  { href: "/today", labelKey: "nav.today", icon: Sun },
+  { href: "/applications", labelKey: "nav.applications", icon: Briefcase },
+  { href: "/leads", labelKey: "nav.jobs", icon: Inbox },
+  { href: "/insights", labelKey: "nav.insights", icon: BarChart3 },
+  { href: "/profile", labelKey: "nav.profile", icon: UserRound },
 ];
 
-export const MOBILE_TABS = NAV_ITEMS.slice(0, 5);
+export const MOBILE_TABS = NAV_ITEMS;
