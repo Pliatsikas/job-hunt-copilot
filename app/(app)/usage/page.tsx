@@ -129,7 +129,7 @@ function Meter({ label, used, limit }: { label: string; used: number; limit: num
         aria-valuemax={limit}
         aria-label={`${label}: ${used} / ${limit}`}
       >
-        <div className={`h-full rounded-full ${tone}`} style={{ width: `${pct}%` }} />
+        <div className={`animate-meter h-full rounded-full ${tone}`} style={{ width: `${pct}%` }} />
       </div>
     </div>
   );

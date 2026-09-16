@@ -68,13 +68,13 @@ export function ProfileForm({ defaults }: { defaults: ProfileDefaults }) {
         </p>
       )}
       {state.savedAt && !state.error && (
-        <p role="status" className="text-sm text-muted-foreground">
+        <p role="status" className="text-sm text-muted-foreground animate-in fade-in duration-300">
           {t("profile.saved")}
         </p>
       )}
 
       <div>
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" pending={pending}>
           {pending ? t("common.saving") : t("profile.saveProfile")}
         </Button>
       </div>

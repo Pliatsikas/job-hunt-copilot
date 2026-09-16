@@ -40,8 +40,8 @@ export function FirstApplicationForm({ callsLeft, limit }: { callsLeft: number; 
           {t("start.skipForNow")}
         </Link>
         <div className="flex flex-col items-end gap-1">
-          <Button type="submit" disabled={pending} size="lg">
-            <Sparkles className="size-4" aria-hidden />
+          <Button type="submit" pending={pending} size="lg">
+            {!pending && <Sparkles className="size-4" aria-hidden />}
             {pending ? t("application.analysing") : t("start.analyseNow")}
           </Button>
           <span className="text-xs text-muted-foreground">{t("common.callsToday", { used: limit - callsLeft, limit })}</span>

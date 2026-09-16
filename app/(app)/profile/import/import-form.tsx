@@ -61,7 +61,7 @@ export function ImportForm({
         )}
 
         <div>
-          <Button type="submit" disabled={importing}>
+          <Button type="submit" pending={importing}>
             {importing ? t("profileImport.extracting") : t("profileImport.extract")}
           </Button>
         </div>
@@ -113,7 +113,7 @@ export function ImportForm({
       )}
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="submit" disabled={applying}>
+        <Button type="submit" pending={applying}>
           {applying ? t("common.saving") : hasExistingCv ? t("profileImport.replace") : t("profileImport.saveAs")}
         </Button>
         <Link href={next ?? "/profile"} className={buttonVariants({ variant: "ghost" })}>

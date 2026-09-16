@@ -20,8 +20,8 @@ export function AnalyzeButton({
 
   return (
     <form action={formAction} className="flex flex-col gap-2">
-      <Button type="submit" disabled={pending} size={size} variant={hasPrevious ? "secondary" : "default"}>
-        {!hasPrevious && <Sparkles className="size-4" aria-hidden />}
+      <Button type="submit" pending={pending} size={size} variant={hasPrevious ? "secondary" : "default"}>
+        {!hasPrevious && !pending && <Sparkles className="size-4" aria-hidden />}
         {pending ? t("application.analysing") : hasPrevious ? t("application.analyseAgain") : t("application.analyse")}
       </Button>
 

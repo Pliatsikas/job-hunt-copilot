@@ -97,9 +97,10 @@ export default async function LeadsPage({
           </p>
         ) : (
           <ul className="flex flex-col gap-3">
-            {leads.map((lead) => (
+            {leads.map((lead, i) => (
               <LeadRow
                 key={lead.id}
+                index={i}
                 lead={{
                   id: lead.id,
                   companyName: lead.companyName,

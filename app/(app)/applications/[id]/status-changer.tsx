@@ -32,7 +32,7 @@ export function StatusChanger({
             </option>
           ))}
         </select>
-        <Button type="submit" size="sm" variant="secondary" disabled={pending}>
+        <Button type="submit" size="sm" variant="secondary" pending={pending}>
           {pending ? t("common.saving") : t("application.update")}
         </Button>
       </div>

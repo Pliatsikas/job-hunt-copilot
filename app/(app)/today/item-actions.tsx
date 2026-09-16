@@ -21,7 +21,7 @@ function ActionButton({
 
   return (
     <form action={formAction}>
-      <Button type="submit" size="sm" variant={variant} disabled={pending}>
+      <Button type="submit" size="sm" variant={variant} pending={pending}>
         {pending ? pendingLabel : label}
       </Button>
       {state.error && (

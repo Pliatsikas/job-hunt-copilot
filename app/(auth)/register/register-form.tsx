@@ -57,7 +57,7 @@ export function RegisterForm() {
           {state.error}
         </p>
       )}
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" pending={pending} className="w-full">
         {pending ? t("auth.creating") : t("auth.register")}
       </Button>
     </form>

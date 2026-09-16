@@ -1,9 +1,10 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { LogOut } from "lucide-react";
 import type { Locale } from "@/lib/i18n/locale";
 import type { T } from "@/lib/i18n/t";
 import { LanguageSwitch } from "./language-switch";
+import { NavigationProgress } from "./navigation-progress";
 import { MOBILE_TABS, NAV_ITEMS } from "./nav-items";
 import { NavLink } from "./nav-link";
 
@@ -29,6 +30,9 @@ export function AppShell({
 }) {
   return (
     <div className="flex min-h-full flex-1">
+      <Suspense fallback={null}>
+        <NavigationProgress />
+      </Suspense>
       <aside className="hidden w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
         <div className="px-5 pt-6 pb-4">
           <Link href="/today" className="flex items-center gap-2 font-semibold tracking-tight">

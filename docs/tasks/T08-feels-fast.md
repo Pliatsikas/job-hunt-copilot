@@ -10,35 +10,50 @@ react. Plus a bit more motion so the interface feels alive.
 
 ## Decisions
 
-- **Every route gets a `loading.tsx`.** Next streams the page: the shell appears at once
-  and the page area shows a skeleton in the shape of the real page (a header bar, a few
-  card outlines) while the server renders. This is what "lazy load" buys us for free with
-  the App Router — no client-side data fetching, no extra library. Skeletons match each
-  page's layout so nothing jumps when the content lands.
-- **A progress bar for navigation.** A thin bar at the top of the viewport that starts on
-  any link click and finishes when the new route is committed — the one signal that says
-  "yes, you pressed it" between the click and the skeleton. Built on `useLinkStatus` /
-  the router's pending state, ~40 lines, no dependency.
-- **Every button shows its pressed state.** Two layers: a CSS press (scale 0.98 + darker
-  fill on `:active`, 80 ms) that answers the finger instantly, and — for buttons that
-  submit — the existing pending label plus a spinner icon. Links styled as buttons get the
-  same press. This lives in `components/ui/button.tsx`, so it applies everywhere at once.
-- **Motion that explains, not decorates.** Page content fades/rises in (150 ms) when it
-  arrives; list rows on Today and Leads appear with a small stagger; the score meter
-  fills from zero; success messages fade in. Everything respects `prefers-reduced-motion`
-  (animations off, instant states). Nothing longer than 200 ms, nothing that blocks input.
-- **No new dependency.** Tailwind's `animate-*` utilities plus a few keyframes in
-  `globals.css`. Framer Motion would be the tool for choreography; this is not that.
-- **Measure, don't guess.** Before and after: the E2E records time-to-first-paint of the
-  skeleton on the application page; the README notes the numbers.
+- **No `loading.tsx`. This was the plan, and it is the one thing this task must not do.**
+  The first build added a skeleton per route. The E2E then failed on the second analysis:
+  the button stayed on "Analysing…" while the analysis was already saved. Bisecting in a
+  production build (dev never reproduces: it neither prefetches nor streams the same way)
+  landed on a known, still-open Next.js bug — [vercel/next.js#66426](https://github.com/vercel/next.js/issues/66426):
+  a `loading.tsx` above a page plus a server action that calls `revalidatePath` for that
+  page leaves the action's transition pending forever. Measured with a probe script against
+  `next start`: status change stuck **9/9** with `loading.tsx`, **0/9** without; analysis
+  ~50% stuck with, 0/11 without. `router.refresh()` from the client instead of
+  `revalidatePath` was no better (5/8 dropped). Skeletons are out until Next fixes it;
+  `lib/no-loading-boundary.test.ts` fails the unit suite if a `loading.tsx` comes back.
+- **The "did I press it" signal is the shell's job, not the page's.** Three layers, none of
+  them a Suspense boundary: a progress bar along the top that starts on any same-origin
+  link click and ends when the route commits; the tapped nav item dims and pulses
+  (`useLinkStatus`); the current page fades to 55% while the next one loads
+  (`html[data-navigating] main`). ~60 lines in `components/shell/navigation-progress.tsx`,
+  no dependency.
+- **Every button shows its pressed state.** A CSS press (scale 0.97 + darker, 100 ms) on
+  `:active`, and a `pending` prop on the shared `Button` that adds a spinner, `aria-busy`
+  and disables the control — so a double click cannot fire an action twice. Every submit
+  button in the app uses it.
+- **Motion that explains, not decorates.** Page content rises in (200 ms); rows on Today,
+  the guide and Jobs for you appear with a 40 ms stagger; score meters fill from zero;
+  status messages fade in. All under 300 ms, nothing blocks input, and
+  `prefers-reduced-motion` collapses every animation and transition to instant.
+- **No new dependency.** `tw-animate-css` was already installed; two keyframes in
+  `globals.css` cover the rest.
 
 ## Built
 
-_(filled in as it lands)_
+- `components/shell/navigation-progress.tsx`, `nav-link.tsx` (pending state),
+  `app-shell.tsx` mounts the bar in a Suspense (it reads `useSearchParams`).
+- `components/ui/button.tsx`: press feedback + `pending`. 19 call sites switched.
+- `components/page.tsx` entrance; stagger on Today / guide / leads; `animate-meter` on the
+  analysis and usage meters; `globals.css` keyframes and reduced-motion rule.
+- `lib/no-loading-boundary.test.ts` — the guard.
+- Probe scripts used for the measurement are not committed (they drive the demo account
+  against a local production build and spend its daily calls); the numbers are above.
 
 ## Verify
 
-_(preview URL when pushed)_
+_(preview URL when pushed)_ — click around on a phone: the bar and the dimming on every
+tap, the spinner on every submit, and — the real test — change a status, add a note, run
+an analysis: the button must come back and the page must show the change without a reload.
 
 ## Left out
 

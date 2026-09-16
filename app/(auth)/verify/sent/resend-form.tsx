@@ -25,7 +25,7 @@ export function ResendForm({ defaultEmail }: { defaultEmail: string }) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <Button type="submit" variant="secondary" disabled={pending}>
+        <Button type="submit" variant="secondary" pending={pending}>
           {pending ? t("auth.sending") : t("auth.resend")}
         </Button>
       </div>
