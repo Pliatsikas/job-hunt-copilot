@@ -38,11 +38,54 @@ Mockups approved by the owner on 2026-09-16: https://claude.ai/artifact/UcmzDpTX
 
 ## Built
 
-_(filled in as it lands)_
+Three commits on the branch, one per stage:
+
+- **A — the language layer.** `lib/i18n/`: locale cookie (`el|en`, default from
+  `Accept-Language`), typed messages (`messages/el.ts` is the shape, `en.ts` must match),
+  `getT()` / `useT()`, `setLocale` server action, `LanguageSwitch` in the shell and on the
+  auth pages. Usage leaves the nav (five items).
+- **B — the flow.** `/start/1..3` (CV as PDF or paste → preferences suggested from the CV
+  → first posting, created and analysed on one button). Today is the guide until the three
+  steps are done, then a list of things to do with one button per row, plus new leads. The
+  application page is one column: a single "Analyse the posting" with the day's call
+  count; after it, score, "You have / You are missing", then the letter, the CV and the
+  interview questions as next steps. `lib/applications/record-analysis.ts` is the one
+  writer for Analysis + Event + derived fields (shared by the analyze action and the
+  guide's first-application action). The PDF import and the preferences save take a
+  `next` redirect so the guide can route through them.
+- **C — the sweep.** Every remaining page and shared component renders through `t()`:
+  leads ("Jobs for you" / "Δουλειές για σένα", Interested / No), profile, PDF import,
+  usage, insights, auth, error and not-found, the CV print view, status badges, chips.
+  The `I18nProvider` sits in the root layout so error boundaries are covered too.
+
+Tests: 356 unit; E2E happy path now walks the guide first (seven counted calls); the
+layout spec covers `/start/1` and `/start/3` and runs a Greek pass at 360 and 1440px.
+
+Found on the way: the guide's step 2 asked the model on every visit while roles were
+empty, so the layout E2E was spending the demo account's daily calls. It now asks only on
+arrival from step 1 (`?suggest=1`, dropped from the URL after firing). The demo counter for
+2026-09-16 was reset.
 
 ## Verify
 
-Preview URL: _(filled in when pushed)_
+Preview URL: https://job-hunt-copilot-cj4ykl344-pliatsikas-projects.vercel.app
+
+What to try, on a phone and a laptop, in both languages (switch at the bottom of the
+sidebar / top of the mobile bar):
+
+1. A **new account**: Today shows three steps and one button. Walk them: paste (or upload)
+   the CV → Continue; step 2 arrives pre-filled from the CV → Continue; paste a posting →
+   "Analyse it" lands on the result.
+2. The **application page**: score, what you have / what you lack, then the three next
+   steps. Write the letter; make the CV; open the questions.
+3. **Today** afterwards: one line per thing to do; "New jobs" appears when a search finds
+   something.
+4. **Jobs for you**: Interested / No.
+
+Not verified by me: one intermittent React hydration warning (#418) on the seeded
+application page appeared once in a local E2E run and did not reproduce in 20+ further
+loads in dev or production builds. If the console shows it on the preview, tell me which
+page.
 
 ## Left out
 

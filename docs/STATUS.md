@@ -30,11 +30,15 @@ known failure modes in `NOTES.md`.
 | Jobs for you (leads) | `lib/ingest/`, `app/(app)/leads` | Search from the owner's preferences across 13 curated Greek employer boards (Workable/Greenhouse) + any they add, Remotive for remote. Local fit ranking (`fit.ts`), no model call. Bookmarklet captures any job page via `/leads/capture`. Public APIs only, never HTML. |
 | Evals | `evals/` | `pnpm eval --runs 3`; results committed under `evals/results/`. |
 | UI shell | `components/shell/`, `components/page*.tsx` | Sidebar on desktop, bottom tabs on mobile. Inter with Greek subset. |
+| Language (T06, on branch) | `lib/i18n/` | Cookie `locale=el\|en`, typed messages `messages/{el,en}.ts`, `getT()` server / `useT()` client. Every string in the UI goes through `t()`; adding copy means adding it to both files or typecheck fails. |
+| Guide (T06, on branch) | `lib/start/`, `app/(app)/start/[step]` | Three steps for a new account: CV → preferences → first posting analysed. Today shows the guide until done, then an action list. |
 
 ## Tests
 
-`pnpm typecheck && pnpm lint && pnpm test` (Vitest, ~320) and `pnpm test:e2e` (Playwright:
-happy path + layout at five widths). CI runs the first three on every push.
+`pnpm typecheck && pnpm lint && pnpm test` (Vitest, ~356) and `pnpm test:e2e` (Playwright:
+happy path + layout at five widths, plus a Greek pass). CI runs the first three on every
+push. Note: local E2E talks to the real Neon database and signs in as the demo account —
+anything that spends a model call on a plain page visit drains the demo's daily budget.
 
 ## In flight
 
