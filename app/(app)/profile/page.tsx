@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getProfile } from "@/lib/profile/get";
 import { ProfileForm } from "./profile-form";
+import { PreferencesForm } from "./preferences-form";
+import { getJobPreferences } from "@/lib/profile/preferences";
 import { Page } from "@/components/page";
 import { PageHeader } from "@/components/page-header";
 
@@ -16,7 +18,7 @@ export default async function ProfilePage({
 }: {
   searchParams: Promise<{ imported?: string }>;
 }) {
-  const profile = await getProfile();
+  const [profile, prefs] = await Promise.all([getProfile(), getJobPreferences()]);
   const { imported } = await searchParams;
 
   return (
@@ -47,6 +49,22 @@ export default async function ProfilePage({
           skills: profile?.skills ?? [],
         }}
       />
+
+      <div className="mt-10">
+        <PreferencesForm
+          hasCv={Boolean(profile?.cvText.trim())}
+          defaults={{
+            targetRoles: prefs?.targetRoles ?? [],
+            city: prefs?.city ?? "",
+            country: prefs?.country ?? "",
+            remote: prefs?.remote ?? "ANY",
+            seniority: prefs?.seniority ?? "",
+            languages: prefs?.languages ?? ["el", "en"],
+            excludeKeywords: prefs?.excludeKeywords ?? [],
+            autoSearch: prefs?.autoSearch ?? true,
+          }}
+        />
+      </div>
     </Page>
   );
 }

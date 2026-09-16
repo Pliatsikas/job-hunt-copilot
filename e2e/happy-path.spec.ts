@@ -143,7 +143,7 @@ test("register, analyse and generate", async ({ page }) => {
     await page.goto("/profile");
     await page.getByLabel(/cv/i).fill(CV_TEXT);
     await page.getByLabel(/skills/i).fill("react, typescript, postgresql, node.js");
-    await page.getByRole("button", { name: /save/i }).click();
+    await page.getByRole("button", { name: /save profile/i }).click();
 
     // Wait for the server action to land, not for client state: the textarea
     // holds the typed text whether or not the save happened, and navigating
@@ -152,6 +152,23 @@ test("register, analyse and generate", async ({ page }) => {
     await expect(page.getByText("Profile saved.")).toBeVisible();
     const profile = await db.profile.findFirst({ where: { user: { email: EMAIL } } });
     expect(profile?.cvText).toContain("Fullstack developer");
+  });
+
+  await test.step("preferences: suggested from the CV, edited, saved", async () => {
+    await page.getByRole("button", { name: /suggest from my cv/i }).click();
+    await expect(page.getByText(/filled in below/i)).toBeVisible({ timeout: 30_000 });
+    // The suggestion filled the empty form; nothing is saved yet.
+    expect(await db.jobPreferences.count({ where: { user: { email: EMAIL } } })).toBe(0);
+
+    await page.getByLabel("Remote").selectOption("REMOTE_OK");
+    await page.getByRole("button", { name: /save preferences/i }).click();
+    await expect(page.getByText("Preferences saved.")).toBeVisible();
+
+    const prefs = await db.jobPreferences.findFirst({ where: { user: { email: EMAIL } } });
+    expect(prefs?.targetRoles).toEqual(["fullstack developer", "frontend developer"]);
+    expect(prefs?.city).toBe("Thessaloniki");
+    expect(prefs?.remote).toBe("REMOTE_OK");
+    expect(prefs?.seniority).toBe("JUNIOR");
   });
 
   await test.step("import a two-column PDF, review it, replace the CV", async () => {
@@ -271,12 +288,12 @@ test("register, analyse and generate", async ({ page }) => {
 
   await test.step("the budget counted every call, with tokens", async () => {
     await page.goto("/usage");
-    // Import, analysis, cover letter, tailored CV: four calls against the budget.
+    // Suggestion, import, analysis, cover letter, tailored CV: five calls.
     await page.goto("/usage");
-    await expect(page.getByText(/4\s*\/\s*12/)).toBeVisible();
+    await expect(page.getByText(/5\s*\/\s*12/)).toBeVisible();
 
     const counter = await db.usageCounter.findFirst({ where: { user: { email: EMAIL } } });
-    expect(counter?.calls).toBe(4);
+    expect(counter?.calls).toBe(5);
     // The streaming path reports usage too — M8's "budget would be fiction"
     // fix, asserted rather than assumed.
     expect((counter?.inputTokens ?? 0) + (counter?.outputTokens ?? 0)).toBeGreaterThan(0);
