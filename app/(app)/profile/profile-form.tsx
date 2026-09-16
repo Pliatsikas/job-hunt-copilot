@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { saveProfile, type ProfileState } from "@/lib/profile/actions";
+import { useT } from "@/lib/i18n/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,13 +18,14 @@ export type ProfileDefaults = {
 };
 
 export function ProfileForm({ defaults }: { defaults: ProfileDefaults }) {
+  const t = useT();
   const [state, formAction, pending] = useActionState<ProfileState, FormData>(saveProfile, {});
 
   return (
     <form action={formAction} className="flex max-w-3xl flex-col gap-6">
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="flex flex-col gap-2 sm:col-span-2">
-          <Label htmlFor="headline">Headline</Label>
+          <Label htmlFor="headline">{t("profile.headline")}</Label>
           <Input
             id="headline"
             name="headline"
@@ -32,7 +34,7 @@ export function ProfileForm({ defaults }: { defaults: ProfileDefaults }) {
           />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="yearsOfExp">Years of experience</Label>
+          <Label htmlFor="yearsOfExp">{t("profile.years")}</Label>
           <Input
             id="yearsOfExp"
             name="yearsOfExp"
@@ -43,7 +45,7 @@ export function ProfileForm({ defaults }: { defaults: ProfileDefaults }) {
           />
         </div>
         <div className="flex flex-col gap-2 sm:col-span-2">
-          <Label htmlFor="location">Location</Label>
+          <Label htmlFor="location">{t("profile.location")}</Label>
           <Input
             id="location"
             name="location"
@@ -56,7 +58,7 @@ export function ProfileForm({ defaults }: { defaults: ProfileDefaults }) {
       <CvTextarea initial={defaults.cvText} />
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor={SKILLS_INPUT_ID}>Skills</Label>
+        <Label htmlFor={SKILLS_INPUT_ID}>{t("profile.skills")}</Label>
         <SkillsEditor initial={defaults.skills} />
       </div>
 
@@ -67,13 +69,13 @@ export function ProfileForm({ defaults }: { defaults: ProfileDefaults }) {
       )}
       {state.savedAt && !state.error && (
         <p role="status" className="text-sm text-muted-foreground">
-          Profile saved.
+          {t("profile.saved")}
         </p>
       )}
 
       <div>
         <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Save profile"}
+          {pending ? t("common.saving") : t("profile.saveProfile")}
         </Button>
       </div>
     </form>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getT } from "@/lib/i18n/server";
 import { ResendForm } from "./resend-form";
 
 export const metadata: Metadata = {
@@ -13,37 +14,34 @@ export default async function VerificationSentPage({
 }: {
   searchParams: Promise<{ email?: string }>;
 }) {
-  const { email } = await searchParams;
+  const [t, { email }] = await Promise.all([getT(), searchParams]);
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle>
-          <h1>Check your inbox</h1>
+          <h1>{t("auth.checkInbox")}</h1>
         </CardTitle>
         <CardDescription>
           {email ? (
             <>
-              A confirmation link is on its way to <strong>{email}</strong>.
+              {t("auth.linkOnWay")} <strong>{email}</strong>.
             </>
           ) : (
-            "A confirmation link is on its way."
+            t("auth.linkOnWayPlain")
           )}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4 text-sm">
-        <p>Open it to finish creating your account. It works for 24 hours.</p>
+        <p>{t("auth.openIt")}</p>
         <p className="rounded-lg border bg-muted/40 p-3 text-muted-foreground">
-          <strong className="text-foreground">Not there? Check your spam folder.</strong> The
-          email comes from a plain mailbox rather than a domain with its own signing, and some
-          providers file that as spam the first time. Marking it &ldquo;not spam&rdquo; fixes it
-          for next time.
+          <strong className="text-foreground">{t("auth.spamTitle")}</strong> {t("auth.spamNote")}
         </p>
         <ResendForm defaultEmail={email ?? ""} />
         <p className="text-center text-muted-foreground">
-          Already confirmed?{" "}
+          {t("auth.alreadyConfirmed")}{" "}
           <Link href="/login" className="underline underline-offset-4">
-            Sign in
+            {t("auth.signIn")}
           </Link>
         </p>
       </CardContent>

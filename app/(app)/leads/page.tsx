@@ -3,6 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { getT } from "@/lib/i18n/server";
 import { bookmarkletSource } from "@/lib/ingest/bookmarklet";
 import { CURATED_EMPLOYERS } from "@/lib/ingest/employers";
 import { countLeads, listNewLeads, listSavedSearches } from "@/lib/ingest/queries";
@@ -20,20 +21,14 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-const REMOTE_LABEL: Record<string, string> = {
-  REMOTE_ONLY: "remote only",
-  REMOTE_OK: "remote or local",
-  ONSITE_OK: "local",
-  ANY: "anywhere",
-};
-
 export default async function LeadsPage({
   searchParams,
 }: {
   searchParams: Promise<{ captured?: string }>;
 }) {
   const user = await requireUser();
-  const [prefs, leads, counts, watched, { captured }] = await Promise.all([
+  const [t, prefs, leads, counts, watched, { captured }] = await Promise.all([
+    getT(),
     db.jobPreferences.findUnique({ where: { userId: user.id } }),
     listNewLeads(),
     countLeads(),
@@ -51,25 +46,23 @@ export default async function LeadsPage({
   return (
     <Page wide>
       <PageHeader
-        title="Jobs for you"
+        title={t("jobs.title")}
         description={
           ready ? (
             <>
-              Looking for <strong>{prefs!.targetRoles.join(", ")}</strong>
-              {prefs!.city ? ` in ${prefs!.city}` : prefs!.country ? ` in ${prefs!.country}` : ""} ·{" "}
-              {REMOTE_LABEL[prefs!.remote]} ·{" "}
+              {t("jobs.lookingFor")} <strong>{prefs!.targetRoles.join(", ")}</strong>
+              {prefs!.city ? ` · ${prefs!.city}` : prefs!.country ? ` · ${prefs!.country}` : ""} · {t(`jobs.remoteLabel.${prefs!.remote}`)} ·{" "}
               <Link href="/profile#preferences" className="underline">
-                change
+                {t("common.change")}
               </Link>
             </>
           ) : (
             <>
-              Tell the app what you are looking for and it will search employers&apos; boards for
-              you.{" "}
-              <Link href="/profile#preferences" className="underline">
-                Set it up on your profile
+              {t("jobs.setUp")}{" "}
+              <Link href="/start/2" className="underline">
+                {t("jobs.setUpLink")}
               </Link>{" "}
-              — one minute, and it starts from your CV.
+              {t("jobs.setUpTail")}
             </>
           )
         }
@@ -78,48 +71,25 @@ export default async function LeadsPage({
 
       {captured === "1" && (
         <p role="status" className="mb-4 rounded-lg border bg-accent/40 p-3 text-sm">
-          Saved from the page you were on. It is in the list below, ranked like the rest.
+          {t("jobs.captured")}
         </p>
       )}
       {captured === "known" && (
         <p role="status" className="mb-4 rounded-lg border bg-muted/40 p-3 text-sm">
-          That one was already here.
+          {t("jobs.capturedKnown")}
         </p>
       )}
 
-      <div className="mb-6 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-xl border bg-card p-4 text-sm">
-          <p className="font-medium">Save any job with one click</p>
-          <p className="mt-1 text-muted-foreground">
-            Drag this to your bookmarks bar. On kariera.gr, LinkedIn or any job page, click it
-            — the posting lands here, ranked against your CV.
-          </p>
-          <BookmarkletLink href={bookmarklet}>★ Save to Job Hunt Copilot</BookmarkletLink>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Nothing is fetched by us from the job site: the click sends what you are already
-            looking at. If your bookmarks bar is hidden: ⌘⇧B on Mac, Ctrl+Shift+B on Windows.
-          </p>
-        </div>
-        <WatchEmployers
-          curated={CURATED_EMPLOYERS.map((e) => ({ name: e.name, source: e.source, greekJobs: e.greekJobs, checkedOn: e.checkedOn }))}
-          own={watched
-            .filter((w) => w.source !== "BOOKMARKLET")
-            .map((w) => ({ id: w.id, name: w.name, source: w.source, query: w.query }))}
-        />
-      </div>
-
-      <section aria-labelledby="queue-heading">
+      <section aria-labelledby="queue-heading" className="mb-6">
         <h2 id="queue-heading" className="mb-3 text-base font-semibold">
-          To look at ({counts.open})
+          {t("jobs.toLookAt", { count: counts.open })}
           <span className="ml-2 text-sm font-normal text-muted-foreground">
-            {counts.promoted} added · {counts.dismissed} dismissed
+            {t("jobs.added", { count: counts.promoted })} · {t("jobs.dismissed", { count: counts.dismissed })}
           </span>
         </h2>
         {leads.length === 0 ? (
           <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-            {ready
-              ? "Nothing waiting. Press “Find jobs now” to read the boards."
-              : "Set what you are looking for first, then press “Find jobs now”."}
+            {ready ? t("jobs.nothingWaiting") : t("jobs.nothingWaitingSetup")}
           </p>
         ) : (
           <ul className="flex flex-col gap-3">
@@ -148,6 +118,22 @@ export default async function LeadsPage({
           </ul>
         )}
       </section>
+
+      {/* The tools come after the list: the list is what the visit is for. */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-xl border bg-card p-4 text-sm">
+          <p className="font-medium">{t("jobs.bookmarkletTitle")}</p>
+          <p className="mt-1 text-muted-foreground">{t("jobs.bookmarkletSub")}</p>
+          <BookmarkletLink href={bookmarklet}>{t("jobs.bookmarkletButton")}</BookmarkletLink>
+          <p className="mt-2 text-xs text-muted-foreground">{t("jobs.bookmarkletNote")}</p>
+        </div>
+        <WatchEmployers
+          curated={CURATED_EMPLOYERS.map((e) => ({ name: e.name, source: e.source, greekJobs: e.greekJobs, checkedOn: e.checkedOn }))}
+          own={watched
+            .filter((w) => w.source !== "BOOKMARKLET")
+            .map((w) => ({ id: w.id, name: w.name, source: w.source, query: w.query }))}
+        />
+      </div>
     </Page>
   );
 }

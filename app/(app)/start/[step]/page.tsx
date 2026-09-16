@@ -20,8 +20,14 @@ export const dynamic = "force-dynamic";
  * back button works and a half-done setup resumes where it stopped; Today
  * links to whichever step is next.
  */
-export default async function StartPage({ params }: { params: Promise<{ step: string }> }) {
-  const { step: raw } = await params;
+export default async function StartPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ step: string }>;
+  searchParams: Promise<{ suggest?: string }>;
+}) {
+  const [{ step: raw }, { suggest }] = await Promise.all([params, searchParams]);
   const step = Number(raw);
   if (![1, 2, 3].includes(step)) notFound();
 
@@ -45,19 +51,19 @@ export default async function StartPage({ params }: { params: Promise<{ step: st
           <p className="mt-1 text-sm text-muted-foreground">{subs[s]}</p>
         </div>
         {s === 1 && <CvStepForm initial={(await getProfile())?.cvText ?? ""} />}
-        {s === 2 && <Step2 />}
+        {s === 2 && <Step2 autoSuggest={suggest === "1"} />}
         {s === 3 && <Step3 />}
       </div>
     </Page>
   );
 }
 
-async function Step2() {
+async function Step2({ autoSuggest }: { autoSuggest: boolean }) {
   const [profile, prefs] = await Promise.all([getProfile(), getJobPreferences()]);
   return (
     <PreferencesForm
       hasCv={Boolean(profile?.cvText.trim())}
-      autoSuggest
+      autoSuggest={autoSuggest}
       nextHref="/start/3"
       defaults={{
         targetRoles: prefs?.targetRoles ?? [],

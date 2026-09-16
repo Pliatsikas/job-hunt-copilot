@@ -16,7 +16,7 @@ export function CvStepForm({ initial }: { initial: string }) {
   return (
     <form action={action} className="flex flex-col gap-5">
       <Link
-        href="/profile/import?next=/start/2"
+        href="/profile/import?next=/start/2%3Fsuggest%3D1"
         className="flex flex-col items-center gap-2 rounded-xl border border-dashed bg-card px-6 py-8 text-center transition-colors hover:bg-accent/30 focus-visible:outline-2 focus-visible:outline-ring"
       >
         <FileUp className="size-8 text-primary" aria-hidden />

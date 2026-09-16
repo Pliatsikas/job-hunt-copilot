@@ -31,7 +31,9 @@ export async function saveCvFromStart(_prev: StartState, formData: FormData): Pr
   });
   revalidatePath("/profile");
   revalidatePath("/today");
-  redirect("/start/2");
+  // The flag asks step 2 to fill itself from the CV once, on this arrival —
+  // not on every visit, which would spend a model call per page load.
+  redirect("/start/2?suggest=1");
 }
 
 const firstSchema = z.object({

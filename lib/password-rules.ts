@@ -9,8 +9,10 @@
  * they have no capitals — the same class of bug as `\b` in M5's detector.
  */
 
+export type PasswordRuleId = "length" | "upper" | "lower" | "digit" | "symbol" | "common";
+
 export type PasswordRule = {
-  id: string;
+  id: PasswordRuleId;
   label: string;
   test: (password: string) => boolean;
 };

@@ -2,6 +2,7 @@
 
 import { useState, type KeyboardEvent } from "react";
 import { normalizeSkills } from "@/lib/schemas/profile";
+import { useT } from "@/lib/i18n/client";
 import { Input } from "@/components/ui/input";
 
 /** Shared with profile-form.tsx, which renders the visible label. */
@@ -13,6 +14,7 @@ export const SKILLS_INPUT_ID = "skills-input";
  */
 export function SkillsEditor({ initial }: { initial: string[] }) {
   const [skills, setSkills] = useState<string[]>(() => normalizeSkills(initial));
+  const t = useT();
   const [draft, setDraft] = useState("");
 
   function commitDraft() {
@@ -40,7 +42,7 @@ export function SkillsEditor({ initial }: { initial: string[] }) {
 
       <div className="flex flex-wrap gap-1.5">
         {skills.length === 0 && (
-          <span className="text-sm text-muted-foreground">No skills yet.</span>
+          <span className="text-sm text-muted-foreground">{t("common.noneYet")}</span>
         )}
         {skills.map((skill) => (
           <span
@@ -51,7 +53,7 @@ export function SkillsEditor({ initial }: { initial: string[] }) {
             <button
               type="button"
               onClick={() => setSkills((c) => c.filter((s) => s !== skill))}
-              aria-label={`Remove ${skill}`}
+              aria-label={t("common.remove", { name: skill })}
               className="text-muted-foreground hover:text-foreground"
             >
               ×
@@ -72,11 +74,11 @@ export function SkillsEditor({ initial }: { initial: string[] }) {
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={handleKeyDown}
         onBlur={commitDraft}
-        placeholder="Type a skill and press Enter"
+        placeholder={t("profile.skillPlaceholder")}
         aria-describedby={`${SKILLS_INPUT_ID}-hint`}
       />
       <p id={`${SKILLS_INPUT_ID}-hint`} className="text-xs text-muted-foreground">
-        Stored lowercase and de-duplicated. Comma-separated pastes are split automatically.
+        {t("profile.skillsNote")}
       </p>
     </div>
   );

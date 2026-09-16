@@ -76,6 +76,8 @@ export function PreferencesForm({
   useEffect(() => {
     if (!autoSuggest || !hasCv || askedRef.current || defaults.targetRoles.length) return;
     askedRef.current = true;
+    // Drop the flag from the URL so a reload does not ask again.
+    window.history.replaceState(null, "", window.location.pathname);
     suggestFormRef.current?.requestSubmit();
   }, [autoSuggest, hasCv, defaults.targetRoles.length]);
 
