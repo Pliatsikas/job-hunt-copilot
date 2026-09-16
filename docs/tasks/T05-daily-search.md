@@ -1,6 +1,6 @@
 # T05 — Daily automatic search (Vercel cron), lead expiry
 
-**Status:** in progress · **Branch:** `task/05-daily-search`
+**Status:** done 2026-09-16 · PR #6 · cron registered on production (`0 6 * * *`), first run expected 2026-09-17 06:xx UTC
 
 ## Asked (owner, 2026-09-16)
 

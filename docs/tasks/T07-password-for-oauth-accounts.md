@@ -1,6 +1,6 @@
 # T07 — Account settings: password for GitHub accounts, forgot password, change email
 
-**Status:** planned · next after T05
+**Status:** planned · after T08 (owner's order, 2026-09-16)
 
 ## Asked (owner, 2026-09-16)
 

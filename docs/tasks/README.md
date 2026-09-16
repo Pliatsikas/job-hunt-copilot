@@ -33,6 +33,7 @@ reset.
 | T02 | Email verification on sign-up (Brevo) | **done** 2026-09-15 | PR #2 |
 | T03 | Job preferences, pre-filled from the CV | **done** 2026-09-16 | PR #3 |
 | T04 | "Jobs for you" — search from preferences, watched employers, bookmarklet, local ranking | **done** 2026-09-16 | PR #4 |
-| T05 | Daily automatic search (Vercel cron), lead expiry | **in progress** | [T05](T05-daily-search.md) |
+| T05 | Daily automatic search (Vercel cron), lead expiry | **done** 2026-09-16 | PR #6 · [T05](T05-daily-search.md) |
 | T06 | Simplify: guided flow, one action per step, Greek and English everywhere | **done** 2026-09-16 | PR #5 · [T06](T06-simplify.md) |
-| T07 | Account settings: password for GitHub accounts, forgot password, change email, first-GitHub-sign-in nudge | planned — next | [T07](T07-password-for-oauth-accounts.md) |
+| T07 | Account settings: password for GitHub accounts, forgot password, change email, first-GitHub-sign-in nudge | planned — after T08 | [T07](T07-password-for-oauth-accounts.md) |
+| T08 | Feels fast: loading states on every page, pressed feedback on every button, navigation progress, motion | **in progress** | [T08](T08-feels-fast.md) |
