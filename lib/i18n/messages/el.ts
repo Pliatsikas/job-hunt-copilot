@@ -292,6 +292,7 @@ export const el = {
     captureReading: "Διαβάζει τη σελίδα…",
     backToJobs: "Πίσω στις δουλειές για σένα",
     posting: "αγγελία",
+    openPosting: "Άνοιξε την αγγελία",
     fitTitle: "Πόσο ταιριάζει η αγγελία με αυτά που ψάχνεις — χωρίς μοντέλο",
     matchTitle: "Βαθμός από την ανάλυση",
     remoteLabel: { REMOTE_ONLY: "μόνο remote", REMOTE_OK: "remote ή κοντά μου", ONSITE_OK: "κοντά μου", ANY: "οπουδήποτε" },

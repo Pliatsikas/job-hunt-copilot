@@ -4,7 +4,8 @@ import { useActionState } from "react";
 import { dismissLead, scoreLead, type IngestState } from "@/lib/ingest/actions";
 import { promoteLead } from "@/lib/applications/promote";
 import { useT } from "@/lib/i18n/client";
-import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 export function LeadRow({
   lead,
@@ -41,14 +42,6 @@ export function LeadRow({
           <p className="text-xs text-muted-foreground">
             {lead.source === "BOOKMARKLET" ? t("jobs.savedByYou") : lead.source.toLowerCase()}
             {lead.location ? ` · ${lead.location}` : ""}
-            {lead.jobUrl && (
-              <>
-                {" · "}
-                <a href={lead.jobUrl} target="_blank" rel="noopener noreferrer" className="underline">
-                  {t("jobs.posting")}
-                </a>
-              </>
-            )}
           </p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1 text-right">
@@ -89,12 +82,24 @@ export function LeadRow({
         </p>
       )}
 
-      <div className="mt-3 flex items-center gap-2">
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         <form action={promoteLead.bind(null, lead.id)}>
           <Button type="submit" size="sm">
             {t("jobs.interested")}
           </Button>
         </form>
+        {/* Where it was found is where you apply: the source's own page, a new tab. */}
+        {lead.jobUrl && (
+          <a
+            href={lead.jobUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ size: "sm", variant: "secondary" })}
+          >
+            <ExternalLink className="size-4" aria-hidden />
+            {t("jobs.openPosting")}
+          </a>
+        )}
         <form action={dismissLead.bind(null, lead.id)}>
           <Button type="submit" size="sm" variant="ghost">
             {t("jobs.notInterested")}

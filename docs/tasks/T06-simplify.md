@@ -82,10 +82,16 @@ sidebar / top of the mobile bar):
    something.
 4. **Jobs for you**: Interested / No.
 
-Not verified by me: one intermittent React hydration warning (#418) on the seeded
-application page appeared once in a local E2E run and did not reproduce in 20+ further
-loads in dev or production builds. If the console shows it on the preview, tell me which
-page.
+Owner's first pass (2026-09-16): likes it; two fixes — the language switch looked broken
+(the pill stretched to the sidebar width and the buttons sat short of its border; now a
+proper pill with `w-fit` and the forms as `contents`), and each lead needs a way to the
+page it was found on (now an "Open the posting" button next to "Interested").
+
+Not verified by me: an intermittent React hydration warning (#418, "HTML") shows up in
+roughly one of four local E2E runs, on different pages (the seeded application, `/usage`),
+and never reproduced in 30+ scripted loads in dev or production builds. `/usage` has no
+page-level client component, so whatever it is lives in the shell or in Next itself. If
+the console shows it on the preview, tell me which page.
 
 ## Left out
 

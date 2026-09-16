@@ -290,6 +290,7 @@ export const en: Messages = {
     captureReading: "Reading the page…",
     backToJobs: "Back to jobs for you",
     posting: "posting",
+    openPosting: "Open the posting",
     fitTitle: "How well the posting matches what you are looking for — no model involved",
     matchTitle: "Match score from the analysis",
     remoteLabel: { REMOTE_ONLY: "remote only", REMOTE_OK: "remote or local", ONSITE_OK: "local", ANY: "anywhere" },
