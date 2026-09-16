@@ -31,3 +31,8 @@ reset.
 |---|---|---|---|
 | T01 | Stronger passwords with a live checklist | **done** 2026-09-15 | PR #1 |
 | T02 | Email verification on sign-up (Brevo) | **done** 2026-09-15 | PR #2 |
+| T03 | Job preferences, pre-filled from the CV | **done** 2026-09-16 | PR #3 |
+| T04 | "Jobs for you" — search from preferences, local ranking, Jooble + Remotive | in progress | `task/04-jobs-for-you` |
+| T05 | Daily automatic search (Vercel cron), lead expiry | planned | — |
+| T06 | Simplify: guided flow, one action per step, less to learn | planned — owner + partner feedback 2026-09-16 | — |
+| T07 | Set a password on a GitHub-only account / forgot password | planned | — |

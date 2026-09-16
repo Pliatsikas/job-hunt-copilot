@@ -21,7 +21,7 @@ known failure modes in `NOTES.md`.
 |---|---|---|
 | Auth | `lib/auth.ts`, `lib/register.ts`, `lib/login.ts`, `lib/email/` | Credentials + optional GitHub. Password rules (`lib/password-rules.ts`). Email verification via Brevo (T02): unverified accounts cannot sign in; links hashed, one use, 24h. IP rate limits in `authorize()` and the register action. |
 | Applications pipeline | `lib/applications/`, `app/(app)/applications` | CRUD, status events, notes, filters. |
-| Profile / CV | `lib/profile/`, `app/(app)/profile` | CV text is the source of truth for every prompt. PDF import in `lib/cv-import/`. |
+| Profile / CV | `lib/profile/`, `app/(app)/profile` | CV text is the source of truth for every prompt. PDF import in `lib/cv-import/`. Job preferences (T03): roles, location, remote, seniority — suggested from the CV, saved by the owner. |
 | Analysis | `lib/analysis/run.ts`, `lib/llm/` | Groq default, Gemini fallback. Grounding drops unquotable claims. Prompt `analyze@2`. |
 | Documents | `app/api/generate/route.ts` (streamed), `lib/applications/tailor.ts` | Cover letters, follow-ups, tailored CV (exact-line grounding, no rewriting). |
 | Today / reminders | `lib/applications/today.ts`, `lib/dates.ts` | Athens civil days, DST-safe. |
@@ -47,3 +47,6 @@ current work.
 - The model never rewrites the owner's own text (CV). Select and reorder only.
 - One task at a time. Each task gets a file in `docs/tasks/`. Nothing reaches production
   until the owner has verified it on the preview URL.
+- **The app is too complex for a new person** (owner + partner, 2026-09-16). Every new screen
+  should reduce what there is to learn, not add to it. T06 is the dedicated pass; until then,
+  prefer one obvious action over several optional ones.

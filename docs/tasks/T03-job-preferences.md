@@ -1,6 +1,6 @@
 # T03 — Job preferences, pre-filled from the CV
 
-**Status:** in progress · **Branch:** `task/03-job-preferences`
+**Status:** done 2026-09-16 · merged in PR #3 · verified by the owner on the preview (test account)
 
 ## Asked (owner, 2026-09-16)
 
