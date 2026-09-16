@@ -68,7 +68,7 @@ arrival from step 1 (`?suggest=1`, dropped from the URL after firing). The demo 
 
 ## Verify
 
-Preview URL: https://job-hunt-copilot-cj4ykl344-pliatsikas-projects.vercel.app
+Preview URL: https://job-hunt-copilot-p8izx7ecb-pliatsikas-projects.vercel.app
 
 What to try, on a phone and a laptop, in both languages (switch at the bottom of the
 sidebar / top of the mobile bar):
