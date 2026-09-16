@@ -3,6 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { formatDateTime } from "@/lib/format";
 import { getT } from "@/lib/i18n/server";
 import { bookmarkletSource } from "@/lib/ingest/bookmarklet";
 import { CURATED_EMPLOYERS } from "@/lib/ingest/employers";
@@ -55,6 +56,9 @@ export default async function LeadsPage({
               <Link href="/profile#preferences" className="underline">
                 {t("common.change")}
               </Link>
+              <br />
+              {prefs!.lastAutoRunAt ? `${t("jobs.lastRun", { date: formatDateTime(prefs!.lastAutoRunAt) })} · ` : ""}
+              {prefs!.autoSearch ? t("jobs.autoOn") : t("jobs.autoOff")}
             </>
           ) : (
             <>

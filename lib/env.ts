@@ -37,6 +37,9 @@ export const envSchema = z.object({
   // Transactional email (T02). Optional: without a key, verification links
   // are written to the server log instead of sent, so local dev and CI work.
   BREVO_API_KEY: optionalEnvString(),
+  // Vercel sends this as a bearer token when it triggers a cron route. Unset
+  // locally, so the route refuses every caller outside Vercel.
+  CRON_SECRET: optionalEnvString(),
   EMAIL_FROM: z.preprocess((v) => (v === "" ? undefined : v), z.email().optional()),
   EMAIL_FROM_NAME: z.string().trim().min(1).default("Job Hunt Copilot"),
 
