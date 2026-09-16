@@ -27,7 +27,7 @@ known failure modes in `NOTES.md`.
 | Today / reminders | `lib/applications/today.ts`, `lib/dates.ts` | Athens civil days, DST-safe. |
 | Insights | `lib/applications/insights.ts` | SQL aggregation, server-rendered charts. |
 | Usage limits | `lib/llm/usage.ts`, `lib/limits.ts` | Per-user + global token/request budgets, `LLM_ENABLED` kill switch. |
-| Leads | `lib/ingest/`, `app/(app)/leads` | Public JSON APIs only (Greenhouse, Lever, Arbeitnow, Remotive). Dedupe, score on arrival, triage. |
+| Jobs for you (leads) | `lib/ingest/`, `app/(app)/leads` | Search from the owner's preferences across 13 curated Greek employer boards (Workable/Greenhouse) + any they add, Remotive for remote. Local fit ranking (`fit.ts`), no model call. Bookmarklet captures any job page via `/leads/capture`. Public APIs only, never HTML. |
 | Evals | `evals/` | `pnpm eval --runs 3`; results committed under `evals/results/`. |
 | UI shell | `components/shell/`, `components/page*.tsx` | Sidebar on desktop, bottom tabs on mobile. Inter with Greek subset. |
 

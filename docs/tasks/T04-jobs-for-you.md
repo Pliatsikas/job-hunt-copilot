@@ -1,6 +1,6 @@
 # T04 — "Jobs for you": search from preferences, watched employers, one-click capture
 
-**Status:** in progress · **Branch:** `task/04-jobs-for-you`
+**Status:** done 2026-09-16 · merged in PR #4 · verified by the owner on the preview, including the bookmarklet on kariera.gr
 
 ## Asked (owner, 2026-09-16)
 
