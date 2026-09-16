@@ -1,6 +1,6 @@
 # T06 — Simplify: guide the person, one action per step, in Greek and English
 
-**Status:** in progress · **Branch:** `task/06-simplify-bilingual`
+**Status:** done 2026-09-16 · **Branch:** `task/06-simplify-bilingual` · PR #5, production Ready
 
 ## Asked (owner, 2026-09-16)
 

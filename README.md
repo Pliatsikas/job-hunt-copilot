@@ -200,6 +200,15 @@ page. Both are now caught by a check that walks every route at five widths and f
 now has a test, and the font is Inter with the Greek subset, since Geist has no Greek glyphs and
 every Greek posting had been falling back too.
 
+**The layout test was quietly spending the demo account's daily model calls.** The guided
+setup's second step asked the model to suggest preferences from the CV whenever the roles were
+empty — sensible on arrival from step one, and exactly what the layout check triggered on every
+visit, against the real database, signed in as the demo account. Twelve calls later the demo
+was locked out for the day and the test page showed the "used up" message instead of the form.
+The suggestion now fires only on arrival from the previous step (a one-shot query flag, dropped
+from the URL as it fires), and the status map records that local end-to-end runs touch
+production data. A page that spends money on load is a bug even when every test is green.
+
 ## Eval results
 
 Ten job ads against one real CV, on a pinned prompt version, so a prompt change produces a

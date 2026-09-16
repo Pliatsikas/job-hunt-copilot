@@ -34,5 +34,5 @@ reset.
 | T03 | Job preferences, pre-filled from the CV | **done** 2026-09-16 | PR #3 |
 | T04 | "Jobs for you" — search from preferences, watched employers, bookmarklet, local ranking | **done** 2026-09-16 | PR #4 |
 | T05 | Daily automatic search (Vercel cron), lead expiry | planned | — |
-| T06 | Simplify: guided flow, one action per step, Greek and English everywhere | **in progress** — on preview, awaiting owner verification | [T06](T06-simplify.md) |
+| T06 | Simplify: guided flow, one action per step, Greek and English everywhere | **done** 2026-09-16 | PR #5 · [T06](T06-simplify.md) |
 | T07 | Set a password on a GitHub-only account / forgot password | planned | — |

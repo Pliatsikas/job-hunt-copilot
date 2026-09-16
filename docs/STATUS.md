@@ -30,8 +30,8 @@ known failure modes in `NOTES.md`.
 | Jobs for you (leads) | `lib/ingest/`, `app/(app)/leads` | Search from the owner's preferences across 13 curated Greek employer boards (Workable/Greenhouse) + any they add, Remotive for remote. Local fit ranking (`fit.ts`), no model call. Bookmarklet captures any job page via `/leads/capture`. Public APIs only, never HTML. |
 | Evals | `evals/` | `pnpm eval --runs 3`; results committed under `evals/results/`. |
 | UI shell | `components/shell/`, `components/page*.tsx` | Sidebar on desktop, bottom tabs on mobile. Inter with Greek subset. |
-| Language (T06, on branch) | `lib/i18n/` | Cookie `locale=el\|en`, typed messages `messages/{el,en}.ts`, `getT()` server / `useT()` client. Every string in the UI goes through `t()`; adding copy means adding it to both files or typecheck fails. |
-| Guide (T06, on branch) | `lib/start/`, `app/(app)/start/[step]` | Three steps for a new account: CV → preferences → first posting analysed. Today shows the guide until done, then an action list. |
+| Language (T06) | `lib/i18n/` | Cookie `locale=el\|en`, typed messages `messages/{el,en}.ts`, `getT()` server / `useT()` client. Every string in the UI goes through `t()`; adding copy means adding it to both files or typecheck fails. |
+| Guide (T06) | `lib/start/`, `app/(app)/start/[step]` | Three steps for a new account: CV → preferences → first posting analysed. Today shows the guide until done, then an action list. |
 
 ## Tests
 
