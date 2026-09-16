@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import type { ActionState } from "@/lib/applications/actions";
 import { STATUSES, WORK_MODES } from "@/lib/schemas/application";
-import { STATUS_LABELS } from "@/components/status-badge";
+import { useT } from "@/lib/i18n/client";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,17 +43,18 @@ export function ApplicationForm({
   submitLabel: string;
   cancelHref: string;
 }) {
+  const t = useT();
   const [state, formAction, pending] = useActionState(action, {});
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="roleTitle">Role title</Label>
+          <Label htmlFor="roleTitle">{t("applications.form.roleTitle")}</Label>
           <Input id="roleTitle" name="roleTitle" required defaultValue={defaults.roleTitle} />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="companyName">Company</Label>
+          <Label htmlFor="companyName">{t("applications.form.companyName")}</Label>
           <Input
             id="companyName"
             name="companyName"
@@ -64,40 +65,38 @@ export function ApplicationForm({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="jobDescription">Job description</Label>
+        <Label htmlFor="jobDescription">{t("applications.form.jobDescription")}</Label>
         <Textarea
           id="jobDescription"
           name="jobDescription"
           required
           rows={12}
           defaultValue={defaults.jobDescription}
-          placeholder="Paste the full posting here."
+          placeholder={t("applications.form.jobDescriptionPlaceholder")}
         />
-        <p className="text-xs text-muted-foreground">
-          Paste the whole posting — this is the text the analysis will read.
-        </p>
+        <p className="text-xs text-muted-foreground">{t("applications.form.jobDescriptionNote")}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="jobUrl">Job URL</Label>
+          <Label htmlFor="jobUrl">{t("applications.form.jobUrl")}</Label>
           <Input id="jobUrl" name="jobUrl" type="url" defaultValue={defaults.jobUrl} />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="source">Source</Label>
+          <Label htmlFor="source">{t("applications.form.source")}</Label>
           <Input
             id="source"
             name="source"
             defaultValue={defaults.source}
-            placeholder="LinkedIn, kariera.gr, referral…"
+            placeholder={t("applications.form.sourcePlaceholder")}
           />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="location">Location</Label>
+          <Label htmlFor="location">{t("applications.form.location")}</Label>
           <Input id="location" name="location" defaultValue={defaults.location} />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="workMode">Work mode</Label>
+          <Label htmlFor="workMode">{t("applications.form.workMode")}</Label>
           <select
             id="workMode"
             name="workMode"
@@ -106,13 +105,13 @@ export function ApplicationForm({
           >
             {WORK_MODES.map((mode) => (
               <option key={mode} value={mode}>
-                {mode.charAt(0) + mode.slice(1).toLowerCase()}
+                {t(`application.workMode.${mode}`)}
               </option>
             ))}
           </select>
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="status">Status</Label>
+          <Label htmlFor="status">{t("applications.form.status")}</Label>
           <select
             id="status"
             name="status"
@@ -121,21 +120,21 @@ export function ApplicationForm({
           >
             {STATUSES.map((status) => (
               <option key={status} value={status}>
-                {STATUS_LABELS[status]}
+                {t(`application.statuses.${status}`)}
               </option>
             ))}
           </select>
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="salaryNote">Salary note</Label>
+          <Label htmlFor="salaryNote">{t("applications.form.salaryNote")}</Label>
           <Input id="salaryNote" name="salaryNote" defaultValue={defaults.salaryNote} />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="appliedAt">Applied on</Label>
+          <Label htmlFor="appliedAt">{t("applications.form.appliedAt")}</Label>
           <Input id="appliedAt" name="appliedAt" type="date" defaultValue={defaults.appliedAt} />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="nextActionAt">Next action</Label>
+          <Label htmlFor="nextActionAt">{t("applications.form.nextActionAt")}</Label>
           <Input
             id="nextActionAt"
             name="nextActionAt"
@@ -153,10 +152,10 @@ export function ApplicationForm({
 
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : submitLabel}
+          {pending ? t("common.saving") : submitLabel}
         </Button>
         <Link href={cancelHref} className={buttonVariants({ variant: "ghost" })}>
-          Cancel
+          {t("common.cancel")}
         </Link>
       </div>
     </form>

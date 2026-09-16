@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useT } from "@/lib/i18n/client";
 import { Button } from "@/components/ui/button";
 
 /** Copy and .md download both stay client-side — no round trip needed. */
@@ -11,6 +12,7 @@ export function DocumentActions({
   content: string;
   filename: string;
 }) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -22,7 +24,7 @@ export function DocumentActions({
       // Clipboard is blocked outside a secure context or without permission —
       // say so rather than leaving the button looking broken.
       setCopied(false);
-      alert("Couldn't copy — your browser blocked clipboard access. Select the text instead.");
+      alert(t("application.copyBlocked"));
     }
   }
 
@@ -39,10 +41,10 @@ export function DocumentActions({
   return (
     <div className="flex gap-2">
       <Button type="button" size="sm" variant="secondary" onClick={copy}>
-        {copied ? "Copied" : "Copy"}
+        {copied ? t("application.copied") : t("application.copy")}
       </Button>
       <Button type="button" size="sm" variant="ghost" onClick={download}>
-        Download .md
+        {t("application.download")} .md
       </Button>
     </div>
   );

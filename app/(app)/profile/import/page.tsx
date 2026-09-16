@@ -11,7 +11,12 @@ export const metadata: Metadata = {
   description: "Upload a CV as PDF, review the extracted text, then save it as your profile CV.",
 };
 
-export default async function ImportPage() {
+export default async function ImportPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
   const profile = await getProfile();
   const hasCv = Boolean(profile?.cvText.trim());
 
@@ -22,7 +27,7 @@ export default async function ImportPage() {
         it. You review the result before it replaces anything.
         {hasCv && " Your current CV stays as it is until you save."}</>} />
 
-      <ImportForm maxBytes={CV_PDF_MAX_BYTES} hasExistingCv={hasCv} />
+      <ImportForm maxBytes={CV_PDF_MAX_BYTES} hasExistingCv={hasCv} next={next?.startsWith("/") ? next : undefined} />
 
       <p className="mt-8 text-xs text-muted-foreground">
         Prefer to paste? <Link href="/profile" className="underline">Edit the CV as text</Link>{" "}

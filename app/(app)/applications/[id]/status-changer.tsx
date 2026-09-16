@@ -2,9 +2,10 @@
 
 import { useActionState } from "react";
 import type { ActionState } from "@/lib/applications/actions";
+import { useT } from "@/lib/i18n/client";
 import { STATUSES } from "@/lib/schemas/application";
-import { STATUS_LABELS } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
+import { SELECT_FOCUS } from "@/components/ui/select-focus";
 
 export function StatusChanger({
   action,
@@ -13,6 +14,7 @@ export function StatusChanger({
   action: (state: ActionState, formData: FormData) => Promise<ActionState>;
   current: string;
 }) {
+  const t = useT();
   const [state, formAction, pending] = useActionState(action, {});
 
   return (
@@ -21,17 +23,17 @@ export function StatusChanger({
         <select
           name="status"
           defaultValue={current}
-          aria-label="Status"
-          className="h-9 flex-1 rounded-lg border border-border bg-background px-2.5 text-sm"
+          aria-label={t("application.status")}
+          className={"h-9 flex-1 rounded-lg border border-border bg-background px-2.5 text-sm" + SELECT_FOCUS}
         >
           {STATUSES.map((status) => (
             <option key={status} value={status}>
-              {STATUS_LABELS[status]}
+              {t(`application.statuses.${status}`)}
             </option>
           ))}
         </select>
         <Button type="submit" size="sm" variant="secondary" disabled={pending}>
-          {pending ? "Saving…" : "Update"}
+          {pending ? t("common.saving") : t("application.update")}
         </Button>
       </div>
       {state.error && (

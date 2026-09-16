@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import type { ActionState } from "@/lib/applications/actions";
+import { useT } from "@/lib/i18n/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -10,6 +11,7 @@ export function NoteForm({
 }: {
   action: (state: ActionState, formData: FormData) => Promise<ActionState>;
 }) {
+  const t = useT();
   const [state, formAction, pending] = useActionState(action, {});
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -21,12 +23,7 @@ export function NoteForm({
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-2">
-      <Textarea
-        name="body"
-        rows={3}
-        required
-        placeholder="Recruiter call went well — they asked about Postgres."
-      />
+      <Textarea name="body" rows={3} required placeholder={t("application.notePlaceholder")} aria-label={t("application.addNote")} />
       {state.error && (
         <p role="alert" className="text-sm text-destructive">
           {state.error}
@@ -34,7 +31,7 @@ export function NoteForm({
       )}
       <div>
         <Button type="submit" size="sm" disabled={pending}>
-          {pending ? "Adding…" : "Add note"}
+          {pending ? t("application.adding") : t("application.addNote")}
         </Button>
       </div>
     </form>

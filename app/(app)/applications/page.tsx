@@ -7,7 +7,9 @@ import {
 } from "@/lib/applications/queries";
 import { applicationFiltersSchema, SORT_FIELDS, STATUSES } from "@/lib/schemas/application";
 import { formatDate } from "@/lib/format";
-import { STATUS_LABELS, StatusBadge } from "@/components/status-badge";
+import { getT } from "@/lib/i18n/server";
+import type { T } from "@/lib/i18n/t";
+import { StatusBadge } from "@/components/status-badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Page } from "@/components/page";
 import { PageHeader } from "@/components/page-header";
@@ -26,13 +28,6 @@ import {
 const selectClass =
   "h-9 rounded-lg border border-border bg-background px-2.5 text-sm" + SELECT_FOCUS;
 
-const SORT_LABELS: Record<(typeof SORT_FIELDS)[number], string> = {
-  created: "Added",
-  applied: "Applied",
-  nextAction: "Next action",
-  role: "Role",
-};
-
 export const metadata: Metadata = {
   title: "Applications",
   description:
@@ -46,6 +41,7 @@ export default async function ApplicationsPage({
 }) {
   const raw = await searchParams;
   const filters = applicationFiltersSchema.parse(raw);
+  const t = await getT();
 
   const [applications, companies, total] = await Promise.all([
     listApplications(filters),
@@ -58,15 +54,11 @@ export default async function ApplicationsPage({
   return (
     <Page wide>
       <PageHeader
-        title="Applications"
-        description={
-          total === 0
-            ? "Nothing tracked yet."
-            : `${total} active ${total === 1 ? "application" : "applications"}`
-        }
+        title={t("applications.title")}
+        description={total === 0 ? t("applications.nothingYet") : t("applications.active", { count: total })}
         actions={
           <Link href="/applications/new" className={buttonVariants()}>
-            Add application
+            {t("applications.add")}
           </Link>
         }
       />
@@ -74,24 +66,24 @@ export default async function ApplicationsPage({
       {total > 0 && (
         <details className="group mb-4 rounded-xl border bg-card open:pb-4 sm:open:pb-0" open>
           <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium sm:hidden">
-            Filters{filtersActive ? " · active" : ""}
+            {t("applications.filters")}{filtersActive ? ` · ${t("applications.filtersActive")}` : ""}
           </summary>
         <form method="GET" className="flex flex-wrap items-end gap-3 px-4 pb-4 pt-0 sm:p-4">
           <div className="flex flex-col gap-1">
             <label htmlFor="q" className="text-xs text-muted-foreground">
-              Search
+              {t("applications.search")}
             </label>
             <Input
               id="q"
               name="q"
               defaultValue={filters.q ?? ""}
-              placeholder="Role, company, description…"
+              placeholder={t("applications.searchPlaceholder")}
               className="w-56"
             />
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="status" className="text-xs text-muted-foreground">
-              Status
+              {t("applications.status")}
             </label>
             <select
               id="status"
@@ -99,17 +91,17 @@ export default async function ApplicationsPage({
               defaultValue={filters.status ?? ""}
               className={selectClass}
             >
-              <option value="">All</option>
+              <option value="">{t("applications.all")}</option>
               {STATUSES.map((status) => (
                 <option key={status} value={status}>
-                  {STATUS_LABELS[status]}
+                  {t(`application.statuses.${status}`)}
                 </option>
               ))}
             </select>
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="company" className="text-xs text-muted-foreground">
-              Company
+              {t("applications.company")}
             </label>
             <select
               id="company"
@@ -117,7 +109,7 @@ export default async function ApplicationsPage({
               defaultValue={filters.company ?? ""}
               className={selectClass}
             >
-              <option value="">All</option>
+              <option value="">{t("applications.all")}</option>
               {companies.map((company) => (
                 <option key={company.id} value={company.id}>
                   {company.name}
@@ -127,31 +119,31 @@ export default async function ApplicationsPage({
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="sort" className="text-xs text-muted-foreground">
-              Sort by
+              {t("applications.sortBy")}
             </label>
             <select id="sort" name="sort" defaultValue={filters.sort} className={selectClass}>
               {SORT_FIELDS.map((field) => (
                 <option key={field} value={field}>
-                  {SORT_LABELS[field]}
+                  {t(`applications.sortOptions.${field}`)}
                 </option>
               ))}
             </select>
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="dir" className="text-xs text-muted-foreground">
-              Order
+              {t("applications.order")}
             </label>
             <select id="dir" name="dir" defaultValue={filters.dir} className={selectClass}>
-              <option value="desc">Newest first</option>
-              <option value="asc">Oldest first</option>
+              <option value="desc">{t("applications.newestFirst")}</option>
+              <option value="asc">{t("applications.oldestFirst")}</option>
             </select>
           </div>
           <Button type="submit" variant="secondary">
-            Apply
+            {t("applications.apply")}
           </Button>
           {filtersActive && (
             <Link href="/applications" className={buttonVariants({ variant: "ghost" })}>
-              Clear
+              {t("applications.clear")}
             </Link>
           )}
         </form>
@@ -159,9 +151,9 @@ export default async function ApplicationsPage({
       )}
 
       {total === 0 ? (
-        <EmptyPipeline />
+        <EmptyPipeline t={t} />
       ) : applications.length === 0 ? (
-        <NoMatches />
+        <NoMatches t={t} />
       ) : (
         <>
           {/* Cards under sm: six columns cannot fit 390px and a sideways-scrolling
@@ -184,9 +176,9 @@ export default async function ApplicationsPage({
                   </div>
                   <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                     <StatusBadge status={application.status} />
-                    {application.appliedAt && <span>Applied {formatDate(application.appliedAt)}</span>}
+                    {application.appliedAt && <span>{t("applications.applied", { date: formatDate(application.appliedAt) ?? "" })}</span>}
                     {application.nextActionAt && (
-                      <span>Next {formatDate(application.nextActionAt)}</span>
+                      <span>{t("applications.next", { date: formatDate(application.nextActionAt) ?? "" })}</span>
                     )}
                   </div>
                 </Link>
@@ -198,13 +190,13 @@ export default async function ApplicationsPage({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Score</TableHead>
-                  <TableHead className="hidden lg:table-cell">Source</TableHead>
-                  <TableHead className="hidden md:table-cell">Applied</TableHead>
-                  <TableHead className="hidden md:table-cell">Next action</TableHead>
+                  <TableHead>{t("applications.role")}</TableHead>
+                  <TableHead>{t("applications.company")}</TableHead>
+                  <TableHead>{t("applications.status")}</TableHead>
+                  <TableHead className="text-right">{t("applications.score")}</TableHead>
+                  <TableHead className="hidden lg:table-cell">{t("applications.source")}</TableHead>
+                  <TableHead className="hidden md:table-cell">{t("applications.appliedCol")}</TableHead>
+                  <TableHead className="hidden md:table-cell">{t("applications.nextCol")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -247,36 +239,25 @@ export default async function ApplicationsPage({
   );
 }
 
-function EmptyPipeline() {
+function EmptyPipeline({ t }: { t: T }) {
   return (
     <div className="rounded-xl border border-dashed px-6 py-12 text-center">
-      <h2 className="text-base font-medium">Track your first application</h2>
-      <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-        Paste a job posting and the role you applied for. Everything else — the match
-        analysis, cover letters, follow-up reminders — builds on top of what you save here.
-      </p>
-      <Link
-        href="/applications/new"
-        className={buttonVariants({ className: "mt-5" })}
-      >
-        Add your first application
+      <h2 className="text-base font-medium">{t("applications.emptyTitle")}</h2>
+      <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{t("applications.emptySub")}</p>
+      <Link href="/applications/new" className={buttonVariants({ className: "mt-5" })}>
+        {t("applications.emptyCta")}
       </Link>
     </div>
   );
 }
 
-function NoMatches() {
+function NoMatches({ t }: { t: T }) {
   return (
     <div className="rounded-xl border border-dashed px-6 py-12 text-center">
-      <h2 className="text-base font-medium">No applications match these filters</h2>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Nothing is wrong — the filters are just narrower than your pipeline.
-      </p>
-      <Link
-        href="/applications"
-        className={buttonVariants({ variant: "secondary", className: "mt-5" })}
-      >
-        Clear filters
+      <h2 className="text-base font-medium">{t("applications.noMatchesTitle")}</h2>
+      <p className="mt-2 text-sm text-muted-foreground">{t("applications.noMatchesSub")}</p>
+      <Link href="/applications" className={buttonVariants({ variant: "secondary", className: "mt-5" })}>
+        {t("applications.clearFilters")}
       </Link>
     </div>
   );

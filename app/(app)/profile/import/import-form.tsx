@@ -15,9 +15,12 @@ import { Textarea } from "@/components/ui/textarea";
 export function ImportForm({
   maxBytes,
   hasExistingCv,
+  next,
 }: {
   maxBytes: number;
   hasExistingCv: boolean;
+  /** Where saving goes afterwards; unset means the profile page. */
+  next?: string;
 }) {
   const [result, importAction, importing] = useActionState<ImportResult, FormData>(
     importCvFromPdf,
@@ -77,6 +80,7 @@ export function ImportForm({
 
   return (
     <form action={applyAction} className="flex max-w-3xl flex-col gap-4">
+      {next && <input type="hidden" name="next" value={next} />}
       <div className="rounded-lg border bg-muted/30 p-4 text-sm">
         <p className="font-medium">Review before saving</p>
         <ul className="mt-2 grid gap-1 text-muted-foreground sm:grid-cols-2">

@@ -1,13 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { db } from "../db";
 import { AnalysisError } from "../llm/repair";
 import { UsageLimitError } from "../llm/usage";
 import { LlmAuthError, LlmQuotaError } from "../llm/types";
 import { runAnalysis } from "../analysis/run";
 import { getProfile } from "../profile/get";
 import { requireOwnedApplication } from "./guards";
+import { recordAnalysis } from "./record-analysis";
 
 export type AnalyzeState = { error?: string; ranAt?: number };
 
@@ -32,42 +32,7 @@ export async function analyzeApplication(
       skills: profile.skills,
       jobDescription: application.jobDescription,
     });
-    const { result, droppedClaims } = run;
-
-    // The Analysis row, its event, and the denormalized fields on Application
-    // land together — Application.latestMatchScore has exactly one writer and
-    // this is it (CLAUDE.md rule 8 / SPEC.md §8 Α2).
-    await db.$transaction(async (tx) => {
-      await tx.analysis.create({
-        data: {
-          applicationId: application.id,
-          userId: application.userId,
-          provider: run.provider,
-          model: run.model,
-          promptVersion: run.promptVersion,
-          matchScore: result.matchScore,
-          result,
-          droppedClaims,
-          inputTokens: run.inputTokens,
-          outputTokens: run.outputTokens,
-          latencyMs: run.latencyMs,
-        },
-      });
-
-      await tx.event.create({
-        data: {
-          applicationId: application.id,
-          userId: application.userId,
-          type: "ANALYSIS_RUN",
-          body: `Match score ${result.matchScore} · ${run.provider}/${run.model}`,
-        },
-      });
-
-      await tx.application.update({
-        where: { id: application.id },
-        data: { latestMatchScore: result.matchScore, lastAnalyzedAt: new Date() },
-      });
-    });
+    await recordAnalysis(application.id, application.userId, run);
 
     revalidatePath(`/applications/${application.id}`);
     revalidatePath("/applications");
