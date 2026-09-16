@@ -71,7 +71,7 @@ Lemon.io boilerplate.
 
 ## Verify
 
-Preview URL: https://job-hunt-copilot-ep2cg60ey-pliatsikas-projects.vercel.app · PR: https://github.com/Pliatsikas/job-hunt-copilot/pull/4
+Preview URL: https://job-hunt-copilot-l9j57ayuv-pliatsikas-projects.vercel.app · PR: https://github.com/Pliatsikas/job-hunt-copilot/pull/4
 
 ## Left out
 
