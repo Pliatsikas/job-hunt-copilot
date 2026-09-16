@@ -102,8 +102,8 @@ Deliberately not started before M9. Recorded now so the list doesn't get rebuilt
 - **Lever's adapter is written to the documented format but has not run against a live
   board.** The slugs tried had moved off Lever. The not-found shape (`{ ok: false }` with a
   200) is handled and tested; the happy path is tested against the documented JSON only.
-- **No scheduler.** Saved searches run on a click. Vercel cron is available on this plan if
-  it ever matters; the budget cap on arrival scoring is what makes that safe to add.
+- ~~**No scheduler.**~~ Closed by T05: `/api/cron/daily-search` runs every morning for
+  users with `autoSearch` on, and retires unread leads after 30 days (`EXPIRED`).
 
 
 - **M11 follow-ups from the owner, 2026-09-15 — deferred until after M12, by their call.**

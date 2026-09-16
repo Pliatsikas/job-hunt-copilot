@@ -290,6 +290,8 @@ enum LeadStatus {
   NEW
   DISMISSED
   PROMOTED
+  /// Αδιάβαστο για 30+ μέρες· το αποσύρει το ημερήσιο cron (T05). Δεν διαγράφεται.
+  EXPIRED
 }
 
 /// Μια αποθηκευμένη αναζήτηση: πηγή + ερώτημα (company slug για τα board APIs,

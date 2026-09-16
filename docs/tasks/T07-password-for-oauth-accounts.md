@@ -1,16 +1,28 @@
-# T07 — Set a password on a GitHub-only account; forgot-password
+# T07 — Account settings: password for GitHub accounts, forgot password, change email
 
-**Status:** planned · not started
+**Status:** planned · next after T05
 
-## Why
+## Asked (owner, 2026-09-16)
 
-The owner's account was created through GitHub and has no password. GitHub OAuth only
-works on production (its callback URL is registered there — SPEC.md Α7), so on every
-preview the owner cannot sign in to their own account and has to use a test account.
+The owner signs in with GitHub and has no password, so on previews (where GitHub OAuth
+cannot work — its callback URL is registered on production only, SPEC.md Α7) they cannot
+open their own account. They want:
+
+1. A place to manage the account — on the profile, or a new **Settings** section.
+2. On the **first sign-in with GitHub**, a prompt to set a password, so the account works
+   with email + password too.
+3. **Forgot password**, for everyone.
+4. **Change email**, with confirmation of the new address.
 
 ## Shape
 
-- "Set a password" on the profile for accounts with none: sends a link (T02's email
-  infrastructure), the link opens a set-password form using the T01 rules.
-- The same flow is "forgot password" for everyone else.
-- Tokens hashed, one use, short TTL — same as verification.
+- Settings page (`/settings`): email (with "change"), password ("set" or "change"), sign out
+  everywhere later if needed. Reached from the account block in the shell.
+- Set / reset password is one flow: a link by email (T02's infrastructure), one use, hashed
+  token, short TTL; the landing form uses the T01 rules and checklist. "Set a password" on
+  settings and "Forgot password?" on the login page both start it.
+- First GitHub sign-in: the `signIn` callback / a check in the app layout sends an account
+  with no password hash to `/settings/password?first=1` once, with a "later" link. Not a
+  wall — a nudge that appears once per account.
+- Change email: a link to the **new** address confirms it; the old address gets a notice.
+  Until confirmed the old email stays in force.
