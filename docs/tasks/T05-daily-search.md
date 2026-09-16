@@ -67,7 +67,7 @@ enough detail to be read, not just run.
 
 ## Verify
 
-Preview URL: _(filled in when pushed)_ — note the cron itself only runs on production.
+Preview URL: https://job-hunt-copilot-3m53rbqsz-pliatsikas-projects.vercel.app — note the cron itself only runs on production.
 On the preview: the Leads page shows "Last search … · automatically every morning". After
 the merge: the morning after, Today should show "N new jobs that fit" without pressing
 anything, and Vercel → Settings → Cron Jobs lists the job.
