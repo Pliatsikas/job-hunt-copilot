@@ -10,6 +10,8 @@ export type NormalizedJob = {
   /** Plain text, already through htmlToText. */
   jobDescription: string;
   postedAt: Date | null;
+  /** When the source says so explicitly; null means "not stated". */
+  remote?: boolean | null;
 };
 
 export type SourceAdapter = {

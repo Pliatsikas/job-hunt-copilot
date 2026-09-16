@@ -50,7 +50,7 @@ export default async function ProfilePage({
         }}
       />
 
-      <div className="mt-10">
+      <div id="preferences" className="mt-10 scroll-mt-6">
         <PreferencesForm
           hasCv={Boolean(profile?.cvText.trim())}
           defaults={{

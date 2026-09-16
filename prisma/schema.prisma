@@ -279,8 +279,11 @@ enum FollowUpContext {
 enum LeadSource {
   GREENHOUSE
   LEVER
+  WORKABLE
   ARBEITNOW
   REMOTIVE
+  /// Captured by the owner from a page they were reading, via the bookmarklet.
+  BOOKMARKLET
 }
 
 enum LeadStatus {
@@ -332,6 +335,10 @@ model Lead {
   analysis       Json?
   droppedClaims  Int?
   scoredAt       DateTime?
+  // Local ranking, no model call: role in title, skills in description,
+  // location and remote agreement with the owner's preferences (T04).
+  fitScore       Int?
+  matchedTerms   String[]
   applicationId  String?    @unique
   createdAt      DateTime   @default(now())
 
@@ -340,6 +347,7 @@ model Lead {
 
   @@unique([userId, dedupeKey])
   @@index([userId, status, createdAt])
+  @@index([userId, status, fitScore])
 }
 
 enum RemotePreference {

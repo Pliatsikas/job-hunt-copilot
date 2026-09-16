@@ -10,12 +10,16 @@ export async function listSavedSearches() {
   });
 }
 
-/** The triage queue: NEW leads, scored ones first, newest within that. */
+/** The queue: NEW leads by fit, then model score, then recency. */
 export async function listNewLeads() {
   const user = await requireUser();
   return db.lead.findMany({
     where: { userId: user.id, status: "NEW" },
-    orderBy: [{ matchScore: { sort: "desc", nulls: "last" } }, { createdAt: "desc" }],
+    orderBy: [
+      { fitScore: { sort: "desc", nulls: "last" } },
+      { matchScore: { sort: "desc", nulls: "last" } },
+      { createdAt: "desc" },
+    ],
     take: 200,
   });
 }
