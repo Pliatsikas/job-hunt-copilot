@@ -47,7 +47,7 @@ T03 preferences → T04 "Jobs for you" over Jooble/Remotive with local ranking �
 
 ## Verify
 
-Preview URL: _(filled in when pushed)_
+Preview URL: https://job-hunt-copilot-gr52ddnav-pliatsikas-projects.vercel.app · PR: https://github.com/Pliatsikas/job-hunt-copilot/pull/3
 
 1. `/profile` → new section "What I'm looking for", empty for a new account.
 2. "Suggest from my CV" → roles/seniority/city appear in the form (not saved yet), one
