@@ -117,6 +117,19 @@ export function createMockProvider(model = "mock-1"): LlmProvider {
     model,
 
     async complete(request: LlmRequest): Promise<LlmResult> {
+      if (schemaHas(request, "rationale")) {
+        return {
+          text: JSON.stringify({
+            targetRoles: ["fullstack developer", "frontend developer"],
+            seniority: "JUNIOR",
+            city: "Thessaloniki",
+            country: "Greece",
+            rationale: "Mock: React and Node in production.",
+          }),
+          usage,
+          latencyMs: 5,
+        };
+      }
       if (schemaHas(request, "sections")) {
         return { text: JSON.stringify(tailorFromPrompt(request.user)), usage, latencyMs: 5 };
       }

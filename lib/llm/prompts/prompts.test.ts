@@ -5,6 +5,7 @@ import * as analyzeV2 from "./analyze.v2";
 import * as coverLetter from "./cover-letter.v1";
 import * as cvCleanup from "./cv-cleanup.v1";
 import * as tailorCv from "./tailor-cv.v1";
+import * as suggest from "./suggest-preferences.v1";
 import * as followUp from "./follow-up.v1";
 import { topGap } from "./shared";
 import type { AnalysisResult } from "../../schemas/analysis";
@@ -24,6 +25,7 @@ describe("versioning", () => {
     expect(followUp.version).toBe("follow-up@1");
     expect(cvCleanup.version).toBe("cv-cleanup@1");
     expect(tailorCv.version).toBe("tailor-cv@1");
+    expect(suggest.version).toBe("suggest-preferences@1");
   });
 
   it("keeps v1 around so old Analysis rows stay explicable", () => {
@@ -276,5 +278,16 @@ describe("tailor-cv@1", () => {
     expect(prompt).toContain("  1| I build React frontends.");
     expect(prompt).toContain("  2| I design schemas.");
     expect(prompt).toContain("Keywords the posting uses");
+  });
+});
+
+describe("suggest-preferences@1", () => {
+  it("grounds every suggested title in the CV and forbids invention", () => {
+    expect(suggest.system).toMatch(/must\s+be supported by the CV/);
+    expect(suggest.system).toMatch(/Do not guess/);
+  });
+
+  it("asks for board-style titles in the candidate's market", () => {
+    expect(suggest.system).toMatch(/as they appear on job boards/);
   });
 });
