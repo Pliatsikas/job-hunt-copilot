@@ -37,6 +37,8 @@ export const remotive: SourceAdapter = {
       jobUrl: job.url ?? null,
       jobDescription: htmlToText(job.description ?? ""),
       postedAt: job.publication_date ? new Date(job.publication_date) : null,
+      // Every Remotive posting is remote by definition of the board.
+      remote: true,
     }));
   },
 };

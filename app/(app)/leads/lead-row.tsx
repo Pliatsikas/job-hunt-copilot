@@ -16,6 +16,8 @@ export function LeadRow({
     jobUrl: string | null;
     source: string;
     matchScore: number | null;
+    fitScore: number | null;
+    matchedTerms: string[];
     droppedClaims: number | null;
     summary: string | null;
     excerpt: string;
@@ -35,7 +37,7 @@ export function LeadRow({
             <span className="font-normal text-muted-foreground"> · {lead.companyName}</span>
           </p>
           <p className="text-xs text-muted-foreground">
-            {lead.source}
+            {lead.source === "BOOKMARKLET" ? "saved by you" : lead.source.toLowerCase()}
             {lead.location ? ` · ${lead.location}` : ""}
             {lead.jobUrl && (
               <>
@@ -47,9 +49,14 @@ export function LeadRow({
             )}
           </p>
         </div>
-        <div className="shrink-0 text-right">
+        <div className="flex shrink-0 flex-col items-end gap-1 text-right">
+          {lead.fitScore !== null && (
+            <p className="text-xs text-muted-foreground" title="How well the posting matches what you are looking for — no model involved">
+              fit <span className="font-semibold tabular-nums text-foreground">{lead.fitScore}</span>
+            </p>
+          )}
           {lead.matchScore !== null ? (
-            <p className="text-2xl font-semibold tabular-nums">{lead.matchScore}</p>
+            <p className="text-2xl font-semibold tabular-nums" title="Match score from the analysis">{lead.matchScore}</p>
           ) : (
             <form action={score}>
               <Button type="submit" size="sm" variant="secondary" disabled={scoring}>
@@ -60,6 +67,15 @@ export function LeadRow({
         </div>
       </div>
 
+      {lead.matchedTerms.length > 0 && (
+        <ul className="mt-2 flex flex-wrap gap-1">
+          {lead.matchedTerms.slice(0, 8).map((t) => (
+            <li key={t} className="rounded-md bg-accent/60 px-1.5 py-0.5 text-[11px] text-accent-foreground">
+              {t}
+            </li>
+          ))}
+        </ul>
+      )}
       {lead.summary ? (
         <p className="mt-2 text-sm">{lead.summary}</p>
       ) : (

@@ -171,6 +171,31 @@ test("register, analyse and generate", async ({ page }) => {
     expect(prefs?.seniority).toBe("JUNIOR");
   });
 
+  await test.step("save a job from another site via the bookmarklet's landing page", async () => {
+    // The bookmarklet opens /leads/capture with the page in the URL fragment.
+    // The fragment never reaches the server; the client form does.
+    const payload = encodeURIComponent(
+      JSON.stringify({
+        t: "Fullstack Developer at Northwind Labs",
+        u: "https://www.kariera.gr/en/jobs/12345",
+        b: "Northwind Labs is hiring a fullstack developer in Thessaloniki. React, TypeScript, Node.js and PostgreSQL. Docker for deployment. Hybrid, two days in the office.",
+      }),
+    );
+    await page.goto(`/leads/capture#${payload}`);
+    await expect(page.getByLabel("Role")).toHaveValue("Fullstack Developer at Northwind Labs");
+    await expect(page.getByLabel("Company")).toHaveValue("Northwind Labs");
+    await page.getByRole("button", { name: /save as a lead/i }).click();
+    await page.waitForURL(/\/leads\?captured=1/);
+
+    const lead = await db.lead.findFirst({ where: { user: { email: EMAIL }, source: "BOOKMARKLET" } });
+    expect(lead?.companyName).toBe("Northwind Labs");
+    expect(lead?.jobUrl).toBe("https://www.kariera.gr/en/jobs/12345");
+    // Ranked locally against the preferences saved earlier, with no model call.
+    expect(lead?.fitScore).toBeGreaterThan(40);
+    expect(lead?.matchedTerms).toContain("role: fullstack developer");
+    await expect(page.getByText("Northwind Labs").first()).toBeVisible();
+  });
+
   await test.step("import a two-column PDF, review it, replace the CV", async () => {
     // The fixture is a two-column layout printed to PDF — the shape SPEC.md
     // §6.2 names as the real problem — with a fake email and phone number in

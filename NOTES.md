@@ -92,7 +92,9 @@ Deliberately not started before M9. Recorded now so the list doesn't get rebuilt
   — it appeared on routes T02 does not touch.
 
 
-- **Score-on-arrival picks the newest three, not the most likely.** On the Vercel board that
+- ~~**Score-on-arrival picks the newest three, not the most likely.**~~ Closed by T04: every lead gets a local fit score first, and the queue is ordered by it.
+
+  (original note kept for the record:) **Score-on-arrival picks the newest three, not the most likely.** On the Vercel board that
   meant three sales roles scored 30/10/10 against a developer CV while 83 engineering postings
   waited. A cheap pre-filter — title or description overlap with the profile's skills, no
   model call — should choose which leads spend the budget. Worth doing before any cron exists,
