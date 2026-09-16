@@ -56,6 +56,14 @@ returned Athens, Georgia).
   bookmarklet to drag, employers accordion, queue by fit with matched terms
 - E2E captures a lead through the landing page and checks its fit and matched terms
 
+**Owner's first try: the bookmarklet did nothing on kariera.gr or jobfind.gr.** Not the
+sites — neither sends a CSP header. React 19 rewrites any `javascript:` href it renders to
+`javascript:throw new Error('React has blocked a javascript: URL…')`, so what the owner
+dragged to their bookmarks bar was a bookmark that threw. `bookmarklet-link.tsx` now sets
+the href on the DOM node after mount, past the sanitiser. Verified by running the
+bookmarklet's code on live kariera.gr, jobfind.gr and LinkedIn pages: each opened
+`/leads/capture` with the page's title and text.
+
 Live run on the owner's CV and preferences (fullstack/frontend/backend/ai, Thessaloniki,
 remote OK, junior): 926 postings from 16 boards in 2.0s, 22 kept, top result Kaizen Gaming
 Backend Engineer, Thessaloniki. Before tuning, the top twelve were Bangalore, Helsinki and

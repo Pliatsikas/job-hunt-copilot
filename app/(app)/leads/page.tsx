@@ -8,7 +8,7 @@ import { CURATED_EMPLOYERS } from "@/lib/ingest/employers";
 import { countLeads, listNewLeads, listSavedSearches } from "@/lib/ingest/queries";
 import { Page } from "@/components/page";
 import { PageHeader } from "@/components/page-header";
-import { buttonVariants } from "@/components/ui/button";
+import { BookmarkletLink } from "./bookmarklet-link";
 import { FindJobsButton } from "./find-jobs";
 import { LeadRow } from "./lead-row";
 import { WatchEmployers } from "./watch-employers";
@@ -94,18 +94,10 @@ export default async function LeadsPage({
             Drag this to your bookmarks bar. On kariera.gr, LinkedIn or any job page, click it
             — the posting lands here, ranked against your CV.
           </p>
-          <a
-            href={bookmarklet}
-            onClick={undefined}
-            className={`${buttonVariants({ variant: "secondary", size: "sm" })} mt-3`}
-            draggable
-            title="Drag me to your bookmarks bar"
-          >
-            ★ Save to Job Hunt Copilot
-          </a>
+          <BookmarkletLink href={bookmarklet}>★ Save to Job Hunt Copilot</BookmarkletLink>
           <p className="mt-2 text-xs text-muted-foreground">
             Nothing is fetched by us from the job site: the click sends what you are already
-            looking at.
+            looking at. If your bookmarks bar is hidden: ⌘⇧B on Mac, Ctrl+Shift+B on Windows.
           </p>
         </div>
         <WatchEmployers
