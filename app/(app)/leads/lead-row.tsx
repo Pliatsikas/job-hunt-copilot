@@ -9,7 +9,10 @@ import { Button, buttonVariants } from "@/components/ui/button";
 
 export function LeadRow({
   lead,
+  index = 0,
 }: {
+  /** Position in the list, for the entrance stagger. */
+  index?: number;
   lead: {
     id: string;
     companyName: string;
@@ -32,7 +35,10 @@ export function LeadRow({
   );
 
   return (
-    <li className="rounded-lg border p-4">
+    <li
+      className="rounded-lg border bg-card p-4 animate-in fade-in slide-in-from-bottom-1 fill-mode-both duration-300"
+      style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="font-medium">
@@ -54,7 +60,7 @@ export function LeadRow({
             <p className="text-2xl font-semibold tabular-nums" title={t("jobs.matchTitle")}>{lead.matchScore}</p>
           ) : (
             <form action={score}>
-              <Button type="submit" size="sm" variant="secondary" disabled={scoring}>
+              <Button type="submit" size="sm" variant="secondary" pending={scoring}>
                 {scoring ? t("jobs.scoring") : t("jobs.score")}
               </Button>
             </form>

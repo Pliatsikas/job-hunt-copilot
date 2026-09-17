@@ -30,7 +30,7 @@ export function NoteForm({
         </p>
       )}
       <div>
-        <Button type="submit" size="sm" disabled={pending}>
+        <Button type="submit" size="sm" pending={pending}>
           {pending ? t("application.adding") : t("application.addNote")}
         </Button>
       </div>

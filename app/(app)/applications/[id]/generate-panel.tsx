@@ -142,8 +142,8 @@ export function GeneratePanel({
       </div>
 
       <div>
-        <Button type="button" onClick={generate} disabled={pending}>
-          <PenLine className="size-4" aria-hidden />
+        <Button type="button" onClick={generate} pending={pending}>
+          {!pending && <PenLine className="size-4" aria-hidden />}
           {pending ? t("application.generating") : isFollowUp ? t("application.followUpTitle") : t("application.writeLetter")}
         </Button>
       </div>

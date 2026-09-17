@@ -19,7 +19,7 @@ export function TailorButton({
 
   return (
     <form action={formAction} className="flex flex-col gap-2">
-      <Button type="submit" disabled={pending || !hasAnalysis} variant={hasPrevious ? "secondary" : "default"}>
+      <Button type="submit" pending={pending} disabled={!hasAnalysis} variant={hasPrevious ? "secondary" : "default"}>
         {pending ? t("application.tailoring") : hasPrevious ? t("application.tailorAgain") : t("application.makeCv")}
       </Button>
       {!hasAnalysis && <p className="text-xs text-muted-foreground">{t("application.tailorNeedsAnalysis")}</p>}

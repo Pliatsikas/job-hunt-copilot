@@ -49,8 +49,12 @@ export default async function TodayPage() {
       />
 
       <ul className="flex flex-col gap-3">
-        {rows.map((row) => (
-          <li key={row.item.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4">
+        {rows.map((row, i) => (
+          <li
+            key={row.item.id}
+            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4 animate-in fade-in slide-in-from-bottom-1 fill-mode-both duration-300"
+            style={{ animationDelay: `${Math.min(i, 6) * 40}ms` }}
+          >
             <div className="flex min-w-0 items-start gap-3">
               <span className={`mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full ${row.kind === "overdue" ? "bg-destructive/10 text-destructive" : "bg-accent text-accent-foreground"}`}>
                 <MessageSquare className="size-4" aria-hidden />
@@ -149,10 +153,11 @@ async function Guide() {
         </div>
 
         <ol className="flex flex-col gap-3">
-          {steps.map((step) => (
+          {steps.map((step, i) => (
             <li
               key={step.n}
-              className={`flex items-start gap-4 rounded-xl border p-4 ${step.n === next ? "border-primary bg-card" : "bg-card/60"}`}
+              style={{ animationDelay: `${i * 80}ms` }}
+              className={`flex items-start gap-4 rounded-xl border p-4 animate-in fade-in slide-in-from-bottom-2 fill-mode-both duration-300 ${step.n === next ? "border-primary bg-card" : "bg-card/60"}`}
               aria-current={step.n === next ? "step" : undefined}
             >
               <span

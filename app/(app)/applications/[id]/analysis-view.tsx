@@ -173,7 +173,7 @@ function ScoreMeter({ score, verdict, t }: { score: number; verdict: AnalysisRes
         aria-valuemax={100}
         aria-label={t("application.scoreLabel")}
       >
-        <div className="h-full rounded-full bg-primary" style={{ width: `${score}%` }} />
+        <div className="animate-meter h-full rounded-full bg-primary" style={{ width: `${score}%` }} />
       </div>
     </div>
   );

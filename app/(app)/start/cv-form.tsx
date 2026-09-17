@@ -44,7 +44,7 @@ export function CvStepForm({ initial }: { initial: string }) {
       )}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="text-sm text-muted-foreground">{t("start.cvChangeLater")}</span>
-        <Button type="submit" disabled={pending || text.trim().length < 200}>
+        <Button type="submit" pending={pending} disabled={text.trim().length < 200}>
           {pending ? t("common.saving") : t("common.continue")}
           <ArrowRight className="size-4" aria-hidden />
         </Button>

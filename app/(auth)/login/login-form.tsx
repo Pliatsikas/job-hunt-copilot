@@ -57,7 +57,7 @@ export function LoginForm() {
           )}
         </p>
       )}
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" pending={pending} className="w-full">
         {pending ? t("auth.signingIn") : t("auth.signIn")}
       </Button>
     </form>

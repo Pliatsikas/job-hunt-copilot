@@ -62,7 +62,7 @@ export function WatchEmployers({
             <Label htmlFor="watch-slug">{t("jobs.employerSlug")}</Label>
             <Input id="watch-slug" name="slug" placeholder={t("jobs.slugPlaceholder")} />
           </div>
-          <Button type="submit" variant="secondary" disabled={pending}>
+          <Button type="submit" variant="secondary" pending={pending}>
             {pending ? t("jobs.checking") : t("jobs.watch")}
           </Button>
           {state.error && (

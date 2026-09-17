@@ -93,8 +93,8 @@ export function PreferencesForm({
           </div>
         )}
         <form action={suggestAction} ref={suggestFormRef}>
-          <Button type="submit" variant="secondary" size="sm" disabled={suggesting || !hasCv}>
-            <Sparkles className="size-4" aria-hidden />
+          <Button type="submit" variant="secondary" size="sm" pending={suggesting} disabled={!hasCv}>
+            {!suggesting && <Sparkles className="size-4" aria-hidden />}
             {suggesting ? t("profile.suggesting") : t("profile.suggest")}
           </Button>
         </form>
@@ -106,7 +106,7 @@ export function PreferencesForm({
         </p>
       )}
       {suggest.suggestion && (
-        <p role="status" className="rounded-lg border bg-accent/40 p-3 text-sm">
+        <p role="status" className="rounded-lg border bg-accent/40 p-3 text-sm animate-in fade-in slide-in-from-top-1 duration-300">
           {suggest.suggestion.rationale} {t("profile.suggestFilled")}
         </p>
       )}
@@ -186,13 +186,13 @@ export function PreferencesForm({
           </p>
         )}
         {state.savedAt && !state.error && (
-          <p role="status" className="text-sm text-muted-foreground">
+          <p role="status" className="text-sm text-muted-foreground animate-in fade-in duration-300">
             {t("profile.prefsSaved")}
           </p>
         )}
 
         <div className={inGuide ? "flex justify-end" : ""}>
-          <Button type="submit" disabled={saving}>
+          <Button type="submit" pending={saving}>
             {saving ? t("common.saving") : inGuide ? t("common.continue") : t("profile.savePrefs")}
             {inGuide && <ArrowRight className="size-4" aria-hidden />}
           </Button>

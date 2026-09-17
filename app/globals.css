@@ -158,3 +158,37 @@
     margin: 18mm;
   }
 }
+
+/* T08: motion that explains. The progress bar creeps toward the right and
+   never quite arrives — it finishes by disappearing when the route commits.
+   The meter fills from zero to its inline width. Under reduced motion every
+   animation and transition collapses to (near) instant; states still change. */
+@keyframes progress {
+  0% { transform: scaleX(0); }
+  20% { transform: scaleX(0.3); }
+  60% { transform: scaleX(0.7); }
+  100% { transform: scaleX(0.92); }
+}
+.animate-progress {
+  animation: progress 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+html[data-navigating] main {
+  opacity: 0.55;
+  transition: opacity 150ms ease-out 100ms;
+}
+main {
+  transition: opacity 150ms ease-out;
+}
+@keyframes meter-fill {
+  from { width: 0; }
+}
+.animate-meter {
+  animation: meter-fill 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -151,7 +151,7 @@ export function ApplicationForm({
       )}
 
       <div className="flex items-center gap-3">
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" pending={pending}>
           {pending ? t("common.saving") : submitLabel}
         </Button>
         <Link href={cancelHref} className={buttonVariants({ variant: "ghost" })}>

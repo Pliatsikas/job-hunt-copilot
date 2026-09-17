@@ -300,6 +300,17 @@ test("register, analyse and generate", async ({ page }) => {
     expect(application?.lastAnalyzedAt).not.toBeNull();
   });
 
+  await test.step("a fast action comes back: status change shows on the timeline, no reload", async () => {
+    // Guards T08's finding (docs/tasks/T08-feels-fast.md): with a loading.tsx
+    // above this page, this button stayed on "Saving…" forever while the
+    // change was silently saved. The assertion is on the page updating in
+    // place — a reload would also show it, and would hide the bug.
+    await page.getByRole("combobox", { name: "Status" }).selectOption("APPLIED");
+    await page.getByRole("button", { name: /^update$/i }).click();
+    await expect(page.getByText(/Saved\s*→\s*Applied/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("button", { name: /^update$/i })).toBeEnabled();
+  });
+
   await test.step("generate a cover letter, streamed", async () => {
     await page.goto(applicationUrl);
     await page.getByRole("button", { name: /write my cover letter/i }).click();

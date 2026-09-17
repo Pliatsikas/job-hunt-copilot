@@ -86,7 +86,7 @@ export function CaptureForm() {
         </p>
       )}
       <div className="flex gap-2">
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" pending={pending}>
           {pending ? t("common.saving") : t("jobs.captureSave")}
         </Button>
         <Link href="/leads" className={buttonVariants({ variant: "ghost" })}>
