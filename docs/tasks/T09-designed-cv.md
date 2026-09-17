@@ -81,7 +81,7 @@ with the photo.
 
 ## Verify
 
-_(preview URL when pushed)_ — with your own account: Profile → "Open the CV" → EN → "Fill
+https://job-hunt-copilot-l2k5brkv4-pliatsikas-projects.vercel.app — with your own account: Profile → "Open the CV" → EN → "Fill
 from my CV text" → review, fix anything, save. Then ΕΛ: paste the Greek version's text in
 the profile first (or type the form). Add the photo. On an analysed application: "Make a CV
 for this role" → pick the language → "Open the CV" → Print / Save as PDF.
