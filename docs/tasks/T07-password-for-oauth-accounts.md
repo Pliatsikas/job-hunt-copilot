@@ -1,6 +1,6 @@
 # T07 — Account settings: password for GitHub accounts, forgot password, change email
 
-**Status:** in progress · **Branch:** `task/07-account-settings`
+**Status:** done 2026-09-17 · PR #8 · verified by the owner on the preview
 
 ## Asked (owner, 2026-09-16)
 

@@ -19,6 +19,7 @@ known failure modes in `NOTES.md`.
 
 | Area | Where | Notes |
 |---|---|---|
+| Account (T07) | `lib/account/`, `app/(app)/settings`, `app/(auth)/{forgot,reset,email-change}` | Set/change password, forgot-password link, email change with confirmation to the new address. Tokens share the VerificationToken table with a purpose prefix (`reset:`, `email-change:`), 1h, one use. Nudge on Today for password-less (GitHub) accounts. |
 | Auth | `lib/auth.ts`, `lib/register.ts`, `lib/login.ts`, `lib/email/` | Credentials + optional GitHub. Password rules (`lib/password-rules.ts`). Email verification via Brevo (T02): unverified accounts cannot sign in; links hashed, one use, 24h. IP rate limits in `authorize()` and the register action. |
 | Applications pipeline | `lib/applications/`, `app/(app)/applications` | CRUD, status events, notes, filters. |
 | Profile / CV | `lib/profile/`, `app/(app)/profile` | CV text is the source of truth for every prompt. PDF import in `lib/cv-import/`. Job preferences (T03): roles, location, remote, seniority — suggested from the CV, saved by the owner. |
@@ -52,7 +53,8 @@ current work.
 - Reports to the owner in Greek; code, comments, commits and README in English.
 - The model never rewrites the owner's own text (CV). Select and reorder only.
 - One task at a time. Each task gets a file in `docs/tasks/`. Nothing reaches production
-  until the owner has verified it on the preview URL.
+  until the owner has verified it on the preview URL. Since T07 the owner can open their own
+  account on previews with email + password (set it once on production via Settings).
 - **The app is too complex for a new person** (owner + partner, 2026-09-16). Every new screen
   should reduce what there is to learn, not add to it. T06 is the dedicated pass; until then,
   prefer one obvious action over several optional ones.
