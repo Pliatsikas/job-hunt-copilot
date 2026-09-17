@@ -56,7 +56,7 @@ open their own account. They want:
 
 ## Verify
 
-_(preview URL when pushed)_ — with the test account: Settings → change the password (then
+https://job-hunt-copilot-mna7441b6-pliatsikas-projects.vercel.app — with the test account: Settings → change the password (then
 sign in with it); "Forgot your password?" on the login page (the email arrives from Brevo,
 check spam); change the email to another address you own and open the link there.
 
