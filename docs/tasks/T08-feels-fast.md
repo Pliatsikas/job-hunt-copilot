@@ -1,6 +1,6 @@
 # T08 — Feels fast: loading states, pressed feedback, navigation progress, motion
 
-**Status:** in progress · **Branch:** `task/08-feels-fast`
+**Status:** done 2026-09-17 · PR #7 · verified by the owner on the preview
 
 ## Asked (owner, 2026-09-16)
 

@@ -35,5 +35,5 @@ reset.
 | T04 | "Jobs for you" — search from preferences, watched employers, bookmarklet, local ranking | **done** 2026-09-16 | PR #4 |
 | T05 | Daily automatic search (Vercel cron), lead expiry | **done** 2026-09-16 | PR #6 · [T05](T05-daily-search.md) |
 | T06 | Simplify: guided flow, one action per step, Greek and English everywhere | **done** 2026-09-16 | PR #5 · [T06](T06-simplify.md) |
-| T07 | Account settings: password for GitHub accounts, forgot password, change email, first-GitHub-sign-in nudge | planned — after T08 | [T07](T07-password-for-oauth-accounts.md) |
-| T08 | Feels fast: loading states on every page, pressed feedback on every button, navigation progress, motion | **in progress** | [T08](T08-feels-fast.md) |
+| T07 | Account settings: password for GitHub accounts, forgot password, change email, first-GitHub-sign-in nudge | **in progress** | [T07](T07-password-for-oauth-accounts.md) |
+| T08 | Feels fast: navigation progress, pressed feedback on every button, motion (no loading.tsx — see file) | **done** 2026-09-17 | PR #7 · [T08](T08-feels-fast.md) |

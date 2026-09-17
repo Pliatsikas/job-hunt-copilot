@@ -209,6 +209,18 @@ The suggestion now fires only on arrival from the previous step (a one-shot quer
 from the URL as it fires), and the status map records that local end-to-end runs touch
 production data. A page that spends money on load is a bug even when every test is green.
 
+**The loading skeletons that broke every button.** Adding a `loading.tsx` per route is the
+textbook way to make a Next.js app feel fast, and it took five minutes. The end-to-end suite
+then failed on the second analysis: "Analysing…" forever, while the analysis had been saved.
+Dev mode never reproduced it. A probe script against a production build did — status change
+stuck 9 times out of 9 with the skeletons, 0 of 9 without — and led to an open Next.js issue
+(#66426): a loading boundary above a page plus a server action that revalidates that page
+leaves the action's transition pending for good. The skeletons came out; a progress bar and a
+dimmed page took their place, a unit test now fails if a `loading.tsx` reappears, and the
+happy path asserts that a status change shows up without a reload. The lesson was less about
+Next than about testing: the bug only exists in the production build, so a suite that runs
+against `next dev` would have shipped it.
+
 ## Eval results
 
 Ten job ads against one real CV, on a pinned prompt version, so a prompt change produces a
