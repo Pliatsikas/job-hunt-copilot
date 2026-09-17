@@ -1,0 +1,287 @@
+/*
+ * The owner's CV layout, as CSS: a dark sidebar (photo, contact, skills,
+ * languages, certifications, interests) and a light main column (name,
+ * subtitle, about, experience, education, projects). Sizes are in mm and px
+ * as in the original so the A4 print comes out the same. Fonts come from
+ * next/font on the page (Source Serif 4 for the name, Inter for the rest —
+ * both with Greek glyphs).
+ */
+.page {
+  --sidebar-bg: #3e3535;
+  --sidebar-text: #f0ebe8;
+  --sidebar-muted: #b8a8a2;
+  --accent: #c9a99a;
+  --main-bg: #faf8f6;
+  --main-text: #2a2220;
+  --main-muted: #7a6e6b;
+  --rule: #e0d8d4;
+
+  width: 210mm;
+  min-height: 297mm;
+  background: var(--main-bg);
+  color: var(--main-text);
+  display: grid;
+  grid-template-columns: 68mm 1fr;
+  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  font-size: 10px;
+  line-height: 1.45;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.sidebar {
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+}
+.photoWrap {
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  position: relative;
+}
+.photoWrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+.photoWrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 60%, var(--sidebar-bg) 100%);
+}
+.sidebarInner {
+  padding: 20px 20px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.sTitle {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 9px;
+}
+.contactList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.contactList li {
+  font-size: 10px;
+  color: var(--sidebar-muted);
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.contactList a {
+  color: var(--sidebar-muted);
+  text-decoration: none;
+}
+.icon {
+  color: var(--accent);
+  min-width: 12px;
+  display: inline-flex;
+}
+.icon svg {
+  display: block;
+  width: 12px;
+  height: 12px;
+}
+.skillGroup {
+  margin-bottom: 9px;
+}
+.sgLabel {
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sidebar-muted);
+  margin-bottom: 4px;
+}
+.skillTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tag {
+  font-size: 9px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(201, 169, 154, 0.18);
+  color: var(--sidebar-text);
+  padding: 2px 7px;
+  border-radius: 2px;
+}
+.langRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.langRow span:first-child {
+  font-size: 10px;
+}
+.langRow span:last-child {
+  font-size: 9.5px;
+  color: var(--accent);
+  text-align: right;
+}
+.certList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.certList li {
+  font-size: 9.5px;
+  color: var(--sidebar-muted);
+  line-height: 1.4;
+  padding-left: 10px;
+  position: relative;
+}
+.certList li::before {
+  content: "✦";
+  position: absolute;
+  left: 0;
+  font-size: 7px;
+  color: var(--accent);
+  top: 2px;
+}
+.certList li strong {
+  color: var(--sidebar-text);
+  font-weight: 500;
+}
+.interestList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.interestPill {
+  font-size: 9.5px;
+  color: var(--sidebar-muted);
+  padding: 2px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+}
+
+.main {
+  padding: 32px 28px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.headerName {
+  font-family: var(--font-cv-serif), Georgia, serif;
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--main-text);
+  line-height: 1;
+  margin: 0;
+}
+.headerSub {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-top: 4px;
+}
+.headerAbout {
+  font-size: 10px;
+  color: var(--main-muted);
+  line-height: 1.7;
+  margin: 10px 0 0;
+}
+.secTitle {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--main-muted);
+  margin: 0 0 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 400;
+}
+.secTitle::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+.entry + .entry {
+  margin-top: 13px;
+}
+.entry {
+  break-inside: avoid;
+}
+.entryTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.entryRole {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--main-text);
+}
+.entryOrg {
+  font-size: 10.5px;
+  color: var(--accent);
+}
+.entryDate {
+  font-size: 9px;
+  color: var(--main-muted);
+  white-space: nowrap;
+}
+.entryLoc {
+  font-size: 9px;
+  color: var(--main-muted);
+  margin: 1px 0 4px;
+}
+.bullets {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.bullets li {
+  font-size: 9.5px;
+  color: var(--main-muted);
+  line-height: 1.5;
+  padding-left: 11px;
+  position: relative;
+}
+.bullets li::before {
+  content: "–";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+.links {
+  font-size: 9px;
+  color: var(--main-muted);
+  margin-top: 3px;
+  padding-left: 11px;
+}
+.links a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

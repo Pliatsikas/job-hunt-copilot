@@ -352,7 +352,7 @@ test("register, analyse and generate", async ({ page }) => {
     expect(savedLines.length).toBeGreaterThan(3);
     for (const line of savedLines) expect(cvLines.has(line), line).toBe(true);
 
-    await page.goto(`${applicationUrl}/cv/1`);
+    await page.goto(`/cv/${applicationUrl.split("/").pop()}/1`);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("CV for this role v1");
     await expect(page.getByRole("button", { name: /print/i })).toBeVisible();
   });

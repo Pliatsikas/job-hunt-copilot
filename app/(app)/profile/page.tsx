@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { requireUser } from "@/lib/auth";
+import { availableCvLanguages } from "@/lib/cv/queries";
 import { getT } from "@/lib/i18n/server";
+import { buttonVariants } from "@/components/ui/button";
 import { getProfile } from "@/lib/profile/get";
 import { ProfileForm } from "./profile-form";
 import { PreferencesForm } from "./preferences-form";
@@ -19,7 +22,8 @@ export default async function ProfilePage({
 }: {
   searchParams: Promise<{ imported?: string }>;
 }) {
-  const [t, profile, prefs, { imported }] = await Promise.all([getT(), getProfile(), getJobPreferences(), searchParams]);
+  const [t, profile, prefs, { imported }, user] = await Promise.all([getT(), getProfile(), getJobPreferences(), searchParams, requireUser()]);
+  const cvLanguages = await availableCvLanguages(user.id);
 
   return (
     <Page>
@@ -36,6 +40,19 @@ export default async function ProfilePage({
           {t("profile.importLink")}
         </Link>
       </p>
+
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
+        <div>
+          <p className="font-medium">{t("cvEditor.cardTitle")}</p>
+          <p className="max-w-xl text-sm text-muted-foreground">{t("cvEditor.cardSub")}</p>
+          {cvLanguages.length > 0 && (
+            <p className="mt-1 text-xs text-muted-foreground">{t("cvEditor.cardReady", { languages: cvLanguages.map((l) => l.toUpperCase()).join(", ") })}</p>
+          )}
+        </div>
+        <Link href="/profile/cv" className={buttonVariants()}>
+          {t("cvEditor.cardCta")}
+        </Link>
+      </div>
 
       <ProfileForm
         defaults={{

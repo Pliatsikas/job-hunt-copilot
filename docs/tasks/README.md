@@ -37,3 +37,4 @@ reset.
 | T06 | Simplify: guided flow, one action per step, Greek and English everywhere | **done** 2026-09-16 | PR #5 · [T06](T06-simplify.md) |
 | T07 | Account settings: password for GitHub accounts, forgot password, change email, first-GitHub-sign-in nudge | **done** 2026-09-17 · PR #8 | [T07](T07-password-for-oauth-accounts.md) |
 | T08 | Feels fast: navigation progress, pressed feedback on every button, motion (no loading.tsx — see file) | **done** 2026-09-17 | PR #7 · [T08](T08-feels-fast.md) |
+| T09 | The CV for a role: designed like the real one, Greek or English, photo | **in progress** | [T09](T09-designed-cv.md) |

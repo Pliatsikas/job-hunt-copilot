@@ -1,0 +1,115 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { requireUser } from "../auth";
+import { db } from "../db";
+import { getProvider } from "../llm";
+import * as structurePrompt from "../llm/prompts/cv-structure.v1";
+import { AnalysisError, completeWithRepair } from "../llm/repair";
+import { LlmAuthError, LlmQuotaError } from "../llm/types";
+import { assertWithinBudget, recordProviderCall, UsageLimitError } from "../llm/usage";
+import { getProfile } from "../profile/get";
+import { CV_LANGUAGES, photoSchema, structuredCvSchema, type CvLanguage, type StructuredCv } from "../schemas/structured-cv";
+import { groundExtraction } from "./extract-grounding";
+import { ensureIds } from "./ids";
+
+export type CvSaveState = { error?: string; savedAt?: number };
+
+function parseLanguage(value: unknown): CvLanguage | null {
+  return CV_LANGUAGES.includes(value as CvLanguage) ? (value as CvLanguage) : null;
+}
+
+/**
+ * The editor posts the whole CV as one JSON field. Validated by the same
+ * schema the readers use; ids are assigned to anything new so the tailoring
+ * selection always has something to point at.
+ */
+export async function saveStructuredCv(_prev: CvSaveState, formData: FormData): Promise<CvSaveState> {
+  const user = await requireUser();
+  const language = parseLanguage(formData.get("language"));
+  if (!language) return { error: "Unknown language." };
+
+  let raw: unknown;
+  try {
+    raw = JSON.parse(String(formData.get("cv") ?? ""));
+  } catch {
+    return { error: "The form could not be read. Reload and try again." };
+  }
+  const parsed = structuredCvSchema.safeParse(raw);
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    return { error: `${issue?.path.join(".") || "cv"}: ${issue?.message ?? "invalid"}` };
+  }
+  const data = ensureIds(parsed.data);
+
+  await db.structuredCv.upsert({
+    where: { userId_language: { userId: user.id, language } },
+    update: { data },
+    create: { userId: user.id, language, data },
+  });
+  revalidatePath("/profile/cv");
+  return { savedAt: Date.now() };
+}
+
+export type ExtractState = { error?: string; cv?: StructuredCv; dropped?: string[] };
+
+/**
+ * One budgeted call that sorts the profile's CV text into the structure.
+ * Nothing is saved: the result fills the editor, grounded string by string
+ * against the source, and the owner presses save — or does not.
+ */
+export async function extractStructuredCv(_prev: ExtractState, _formData: FormData): Promise<ExtractState> {
+  const user = await requireUser();
+  const profile = await getProfile();
+  if (!profile?.cvText.trim()) return { error: "Add your CV text first — the extraction reads it." };
+
+  try {
+    await assertWithinBudget(user.id);
+    const out = await completeWithRepair(
+      getProvider(),
+      {
+        system: structurePrompt.system,
+        user: structurePrompt.buildUserPrompt({ cvText: profile.cvText }),
+        temperature: 0,
+        maxTokens: 6000,
+      },
+      structuredCvSchema,
+      (usage) => recordProviderCall(user.id, usage),
+    );
+    const grounded = groundExtraction(out.data, profile.cvText);
+    return { cv: ensureIds(grounded.cv), dropped: grounded.dropped };
+  } catch (error) {
+    if (
+      error instanceof UsageLimitError ||
+      error instanceof AnalysisError ||
+      error instanceof LlmAuthError ||
+      error instanceof LlmQuotaError
+    ) {
+      return { error: error.message };
+    }
+    console.error("CV extraction failed:", error);
+    return { error: "The extraction failed partway through. Nothing was changed." };
+  }
+}
+
+export type PhotoState = { error?: string; savedAt?: number };
+
+/** The browser resized it already; the server only checks the shape and the size. */
+export async function savePhoto(_prev: PhotoState, formData: FormData): Promise<PhotoState> {
+  const user = await requireUser();
+  const parsed = photoSchema.safeParse(formData.get("photo"));
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Not an image the CV can use." };
+  await db.profile.upsert({
+    where: { userId: user.id },
+    update: { photo: parsed.data },
+    create: { userId: user.id, cvText: "", skills: [], photo: parsed.data },
+  });
+  revalidatePath("/profile/cv");
+  return { savedAt: Date.now() };
+}
+
+export async function removePhoto(): Promise<void> {
+  const user = await requireUser();
+  await db.profile.updateMany({ where: { userId: user.id }, data: { photo: null } });
+  revalidatePath("/profile/cv");
+}

@@ -7,6 +7,7 @@ import { requireOwnedApplication } from "@/lib/applications/guards";
 import { listAnalyses, listDocuments, listEvents } from "@/lib/applications/queries";
 import { tailorCv } from "@/lib/applications/tailor";
 import { requireUser } from "@/lib/auth";
+import { availableCvLanguages } from "@/lib/cv/queries";
 import { getT } from "@/lib/i18n/server";
 import { getUsageToday } from "@/lib/llm/usage";
 import { getProfile } from "@/lib/profile/get";
@@ -44,7 +45,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
     listAnalyses(application.id),
     listDocuments(application.id),
   ]);
-  const usage = await getUsageToday(user.id);
+  const [usage, cvLanguages] = await Promise.all([getUsageToday(user.id), availableCvLanguages(user.id)]);
   const [latestAnalysis, ...previousAnalyses] = analyses;
   const hasCv = Boolean(profile?.cvText.trim());
   const calls = t("common.callsToday", { used: usage.requests, limit: usage.limits.requests });
@@ -137,6 +138,8 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
                     action={tailorCv.bind(null, application.id)}
                     hasAnalysis
                     hasPrevious={documents.some((d) => d.type === "CV_TAILORED")}
+                    applicationId={application.id}
+                    cvLanguages={cvLanguages}
                   />
                 </div>
 
@@ -181,7 +184,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
                         filename={`${doc.type === "COVER_LETTER" ? "cover-letter" : doc.type === "CV_TAILORED" ? "cv" : "follow-up"}-v${doc.version}-${doc.language}.md`}
                       />
                       {doc.type === "CV_TAILORED" && (
-                        <Link href={`/applications/${application.id}/cv/${doc.version}`} className="text-sm underline">
+                        <Link href={`/cv/${application.id}/${doc.version}`} target="_blank" className="text-sm underline">
                           {t("application.openPrintView")}
                         </Link>
                       )}

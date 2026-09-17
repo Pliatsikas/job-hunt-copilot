@@ -19,6 +19,7 @@ const ROUTES = [
   "/start/1",
   "/start/3",
   "/settings",
+  "/profile/cv",
 ];
 const WIDTHS = [360, 390, 768, 1024, 1440];
 // Greek copy runs longer than English; the narrowest and widest layouts get
