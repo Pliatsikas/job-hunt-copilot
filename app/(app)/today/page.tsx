@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Briefcase, Check, MessageSquare } from "lucide-react";
+import { cookies } from "next/headers";
+import { KeyRound } from "lucide-react";
+import { dismissPasswordNudge } from "@/lib/account/actions";
+import { PASSWORD_NUDGE_COOKIE } from "@/lib/account/nudge";
+import { getAccount } from "@/lib/account/queries";
 import { markActionDone, snoozeApplication } from "@/lib/applications/reminders";
 import { getTodayData, type TodayItem } from "@/lib/applications/today";
 import { getT } from "@/lib/i18n/server";
@@ -47,6 +52,8 @@ export default async function TodayPage() {
               : t("today.thingsToDo", { count })
         }
       />
+
+      <PasswordNudge />
 
       <ul className="flex flex-col gap-3">
         {rows.map((row, i) => (
@@ -119,6 +126,37 @@ export default async function TodayPage() {
 }
 
 type Row = { item: TodayItem; kind: "overdue" | "dueToday" | "stale"; days: number };
+
+/**
+ * A GitHub-only account has no password, so it cannot sign in where GitHub
+ * is not wired up (every preview). One card, until a password exists or
+ * "Later" is pressed — which is quiet for 30 days in this browser.
+ */
+async function PasswordNudge() {
+  const [t, account, jar] = await Promise.all([getT(), getAccount(), cookies()]);
+  if (account.hasPassword || jar.get(PASSWORD_NUDGE_COOKIE)) return null;
+  return (
+    <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 animate-in fade-in duration-300">
+      <div className="flex min-w-0 items-start gap-3">
+        <KeyRound className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
+        <div>
+          <p className="font-medium">{t("settings.nudgeTitle")}</p>
+          <p className="text-sm text-muted-foreground">{t("settings.nudgeSub")}</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <Link href="/settings#password-section" className={buttonVariants({ size: "sm" })}>
+          {t("settings.nudgeCta")}
+        </Link>
+        <form action={dismissPasswordNudge}>
+          <button type="submit" className="text-sm text-muted-foreground underline-offset-4 hover:underline">
+            {t("settings.nudgeLater")}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 function toRow(item: TodayItem, kind: Row["kind"]): Row {
   const days =

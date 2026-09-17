@@ -11,7 +11,7 @@ import { env } from "../env";
  * verify-on-preview workflow with it. Vercel sets x-forwarded-host and
  * -proto; locally there is only host.
  */
-async function requestOrigin(): Promise<string> {
+export async function requestOrigin(): Promise<string> {
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
   const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
