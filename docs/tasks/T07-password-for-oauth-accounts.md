@@ -14,15 +14,53 @@ open their own account. They want:
 3. **Forgot password**, for everyone.
 4. **Change email**, with confirmation of the new address.
 
-## Shape
+## Decisions
 
-- Settings page (`/settings`): email (with "change"), password ("set" or "change"), sign out
-  everywhere later if needed. Reached from the account block in the shell.
-- Set / reset password is one flow: a link by email (T02's infrastructure), one use, hashed
-  token, short TTL; the landing form uses the T01 rules and checklist. "Set a password" on
-  settings and "Forgot password?" on the login page both start it.
-- First GitHub sign-in: the `signIn` callback / a check in the app layout sends an account
-  with no password hash to `/settings/password?first=1` once, with a "later" link. Not a
-  wall — a nudge that appears once per account.
-- Change email: a link to the **new** address confirms it; the old address gets a notice.
-  Until confirmed the old email stays in force.
+- **Signed in = proven.** An account with no password sets one directly on Settings; the
+  session is the proof of ownership, no email round trip. The same write marks the address
+  verified: GitHub already checked it, and without that the new password would be refused at
+  sign-in as "unconfirmed". Changing an existing password needs the current one.
+- **Forgot password is a link by email**, reusing T02's machinery: the `VerificationToken`
+  table, SHA-256 at rest, one live token per identifier, one use. The identifier carries the
+  purpose (`reset:<email>`, `email-change:<userId>:<new email>`) so a reset link can never
+  confirm an address and vice versa. One hour, not 24: these links act on an existing
+  account. The token is consumed on **submit**, not on page view, so a mail client that
+  prefetches links does not burn it. No schema change.
+- **The forgot form is not an oracle.** Same sentence for every address; limited per address
+  (3/h) and per IP (10/h).
+- **Email change goes to the new address.** The old one stays in force until the link is
+  opened; the old address gets a notice afterwards. "Taken" is not revealed — the reply is
+  the same and the taken address simply never gets a working link. After the change the
+  session's JWT still carries the old address, so the landing page signs out and the person
+  signs in again with the new one.
+- **The nudge is a card on Today, not a wall.** Shown while the account has no password;
+  "Later" sets a cookie for 30 days in that browser. It links to Settings.
+- **Settings is its own page** (`/settings`), reached from the email in the sidebar foot and
+  a gear in the mobile top bar. Only account matters live there; the profile stays about
+  the CV.
+
+## Built
+
+- `lib/account/tokens.ts` (purpose-carrying tokens), `lib/account/actions.ts` (`setPassword`,
+  `changePassword`, `requestPasswordReset`, `resetPassword`, `requestEmailChange`,
+  `confirmEmailChange`, `dismissPasswordNudge`), `lib/account/queries.ts`.
+- `lib/email/templates.ts`: one `systemEmail()` layout; reset, email-change and
+  email-changed-notice emails built on it.
+- Pages: `/settings` (app), `/forgot`, `/reset?token=`, `/email-change?token=` (auth, public).
+  Login: "Forgot your password?" link and the two return messages. Today: the nudge card.
+- Tests: `lib/account/tokens.test.ts`; the happy path now changes the password on Settings,
+  signs in with it, then walks the forgot-password link (used once, refused twice). The
+  email-change flow was probed end to end against a local production build with the log
+  email provider: link to the new address → "Email changed" → sign in with the new one →
+  second use refused → notice to the old address.
+
+## Verify
+
+_(preview URL when pushed)_ — with the test account: Settings → change the password (then
+sign in with it); "Forgot your password?" on the login page (the email arrives from Brevo,
+check spam); change the email to another address you own and open the link there.
+
+**The nudge cannot be seen on a preview** (GitHub sign-in only works on production). After the
+merge: sign in on production with GitHub → Today shows "Set a password on your account" →
+Settings → set it. From then on the owner's own account opens on every preview with
+email + password.

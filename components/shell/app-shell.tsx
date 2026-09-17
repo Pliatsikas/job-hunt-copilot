@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
-import { LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import type { Locale } from "@/lib/i18n/locale";
 import type { T } from "@/lib/i18n/t";
 import { LanguageSwitch } from "./language-switch";
@@ -60,9 +60,14 @@ export function AppShell({
         <div className="flex flex-col gap-3 border-t border-sidebar-border px-5 py-4">
           <LanguageSwitch current={locale} label={t("nav.language")} />
           {email && (
-            <p className="truncate text-xs text-muted-foreground" title={email}>
-              {email}
-            </p>
+            <Link
+              href="/settings"
+              className="flex items-center gap-2 truncate text-xs text-muted-foreground underline-offset-4 hover:text-sidebar-foreground hover:underline"
+              title={t("nav.settings")}
+            >
+              <Settings className="size-3.5 shrink-0" aria-hidden />
+              <span className="truncate">{email}</span>
+            </Link>
           )}
           <form action={signOut}>
             <button
@@ -86,6 +91,13 @@ export function AppShell({
           </Link>
           <div className="flex items-center gap-3">
             <LanguageSwitch current={locale} label={t("nav.language")} />
+            <Link
+              href="/settings"
+              aria-label={t("nav.settings")}
+              className="grid size-9 place-items-center rounded-lg text-muted-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
+            >
+              <Settings className="size-4" aria-hidden />
+            </Link>
             <form action={signOut}>
               <button
                 type="submit"

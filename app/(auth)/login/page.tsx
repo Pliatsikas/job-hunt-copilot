@@ -20,9 +20,9 @@ export const metadata: Metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ registered?: string }>;
+  searchParams: Promise<{ registered?: string; reset?: string; emailChanged?: string }>;
 }) {
-  const [t, { registered }] = await Promise.all([getT(), searchParams]);
+  const [t, { registered, reset, emailChanged }] = await Promise.all([getT(), searchParams]);
 
   return (
     <Card className="w-full max-w-sm">
@@ -34,11 +34,16 @@ export default async function LoginPage({
           <h1>{t("auth.signInTitle")}</h1>
         </CardTitle>
         <CardDescription>
-          {registered ? t("auth.accountCreated") : t("auth.signInSub")}
+          {registered ? t("auth.accountCreated") : reset ? t("settings.resetDone") : emailChanged ? t("settings.emailChangedLogin") : t("auth.signInSub")}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <LoginForm />
+        <p className="text-center text-sm">
+          <Link href="/forgot" className="text-muted-foreground underline underline-offset-4">
+            {t("settings.forgotLink")}
+          </Link>
+        </p>
         {githubEnabled && (
           <>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">

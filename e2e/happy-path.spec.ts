@@ -17,6 +17,8 @@ const RUN = Date.now();
 const EMAIL = `e2e-${RUN}@example.com`;
 // Meets every rule in lib/password-rules.ts — the register form enforces them.
 const PASSWORD = "E2e-password-2026!";
+const PASSWORD_2 = "E2e-password-2026!!";
+const PASSWORD_3 = "E2e-password-2026!!!";
 
 const CV_TEXT = [
   "Fullstack developer with two years of professional experience.",
@@ -353,6 +355,50 @@ test("register, analyse and generate", async ({ page }) => {
     await page.goto(`${applicationUrl}/cv/1`);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("CV for this role v1");
     await expect(page.getByRole("button", { name: /print/i })).toBeVisible();
+  });
+
+  await test.step("settings: change the password with the current one, then sign in with the new", async () => {
+    await page.goto("/settings");
+    await page.getByLabel("Current password").fill(PASSWORD);
+    await page.getByLabel("New password").fill(PASSWORD_2);
+    await page.getByRole("button", { name: /change password/i }).click();
+    await expect(page.getByText("Password changed.")).toBeVisible();
+
+    await page.getByRole("button", { name: /sign out/i }).first().click();
+    await page.waitForURL(/\/login/);
+    await page.getByLabel("Email").fill(EMAIL);
+    await page.getByLabel("Password", { exact: true }).fill(PASSWORD_2);
+    await page.getByRole("button", { name: /sign in/i }).click();
+    await page.waitForURL(/\/today/);
+  });
+
+  await test.step("forgot password: the emailed link sets a new one, once", async () => {
+    await page.goto("/forgot");
+    await page.getByLabel("Email").fill(EMAIL);
+    await page.getByRole("button", { name: /send me a link/i }).click();
+    // The same sentence whether or not the address has an account.
+    await expect(page.getByText(/if that address has an account/i)).toBeVisible();
+
+    // The token is hashed at rest, so — as for sign-up — the test issues one
+    // through the same function the action used and follows the link.
+    const { issueAccountToken, resetIdentifier } = await import("../lib/account/tokens");
+    const token = await issueAccountToken(resetIdentifier(EMAIL));
+    await page.goto(`/reset?token=${encodeURIComponent(token)}`);
+    await page.getByLabel("New password").fill(PASSWORD_3);
+    await page.getByRole("button", { name: /save password/i }).click();
+    await page.waitForURL(/\/login\?reset=1/);
+
+    // A second submit with the same token is refused, and the first change held.
+    await page.goto(`/reset?token=${encodeURIComponent(token)}`);
+    await page.getByLabel("New password").fill(PASSWORD_2);
+    await page.getByRole("button", { name: /save password/i }).click();
+    await expect(page.locator('form p[role="alert"]')).toContainText(/not valid/i);
+
+    await page.goto("/login");
+    await page.getByLabel("Email").fill(EMAIL);
+    await page.getByLabel("Password", { exact: true }).fill(PASSWORD_3);
+    await page.getByRole("button", { name: /sign in/i }).click();
+    await page.waitForURL(/\/today/);
   });
 
   await test.step("the budget counted every call, with tokens", async () => {

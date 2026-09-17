@@ -4,7 +4,7 @@ import type { NextAuthConfig } from "next-auth";
 // authorize() — those touch Prisma/pg/bcryptjs, none of which run on Edge.
 // The full config in lib/auth.ts spreads this and adds them back in for
 // everywhere else (route handlers, server actions, server components).
-const PUBLIC_PATHS = ["/login", "/register", "/verify"];
+const PUBLIC_PATHS = ["/login", "/register", "/verify", "/forgot", "/reset", "/email-change"];
 
 export default {
   providers: [],
