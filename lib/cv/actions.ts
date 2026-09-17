@@ -9,7 +9,7 @@ import { AnalysisError, completeWithRepair } from "../llm/repair";
 import { LlmAuthError, LlmQuotaError } from "../llm/types";
 import { assertWithinBudget, recordProviderCall, UsageLimitError } from "../llm/usage";
 import { getProfile } from "../profile/get";
-import { CV_LANGUAGES, photoSchema, structuredCvSchema, type CvLanguage, type StructuredCv } from "../schemas/structured-cv";
+import { CV_LANGUAGES, extractedCvSchema, photoSchema, structuredCvSchema, type CvLanguage, type StructuredCv } from "../schemas/structured-cv";
 import { groundExtraction } from "./extract-grounding";
 import { ensureIds } from "./ids";
 
@@ -71,9 +71,13 @@ export async function extractStructuredCv(_prev: ExtractState, _formData: FormDa
         system: structurePrompt.system,
         user: structurePrompt.buildUserPrompt({ cvText: profile.cvText }),
         temperature: 0,
-        maxTokens: 6000,
+        // Sorting, not deliberating: at default reasoning gpt-oss spent the
+        // whole output allowance thinking and returned nothing. 5 000 plus a
+        // ~2 300-token prompt stays under Groq's 8 000-per-minute request cap.
+        maxTokens: 5000,
+        reasoning: "low",
       },
-      structuredCvSchema,
+      extractedCvSchema,
       (usage) => recordProviderCall(user.id, usage),
     );
     const grounded = groundExtraction(out.data, profile.cvText);

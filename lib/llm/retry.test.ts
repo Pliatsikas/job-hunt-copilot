@@ -20,6 +20,15 @@ describe("isTransient", () => {
     expect(isTransient(error)).toBe(true);
   });
 
+  it("treats Groq's per-minute 413 as transient, a plain 413 as permanent", () => {
+    const tpm = Object.assign(
+      new Error('413 {"error":{"message":"Request too large for model on tokens per minute (TPM): Limit 8000, Requested 8361","type":"tokens","code":"rate_limit_exceeded"}}'),
+      { status: 413 },
+    );
+    expect(isTransient(tpm)).toBe(true);
+    expect(isTransient(httpError(413))).toBe(false);
+  });
+
   it("does not treat an unrecognised error as transient", () => {
     expect(isTransient(new Error("something else"))).toBe(false);
     expect(isTransient(null)).toBe(false);

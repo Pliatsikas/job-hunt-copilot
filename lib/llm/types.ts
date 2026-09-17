@@ -22,6 +22,13 @@ export type LlmRequest = {
   schema: z.ZodType;
   maxTokens?: number;
   temperature?: number;
+  /**
+   * How much a reasoning model may deliberate before answering. Unset keeps
+   * the provider's default (the analysis earns it); "low" is for sorting and
+   * writing tasks where the deliberation was measured to be most of the
+   * bill — and, on Groq's 8 000-tokens-per-minute tier, most of the room.
+   */
+  reasoning?: "low" | "medium" | "high";
 };
 
 /**

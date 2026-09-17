@@ -110,3 +110,20 @@ export const photoSchema = z
   .string()
   .max(PHOTO_MAX_CHARS, "The photo is too large — it should be under 300 KB after resizing.")
   .regex(/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/, "Not an image the CV can use.");
+
+/**
+ * What the extraction model returns: the structured CV, plus for every bullet
+ * a reference to the numbered sentence(s) of the CV text it was written from
+ * ("S12" or "S12,S13"). The grounding resolves the reference and checks the
+ * bullet really says what those sentences say; then the field is dropped and
+ * the CV saved without it. Not optional (Groq strict mode); "" fails the
+ * check on purpose.
+ */
+const extractedBullet = z.object({ id, text: line.min(1), source: z.string().trim().max(20) });
+const extractedEntry = entrySchema.extend({ bullets: z.array(extractedBullet).max(12) });
+export const extractedCvSchema = structuredCvSchema.extend({
+  experience: z.array(extractedEntry).max(12),
+  education: z.array(extractedEntry).max(8),
+  projects: z.array(extractedEntry).max(12),
+});
+export type ExtractedCv = z.infer<typeof extractedCvSchema>;

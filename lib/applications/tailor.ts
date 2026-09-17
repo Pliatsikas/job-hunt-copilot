@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getProvider } from "../llm";
 import * as tailorPrompt from "../llm/prompts/tailor-cv.v1";
-import * as tailorPromptV2 from "../llm/prompts/tailor-cv.v2";
+import * as tailorPromptV3 from "../llm/prompts/tailor-cv.v3";
 import { getStructuredCvFor } from "../cv/queries";
 import { applySelection, renderStructuredCvText } from "../cv/select";
 import { cvSelectionSchema } from "../schemas/cv-selection";
@@ -22,6 +22,10 @@ export type TailorState = {
   version?: number;
   /** "designed" when built from the structured CV (T09), "text" for the line-based fallback. */
   kind?: "designed" | "text";
+  /** Designed: bullets the model rephrased for this role (original → new). */
+  changes?: { id: string; from: string; to: string }[];
+  /** Designed: rewrites refused for an invented fact or the wrong language. */
+  rejected?: { id: string; text: string; reason: string }[];
   /** Lines the model returned that were not the CV's; shown so the drop is visible. */
   droppedLines?: string[];
   coverage?: number;
@@ -29,7 +33,7 @@ export type TailorState = {
 };
 
 const TAILOR_TEMPERATURE = 0.1;
-const TAILOR_MAX_TOKENS = 4096;
+const TAILOR_MAX_TOKENS = 3500;
 
 /**
  * If more than this share of returned lines fails grounding, the output is
@@ -68,27 +72,39 @@ export async function tailorCv(
       const completion = await completeWithRepair(
         getProvider(),
         {
-          system: tailorPromptV2.system,
-          user: tailorPromptV2.buildUserPrompt({
+          system: tailorPromptV3.system,
+          user: tailorPromptV3.buildUserPrompt({
             cv: structured,
+            language,
             jobDescription: application.jobDescription,
             roleTitle: application.roleTitle,
             analysis,
           }),
           temperature: TAILOR_TEMPERATURE,
-          maxTokens: TAILOR_MAX_TOKENS,
+          // Rewrites for ~20 bullets plus ids: ~2 000 tokens of answer. Low
+          // reasoning keeps gpt-oss from spending the rest deliberating, and
+          // the whole request stays under Groq's 8 000-per-minute cap.
+          maxTokens: 5000,
+          reasoning: "low",
         },
         cvSelectionSchema,
         (usage) => recordProviderCall(application.userId, usage),
       );
-      const applied = applySelection(structured, completion.data);
+      const applied = applySelection(structured, completion.data, language, renderStructuredCvText(structured, CV_LABELS[language]));
       const version = await saveGeneratedDocument({
         applicationId: application.id,
         userId: application.userId,
         type: "CV_TAILORED",
         language,
         content: renderStructuredCvText(applied.cv, CV_LABELS[language]),
-        data: { source: "structured", language, cv: applied.cv, keywordsAddressed: completion.data.keywordsAddressed },
+        data: {
+          source: "structured",
+          language,
+          cv: applied.cv,
+          keywordsAddressed: completion.data.keywordsAddressed,
+          changes: applied.changes,
+          rejected: applied.rejected,
+        },
       });
       revalidatePath(`/applications/${application.id}`);
       return {
@@ -97,6 +113,8 @@ export async function tailorCv(
         coverage: applied.coverage,
         keywordsAddressed: completion.data.keywordsAddressed,
         droppedLines: applied.unknownIds,
+        changes: applied.changes,
+        rejected: applied.rejected,
       };
     }
 

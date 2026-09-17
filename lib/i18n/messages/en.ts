@@ -195,6 +195,12 @@ export const en: Messages = {
     cvTextNote: "Comes out as plain text from the profile's CV text. For the designed one, fill in the structured CV first.",
     setUpCv: "Fill in the CV",
     openCv: "Open the CV",
+    rephrased: "{count} bullets rephrased for this role",
+    rephrasedNone: "Nothing was rephrased — kept as you wrote it.",
+    rejectedRewrites: "{count} of the model's rewrites were refused because they added something you do not have",
+    wasWritten: "You wrote",
+    nowSays: "Now says",
+    whatChanged: "What changed for this role",
   },
   applications: {
     title: "Applications",

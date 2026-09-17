@@ -7,6 +7,7 @@ import { getPhoto } from "@/lib/cv/queries";
 import { formatDate } from "@/lib/format";
 import { getT } from "@/lib/i18n/server";
 import { CV_LANGUAGES, structuredCvSchema, type CvLanguage } from "@/lib/schemas/structured-cv";
+import { CvChanges } from "@/components/cv/changes";
 import { DesignedCv } from "@/components/cv/designed-cv";
 import { buttonVariants } from "@/components/ui/button";
 import { PrintButton } from "./print-button";
@@ -60,9 +61,15 @@ export default async function TailoredCvPage({ params }: { params: Promise<{ id:
       </div>
 
       {designed ? (
-        <div className="flex justify-center px-2 pb-8 print:p-0">
-          <DesignedCv cv={designed.cv} language={designed.language} photo={photo} />
-        </div>
+        <>
+          <div className="mx-auto max-w-[210mm] px-4 pb-4 print:hidden">
+            <h2 className="mb-2 text-sm font-semibold">{t("application.whatChanged")}</h2>
+            <CvChanges changes={designed.changes} rejected={designed.rejected} t={t} />
+          </div>
+          <div className="flex justify-center px-2 pb-8 print:p-0">
+            <DesignedCv cv={designed.cv} language={designed.language} photo={photo} />
+          </div>
+        </>
       ) : (
         <PlainCv content={doc.content} />
       )}
@@ -70,14 +77,26 @@ export default async function TailoredCvPage({ params }: { params: Promise<{ id:
   );
 }
 
-function readDesigned(data: unknown): { cv: ReturnType<typeof structuredCvSchema.parse>; language: CvLanguage } | null {
+type Designed = {
+  cv: ReturnType<typeof structuredCvSchema.parse>;
+  language: CvLanguage;
+  changes: { id: string; from: string; to: string }[];
+  rejected: { id: string; text: string; reason: string }[];
+};
+
+function readDesigned(data: unknown): Designed | null {
   if (!data || typeof data !== "object") return null;
-  const d = data as { source?: string; language?: string; cv?: unknown };
+  const d = data as { source?: string; language?: string; cv?: unknown; changes?: unknown; rejected?: unknown };
   if (d.source !== "structured") return null;
   const cv = structuredCvSchema.safeParse(d.cv);
   if (!cv.success) return null;
   const language = CV_LANGUAGES.includes(d.language as CvLanguage) ? (d.language as CvLanguage) : "en";
-  return { cv: cv.data, language };
+  return {
+    cv: cv.data,
+    language,
+    changes: Array.isArray(d.changes) ? (d.changes as Designed["changes"]) : [],
+    rejected: Array.isArray(d.rejected) ? (d.rejected as Designed["rejected"]) : [],
+  };
 }
 
 /** The pre-T09 document: headings and lines, one column. */

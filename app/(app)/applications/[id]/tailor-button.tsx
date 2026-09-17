@@ -9,6 +9,7 @@ import type { CvLanguage } from "@/lib/schemas/structured-cv";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { SELECT_FOCUS } from "@/components/ui/select-focus";
+import { CvChanges } from "@/components/cv/changes";
 
 export function TailorButton({
   action,
@@ -93,6 +94,8 @@ export function TailorButton({
           </Link>
         </div>
       )}
+
+      {state.kind === "designed" && state.changes && state.rejected && <CvChanges changes={state.changes} rejected={state.rejected} t={t} />}
 
       {state.kind === "text" && state.droppedLines && state.droppedLines.length > 0 && (
         <details className="rounded-lg border border-destructive/40 p-3 text-xs">

@@ -1,25 +1,77 @@
 import type { CvSelection } from "../schemas/cv-selection";
-import type { CvEntry, StructuredCv } from "../schemas/structured-cv";
+import type { CvEntry, CvLanguage, StructuredCv } from "../schemas/structured-cv";
+import { matchesLanguage, supportShare, unsupportedFacts } from "./facts";
+
+/** A rewrite must be mostly the owner's own words (from the bullet or anywhere in the CV). */
+export const MIN_REWRITE_SUPPORT = 0.6;
+
+export type CvChange = { id: string; from: string; to: string };
+export type CvRejection = { id: string; text: string; reason: string };
 
 export type Applied = {
   cv: StructuredCv;
   /** Ids the model returned that the CV does not have — reported, never rendered. */
   unknownIds: string[];
+  /** Rewrites that were used: what the owner wrote → what the document says. */
+  changes: CvChange[];
+  /** Rewrites refused (an invented fact, the wrong language) — the original stands. */
+  rejected: CvRejection[];
   /** Share of the source's bullets that made it in. */
   coverage: number;
 };
 
 /**
- * Turns the model's id list into a CV. Anything not in the source is dropped
- * and counted; skills stay in the source's order within a group; education
- * and every role are always kept (the model orders them and picks bullets),
- * projects may be thinned. Contacts, languages and interests are not the
- * model's to choose.
+ * Turns the model's answer into a CV. Ids not in the source are dropped and
+ * counted; skills stay in the source's order within a group; education and
+ * every role are always kept (the model orders them and picks bullets),
+ * projects may be thinned; an entry kept with none of its bullets keeps all
+ * of them. Contacts, languages and interests are not the model's to choose.
+ *
+ * A rewrite replaces the owner's bullet only when every fact in it already
+ * exists somewhere in the owner's CV and it reads in the CV's language.
+ * Anything else falls back to the original and is reported, so the owner
+ * can see what the model wanted to say and why it was not allowed to.
  */
-export function applySelection(source: StructuredCv, selection: CvSelection): Applied {
+export function applySelection(source: StructuredCv, selection: CvSelection, language: CvLanguage, sourceText: string): Applied {
   const unknown: string[] = [];
+  const changes: CvChange[] = [];
+  const rejected: CvRejection[] = [];
 
-  const pickEntries = (list: CvEntry[], chosen: { id: string; bullets: string[] }[], keepAll: boolean): CvEntry[] => {
+  /**
+   * `scope` is the text a rewrite may draw facts from: the entry it belongs
+   * to for a bullet, the whole CV for the about paragraph. A bullet about the
+   * Electron app may not borrow "Node.js backend" from the SaaS project two
+   * entries down — the technology exists in the CV, but not on that project.
+   */
+  const rewriteOf = (id: string, original: string, proposed: string, scope: string): string => {
+    const text = proposed.trim();
+    if (!text || text === original) return original;
+    const missing = unsupportedFacts(text, sourceText);
+    if (missing.length) {
+      rejected.push({ id, text, reason: `not in your CV: ${missing.join(", ")}` });
+      return original;
+    }
+    const outOfScope = unsupportedFacts(text, scope);
+    if (outOfScope.length) {
+      rejected.push({ id, text, reason: `not part of this entry: ${outOfScope.join(", ")}` });
+      return original;
+    }
+    if (!matchesLanguage(text, language)) {
+      rejected.push({ id, text, reason: "wrong language" });
+      return original;
+    }
+    // Facts can be right and the sentence still invented ("Led agile
+    // ceremonies" out of "worked in a team"): most of its words must be the
+    // owner's, from this bullet or anywhere in the CV.
+    if (supportShare(text, `${original}\n${sourceText}`) < MIN_REWRITE_SUPPORT) {
+      rejected.push({ id, text, reason: "says more than your CV does" });
+      return original;
+    }
+    changes.push({ id, from: original, to: text });
+    return text;
+  };
+
+  const pickEntries = (list: CvEntry[], chosen: { id: string; bullets: { id: string; text: string }[] }[], keepAll: boolean): CvEntry[] => {
     const byId = new Map(list.map((e) => [e.id, e]));
     const out: CvEntry[] = [];
     const seen = new Set<string>();
@@ -31,14 +83,16 @@ export function applySelection(source: StructuredCv, selection: CvSelection): Ap
       }
       if (seen.has(c.id)) continue;
       seen.add(c.id);
-      const bulletIds = new Set(entry.bullets.map((b) => b.id));
-      for (const b of c.bullets) if (!bulletIds.has(b)) unknown.push(b);
-      const wanted = new Set(c.bullets);
+      const proposed = new Map<string, string>();
+      for (const b of c.bullets) {
+        if (entry.bullets.some((x) => x.id === b.id)) proposed.set(b.id, b.text);
+        else unknown.push(b.id);
+      }
       // Source order, not the model's: the owner wrote the bullets in a sequence.
-      // An entry kept with none of its bullets is an entry the model forgot to
-      // fill in, not a decision — it keeps all of them.
-      const bullets = entry.bullets.filter((b) => wanted.has(b.id));
-      out.push({ ...entry, bullets: bullets.length ? bullets : entry.bullets });
+      let bullets = entry.bullets.filter((b) => proposed.has(b.id));
+      if (!bullets.length) bullets = entry.bullets;
+      const scope = [entry.title, entry.org, entry.date, entry.location, ...entry.bullets.map((b) => b.text), ...(entry.links ?? []).map((l) => l.label)].join("\n");
+      out.push({ ...entry, bullets: bullets.map((b) => ({ ...b, text: rewriteOf(b.id, b.text, proposed.get(b.id) ?? "", scope) })) });
     }
     if (keepAll) {
       for (const e of list) if (!seen.has(e.id)) out.push(e);
@@ -70,7 +124,7 @@ export function applySelection(source: StructuredCv, selection: CvSelection): Ap
 
   const cv: StructuredCv = {
     ...source,
-    about: selection.keepAbout ? source.about : "",
+    about: selection.keepAbout ? rewriteOf("about", source.about, selection.about, sourceText) : "",
     skillGroups,
     certifications: source.certifications.filter((c) => wantedCerts.has(c.id)),
     // Every role stays — a CV with a job missing reads as a gap, not a choice.
@@ -83,7 +137,7 @@ export function applySelection(source: StructuredCv, selection: CvSelection): Ap
   const sourceBullets = [...source.experience, ...source.education, ...source.projects].reduce((n, e) => n + e.bullets.length, 0);
   const keptBullets = [...cv.experience, ...cv.education, ...cv.projects].reduce((n, e) => n + e.bullets.length, 0);
 
-  return { cv, unknownIds: unknown, coverage: sourceBullets ? keptBullets / sourceBullets : 1 };
+  return { cv, unknownIds: unknown, changes, rejected, coverage: sourceBullets ? keptBullets / sourceBullets : 1 };
 }
 
 /** The document's plain-text form: what copy and .md download give. */
