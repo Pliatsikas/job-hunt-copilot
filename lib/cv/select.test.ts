@@ -44,7 +44,8 @@ describe("applySelection", () => {
       sourceText,
     );
     expect(cv.about).toBe("");
-    expect(cv.skillGroups[0].skills.map((s) => s.id)).toEqual(["s1", "s3"]);
+    // Skills are reordered as asked (s3 first, s1), never dropped (s2 stays, last).
+    expect(cv.skillGroups[0].skills.map((s) => s.id)).toEqual(["s3", "s1", "s2"]);
     expect(cv.experience.map((e) => e.id)).toEqual(["exp-2", "exp-1"]);
     expect(cv.experience[1].bullets.map((b) => b.id)).toEqual(["exp-1-b1", "exp-1-b3"]);
     expect(cv.education.map((e) => e.id)).toEqual(["edu-1"]);
@@ -126,6 +127,28 @@ describe("applySelection", () => {
     const { cv, rejected } = applySelection(source, sel, "en", sourceText, ["RESTful microservices", "Docker"]);
     expect(cv.experience[0].bullets[0].text).toBe("Built RESTful microservices with Node.js and PostgreSQL.");
     expect(rejected.map((r) => r.reason)).toEqual(["not in your CV: Kubernetes"]);
+  });
+
+  it("keeps every skill group and certification when the model returns none", () => {
+    const { cv } = applySelection(
+      source,
+      { keepAbout: true, about: "", skillGroups: [], experience: [], education: [], projects: [], certifications: [], keywordsAddressed: [] },
+      "en",
+      sourceText,
+    );
+    expect(cv.skillGroups.map((g) => g.skills.length)).toEqual([3]);
+    expect(cv.certifications).toHaveLength(1);
+  });
+
+  it("refuses a rewrite that inflates seniority", () => {
+    const { cv, rejected } = applySelection(
+      source,
+      { keepAbout: true, about: "Seasoned developer with extensive experience in REST APIs on Node.js and PostgreSQL.", skillGroups: [], experience: [], education: [], projects: [], certifications: [], keywordsAddressed: [] },
+      "en",
+      sourceText,
+    );
+    expect(cv.about).toBe("About me");
+    expect(rejected[0].reason).toBe("claims a level your CV does not: Seasoned, extensive experience");
   });
 
   it("refuses a rewrite that borrows a technology from another entry", () => {

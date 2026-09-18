@@ -32,12 +32,14 @@ Two rules that are checked automatically:
    A CV fact also stays with its entry: a bullet may not borrow a company, a number or a
    technology from another entry. Allowed keywords may go anywhere they read naturally.
 2. Same language as the CV. A Greek CV gets Greek rewrites, an English CV English ones.
+3. Same level as the CV. A student stays a student; "seasoned", "senior", "expert",
+   "extensive experience" and years-of-experience claims are refused unless the CV says so.
 
 What you return:
 - keepAbout: true. about: the summary rewritten for this role — 2–3 sentences, first
   person, the candidate's real profile in the posting's terms, the allowed keywords worked in.
 - skillGroups: every group and every skill, by id, ordered so the posting's priorities come
-  first. Do not drop skills.
+  first. Nothing is dropped whatever you return — this is ordering only.
 - experience / education / projects: every entry, in a sensible order, and EVERY bullet with
   a rewrite. Do not drop entries or bullets — selection is not the job, wording is. A rewrite:
   no "I", starts with a strong verb, a natural sentence with its articles, ≤ 25 words, says

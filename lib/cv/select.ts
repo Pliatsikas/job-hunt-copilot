@@ -2,7 +2,7 @@ import type { AnalysisResult } from "../schemas/analysis";
 import type { CvSelection } from "../schemas/cv-selection";
 import type { CvEntry, CvLanguage, StructuredCv } from "../schemas/structured-cv";
 import { normalizeForGrounding } from "../llm/grounding";
-import { matchesLanguage, supportShare, unsupportedFacts } from "./facts";
+import { matchesLanguage, seniorityClaims, supportShare, unsupportedFacts } from "./facts";
 
 /** A rewrite must be mostly the owner's words — from the bullet, the CV, or the posting's allowed keywords. */
 export const MIN_REWRITE_SUPPORT = 0.5;
@@ -37,10 +37,11 @@ export type Applied = {
 
 /**
  * Turns the model's answer into a CV. Ids not in the source are dropped and
- * counted; skills stay in the source's order within a group; education and
- * every role are always kept (the model orders them and picks bullets),
- * projects may be thinned; an entry kept with none of its bullets keeps all
- * of them. Contacts, languages and interests are not the model's to choose.
+ * counted; every skill group, skill and certification is kept (the model
+ * only orders them); education and every role are always kept (the model
+ * orders them and picks bullets), projects may be thinned; an entry kept
+ * with none of its bullets keeps all of them. Contacts, languages and
+ * interests are not the model's to choose.
  *
  * A rewrite replaces the owner's bullet only when every fact in it already
  * exists in the owner's CV — or is one of `allowedTerms`: the posting's
@@ -87,6 +88,11 @@ export function applySelection(
       rejected.push({ id, text, reason: "wrong language" });
       return original;
     }
+    const inflated = seniorityClaims(text, sourceText);
+    if (inflated.length) {
+      rejected.push({ id, text, reason: `claims a level your CV does not: ${inflated.join(", ")}` });
+      return original;
+    }
     // Facts can be right and the sentence still invented ("Led agile
     // ceremonies" out of "worked in a team"): most of its words must be the
     // owner's, from this bullet or anywhere in the CV.
@@ -127,33 +133,31 @@ export function applySelection(
     return out;
   };
 
-  const groupById = new Map(source.skillGroups.map((g) => [g.id, g]));
-  const skillGroups = [];
-  const seenGroups = new Set<string>();
-  for (const g of selection.skillGroups) {
-    const group = groupById.get(g.id);
-    if (!group) {
-      unknown.push(g.id);
-      continue;
-    }
-    if (seenGroups.has(g.id)) continue;
-    seenGroups.add(g.id);
-    const ids = new Set(group.skills.map((s) => s.id));
-    for (const s of g.skills) if (!ids.has(s)) unknown.push(s);
-    const wanted = new Set(g.skills);
-    const skills = group.skills.filter((s) => wanted.has(s.id));
-    if (skills.length) skillGroups.push({ ...group, skills });
-  }
+  // Skills and certifications are never the model's to drop: it may only
+  // reorder groups and the skills inside them. The owner's first real run
+  // came back with an empty skillGroups list and a CV with no skills at all
+  // — the one thing a screening system reads first.
+  const groupOrder = new Map(selection.skillGroups.map((g, i) => [g.id, i]));
+  for (const g of selection.skillGroups) if (!source.skillGroups.some((x) => x.id === g.id)) unknown.push(g.id);
+  const skillGroups = [...source.skillGroups]
+    .sort((a, b) => (groupOrder.get(a.id) ?? 999) - (groupOrder.get(b.id) ?? 999))
+    .map((group) => {
+      const wanted = selection.skillGroups.find((g) => g.id === group.id)?.skills ?? [];
+      const ids = new Set(group.skills.map((s) => s.id));
+      for (const s of wanted) if (!ids.has(s)) unknown.push(s);
+      const rank = new Map(wanted.map((id, i) => [id, i]));
+      const skills = [...group.skills].sort((a, b) => (rank.get(a.id) ?? 999) - (rank.get(b.id) ?? 999));
+      return { ...group, skills };
+    });
 
   const certIds = new Set(source.certifications.map((c) => c.id));
   for (const c of selection.certifications) if (!certIds.has(c)) unknown.push(c);
-  const wantedCerts = new Set(selection.certifications);
 
   const cv: StructuredCv = {
     ...source,
     about: selection.keepAbout ? rewriteOf("about", source.about, selection.about, sourceText) : "",
     skillGroups,
-    certifications: source.certifications.filter((c) => wantedCerts.has(c.id)),
+    certifications: source.certifications,
     // Every role stays — a CV with a job missing reads as a gap, not a choice.
     // Projects are the one list the model may thin out.
     experience: pickEntries(source.experience, selection.experience, true),

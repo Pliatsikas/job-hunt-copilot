@@ -114,3 +114,16 @@ export function supportShare(candidate: string, reference: string): number {
   const supported = words.filter((w) => stems.has(w.slice(0, 5))).length;
   return supported / words.length;
 }
+
+/**
+ * Words that raise the candidate's level without a fact to check: a
+ * fourth-year student came back as "Seasoned full-stack developer". Ordinary
+ * words, so the fact guard let them through. Refused in a rewrite unless
+ * the owner's own CV uses them.
+ */
+const SENIORITY_CLAIMS = /(?<!\p{L})(seasoned|senior|expert|veteran|extensive experience|years of experience|έμπειρος|πολυετ\p{L}*|εξειδικευμέν\p{L}*)(?!\p{L})/giu;
+
+export function seniorityClaims(text: string, source: string): string[] {
+  const haystack = source.toLowerCase();
+  return [...new Set([...text.matchAll(SENIORITY_CLAIMS)].map((m) => m[1]).filter((w) => !haystack.includes(w.toLowerCase())))];
+}

@@ -1,6 +1,6 @@
 # T09 — The CV for a role: designed like the real one, Greek or English, with a photo
 
-**Status:** in progress · **Branch:** `task/09-designed-cv`
+**Status:** parked 2026-09-18 (owner's call) · **Branch:** `task/09-designed-cv` · PR #9 open, preview verified twice, not merged
 
 ## Asked (owner, 2026-09-17)
 
@@ -65,6 +65,18 @@ genuinely good CV."
   "Thessaloniki"; one refusal, a URL the model had mistyped. The result is saved on the
   document (`Document.data`: the CV, the changes, the refusals), the plain-text rendering in
   `content` as before.
+- **Skills and certifications are never the model's to drop** (2026-09-18, after the owner's
+  real run came back with *no skills at all*: the model returned an empty `skillGroups` list
+  and the code honoured it). Now the model only orders them. Same day, same run: a
+  fourth-year student's summary opened "Seasoned full-stack developer" — ordinary words, so
+  the fact guard let it through. A third guard refuses seniority claims ("seasoned",
+  "senior", "expert", "extensive experience", years-of-experience, and the Greek forms)
+  unless the CV itself uses them.
+- **Parked here by the owner's call (2026-09-18).** Two real runs in, the results still did
+  not read right to them, and "training" is not a lever this project has: it is prompt +
+  guards + the owner's testing time, and each round costs the latter. The deterministic
+  defects found are fixed; the next round, if any, should start from a written example of
+  what a *good* result looks like for one specific posting, so the prompt has a target.
 - **Groq's free tier shaped two settings.** Requests are capped at 8 000 tokens per minute
   *including* `max_tokens`, and gpt-oss spends its allowance reasoning before it writes: at
   default effort the extraction returned an empty answer. Both structured calls now run with
