@@ -126,7 +126,7 @@ the reference layout, with the photo.
 
 ## Verify
 
-https://job-hunt-copilot-63imm2v23-pliatsikas-projects.vercel.app — with your own account: Profile → "Open the CV" → EN →
+https://job-hunt-copilot-1eb1k8e4q-pliatsikas-projects.vercel.app — with your own account: Profile → "Open the CV" → EN →
 "Fill from my CV text" → review (expand "items … were removed" to see what and why), fix
 anything, save. Then ΕΛ: paste the Greek version's text in the profile first (or type the
 form). Add the photo. On an analysed application: "Make a CV for this role" → pick the
