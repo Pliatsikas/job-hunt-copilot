@@ -1,9 +1,24 @@
+import type { AnalysisResult } from "../schemas/analysis";
 import type { CvSelection } from "../schemas/cv-selection";
 import type { CvEntry, CvLanguage, StructuredCv } from "../schemas/structured-cv";
+import { normalizeForGrounding } from "../llm/grounding";
 import { matchesLanguage, supportShare, unsupportedFacts } from "./facts";
 
-/** A rewrite must be mostly the owner's own words (from the bullet or anywhere in the CV). */
-export const MIN_REWRITE_SUPPORT = 0.6;
+/** A rewrite must be mostly the owner's words — from the bullet, the CV, or the posting's allowed keywords. */
+export const MIN_REWRITE_SUPPORT = 0.5;
+
+/**
+ * The posting's vocabulary the rewrites may use: the skills the analysis
+ * matched against the CV (with evidence) and the keywords it says to mirror
+ * — minus anything it listed as a gap. "RAG" is allowed when the CV says
+ * "Retrieval-Augmented Generation"; "Kubernetes" is not when the CV has
+ * never met it, however much the posting wants it.
+ */
+export function allowedPostingTerms(analysis: AnalysisResult): string[] {
+  const gaps = new Set(analysis.gaps.map((g) => normalizeForGrounding(g.skill)));
+  const terms = [...analysis.matchedSkills.map((m) => m.skill), ...analysis.keywordsToMirror];
+  return [...new Set(terms.filter((t) => t.trim() && !gaps.has(normalizeForGrounding(t))))];
+}
 
 export type CvChange = { id: string; from: string; to: string };
 export type CvRejection = { id: string; text: string; reason: string };
@@ -28,30 +43,42 @@ export type Applied = {
  * of them. Contacts, languages and interests are not the model's to choose.
  *
  * A rewrite replaces the owner's bullet only when every fact in it already
- * exists somewhere in the owner's CV and it reads in the CV's language.
- * Anything else falls back to the original and is reported, so the owner
- * can see what the model wanted to say and why it was not allowed to.
+ * exists in the owner's CV — or is one of `allowedTerms`: the posting's
+ * keywords that the analysis matched against the CV (the owner asked for
+ * the posting's vocabulary to be worked in; a keyword the analysis listed as
+ * a gap is not in this list and is refused). It must also read in the CV's
+ * language. Anything else falls back to the original and is reported, so
+ * the owner can see what the model wanted to say and why it was not allowed.
  */
-export function applySelection(source: StructuredCv, selection: CvSelection, language: CvLanguage, sourceText: string): Applied {
+export function applySelection(
+  source: StructuredCv,
+  selection: CvSelection,
+  language: CvLanguage,
+  sourceText: string,
+  allowedTerms: string[] = [],
+): Applied {
   const unknown: string[] = [];
   const changes: CvChange[] = [];
   const rejected: CvRejection[] = [];
+  const allowed = allowedTerms.join("\n");
+  const cvAndAllowed = `${sourceText}\n${allowed}`;
 
   /**
-   * `scope` is the text a rewrite may draw facts from: the entry it belongs
-   * to for a bullet, the whole CV for the about paragraph. A bullet about the
-   * Electron app may not borrow "Node.js backend" from the SaaS project two
-   * entries down — the technology exists in the CV, but not on that project.
+   * `scope` is the text a rewrite may draw CV facts from: the entry it
+   * belongs to for a bullet, the whole CV for the about paragraph. A bullet
+   * about the Electron app may not borrow "E-Avenue" or "~2,600 records"
+   * from another entry. The posting's allowed keywords are exempt: the
+   * owner wants them woven in wherever they read naturally.
    */
   const rewriteOf = (id: string, original: string, proposed: string, scope: string): string => {
     const text = proposed.trim();
     if (!text || text === original) return original;
-    const missing = unsupportedFacts(text, sourceText);
+    const missing = unsupportedFacts(text, cvAndAllowed);
     if (missing.length) {
       rejected.push({ id, text, reason: `not in your CV: ${missing.join(", ")}` });
       return original;
     }
-    const outOfScope = unsupportedFacts(text, scope);
+    const outOfScope = unsupportedFacts(text, `${scope}\n${allowed}`);
     if (outOfScope.length) {
       rejected.push({ id, text, reason: `not part of this entry: ${outOfScope.join(", ")}` });
       return original;
@@ -63,7 +90,7 @@ export function applySelection(source: StructuredCv, selection: CvSelection, lan
     // Facts can be right and the sentence still invented ("Led agile
     // ceremonies" out of "worked in a team"): most of its words must be the
     // owner's, from this bullet or anywhere in the CV.
-    if (supportShare(text, `${original}\n${sourceText}`) < MIN_REWRITE_SUPPORT) {
+    if (supportShare(text, `${original}\n${cvAndAllowed}`) < MIN_REWRITE_SUPPORT) {
       rejected.push({ id, text, reason: "says more than your CV does" });
       return original;
     }

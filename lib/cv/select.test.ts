@@ -112,6 +112,22 @@ describe("applySelection", () => {
     ]);
   });
 
+  it("lets a rewrite use the posting's allowed keywords anywhere, but never a gap", () => {
+    const sel = {
+      keepAbout: true,
+      about: "",
+      skillGroups: [],
+      experience: [{ id: "exp-1", bullets: [{ id: "exp-1-b1", text: "Built RESTful microservices with Node.js and PostgreSQL." }] }],
+      education: [],
+      projects: [{ id: "proj-2", bullets: [{ id: "proj-2-b1", text: "A game in Unity, deployed on Kubernetes." }] }],
+      certifications: [],
+      keywordsAddressed: [],
+    };
+    const { cv, rejected } = applySelection(source, sel, "en", sourceText, ["RESTful microservices", "Docker"]);
+    expect(cv.experience[0].bullets[0].text).toBe("Built RESTful microservices with Node.js and PostgreSQL.");
+    expect(rejected.map((r) => r.reason)).toEqual(["not in your CV: Kubernetes"]);
+  });
+
   it("refuses a rewrite that borrows a technology from another entry", () => {
     const { cv, rejected } = applySelection(
       source,

@@ -5,7 +5,7 @@ import { getProvider } from "../llm";
 import * as tailorPrompt from "../llm/prompts/tailor-cv.v1";
 import * as tailorPromptV3 from "../llm/prompts/tailor-cv.v3";
 import { getStructuredCvFor } from "../cv/queries";
-import { applySelection, renderStructuredCvText } from "../cv/select";
+import { allowedPostingTerms, applySelection, renderStructuredCvText } from "../cv/select";
 import { cvSelectionSchema } from "../schemas/cv-selection";
 import { CV_LABELS, CV_LANGUAGES, type CvLanguage } from "../schemas/structured-cv";
 import { AnalysisError, completeWithRepair } from "../llm/repair";
@@ -41,6 +41,7 @@ const TAILOR_MAX_TOKENS = 3500;
  * model meant to include is not a tailored CV; it is a broken one.
  */
 const MAX_DROPPED_SHARE = 0.34;
+
 
 /**
  * Not streamed, for the same reason the analysis is not (SPEC.md §8 Α4): the
@@ -90,7 +91,13 @@ export async function tailorCv(
         cvSelectionSchema,
         (usage) => recordProviderCall(application.userId, usage),
       );
-      const applied = applySelection(structured, completion.data, language, renderStructuredCvText(structured, CV_LABELS[language]));
+      const applied = applySelection(
+        structured,
+        completion.data,
+        language,
+        renderStructuredCvText(structured, CV_LABELS[language]),
+        allowedPostingTerms(analysis),
+      );
       const version = await saveGeneratedDocument({
         applicationId: application.id,
         userId: application.userId,

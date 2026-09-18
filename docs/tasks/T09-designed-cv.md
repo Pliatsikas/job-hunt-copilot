@@ -51,10 +51,20 @@ genuinely good CV."
 - **"Fill from my CV text"** (`cv-structure@3`) turns the existing `cvText` into the
   structure: groups skills, writes bullets from the numbered sentences, keeps the CV's own
   language. Nothing is saved until the owner presses save.
-- **Tailoring** (`tailor-cv@3`) selects by id and rewrites toward the posting. Every role and
-  education entry stays; skills keep their order; projects may be thinned. The result is
-  saved on the document (`Document.data`: the CV, the changes, the refusals), the plain-text
-  rendering in `content` as before.
+- **Tailoring** (`tailor-cv@3`) is about wording, not selection — the owner's second note
+  (2026-09-18): "I don't care about adding or removing pieces; the point is to change what
+  the CV *says* and put in the keywords it finds in the posting." So every entry and every
+  bullet is rewritten for the role, and the rewrites may use the posting's vocabulary —
+  under one line: an **allowed keyword** is a posting term the analysis matched against the
+  CV or listed to mirror, *minus every gap*. "RAG" is allowed when the CV says
+  "Retrieval-Augmented Generation"; "Kubernetes" is refused when the analysis says the CV
+  lacks it. Allowed keywords may appear in any bullet; CV facts (a company, a number, a stack
+  item) still stay with their own entry. Measured on the owner's structured CV: 20 of 21
+  bullets rewritten, the summary retargeted with "React and TypeScript frontends",
+  "Node.js/PostgreSQL backends", "REST APIs, real-time features, LLM/RAG", "hybrid",
+  "Thessaloniki"; one refusal, a URL the model had mistyped. The result is saved on the
+  document (`Document.data`: the CV, the changes, the refusals), the plain-text rendering in
+  `content` as before.
 - **Groq's free tier shaped two settings.** Requests are capped at 8 000 tokens per minute
   *including* `max_tokens`, and gpt-oss spends its allowance reasoning before it writes: at
   default effort the extraction returned an empty answer. Both structured calls now run with
