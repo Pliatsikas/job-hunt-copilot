@@ -53,6 +53,9 @@ export function createGroqProvider(apiKey: string, model: string): LlmProvider {
           model,
           temperature: request.temperature,
           max_tokens: request.maxTokens,
+          // Only when the caller asks (see LlmRequest.reasoning); the SDK's
+          // type trails the API, hence the spread rather than a plain field.
+          ...(request.reasoning ? { reasoning_effort: request.reasoning } : {}),
           messages: [
             { role: "system", content: request.system },
             { role: "user", content: request.user },

@@ -33,7 +33,11 @@ export function AppShell({
       <Suspense fallback={null}>
         <NavigationProgress />
       </Suspense>
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
+      {/* Pinned to the viewport: on a long page the account block (settings,
+          sign out) used to sit at the bottom of a sidebar as tall as the page,
+          a full scroll away. Now the sidebar is exactly one screen tall and
+          scrolls on its own if it ever has to. */}
+      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col overflow-y-auto border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
         <div className="px-5 pt-6 pb-4">
           <Link href="/today" className="flex items-center gap-2 font-semibold tracking-tight">
             <span className="grid size-7 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground text-sm">

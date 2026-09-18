@@ -37,6 +37,7 @@ model User {
   savedSearches  SavedSearch[]
   leads          Lead[]
   jobPreferences JobPreferences?
+  structuredCvs  StructuredCv[]
 }
 
 model Profile {
@@ -50,6 +51,9 @@ model Profile {
   // Specced in SPEC.md §2 but unused until a milestone needs it — nullable,
   // no writer, so it costs nothing to carry rather than re-migrate later.
   preferences Json?
+  /// Προαιρετική φωτογραφία για το σχεδιασμένο CV (T09): data URL ≤ 300 KB,
+  /// μικρυμένη στον browser πριν ανέβει. Καμία αποθήκευση αρχείων.
+  photo       String?  @db.Text
   updatedAt   DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -249,6 +253,9 @@ model Document {
   context       FollowUpContext?
   language      String           @default("en") // "en" | "el"
   content       String           @db.Text
+  /// CV_TAILORED από T09: η επιλογή (ids από το StructuredCv) που έδωσε το
+  /// κείμενο, ώστε η εκτύπωση να ξαναχτίζει τη σχεδιασμένη σελίδα.
+  data          Json?
   // Monotonic per (applicationId, type): regenerating keeps the old text
   // rather than overwriting it.
   version       Int              @default(1)
@@ -385,4 +392,19 @@ model JobPreferences {
   updatedAt       DateTime         @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Το δομημένο βιογραφικό (T09): ένα ανά γλώσσα. `data` ελέγχεται από το
+/// lib/schemas/structured-cv.ts σε κάθε ανάγνωση. Πηγή για το σχεδιασμένο CV·
+/// το cvText του Profile μένει η πηγή για την ανάλυση.
+model StructuredCv {
+  id        String   @id @default(cuid())
+  userId    String
+  language  String // "en" | "el"
+  data      Json
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, language])
 }
