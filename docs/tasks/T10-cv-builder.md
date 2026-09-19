@@ -58,7 +58,7 @@ change persists across reload.
 
 ## Verify
 
-_(preview URL when pushed)_ — Profile → "Open the builder". Pick each template, a colour,
+https://job-hunt-copilot-4clfrwjjq-pliatsikas-projects.vercel.app — Profile → "Open the builder". Pick each template, a colour,
 photo on/off; type and watch the page; "Download PDF" → Save as PDF. On the phone: the
 Edit / Preview tabs.
 
