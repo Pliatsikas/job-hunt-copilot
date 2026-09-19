@@ -27,7 +27,21 @@ const emptyEntry = (prefix: string): CvEntry => ({ id: newId(prefix), title: "",
  * it; the form posts it as one JSON field. Nothing is saved until the save
  * button — including the model's extraction, which only fills the state.
  */
-export function CvEditor({ initial, language, hasCvText }: { initial: StructuredCv; language: CvLanguage; hasCvText: boolean }) {
+export function CvEditor({
+  initial,
+  language,
+  hasCvText,
+  onChange,
+  designJson,
+}: {
+  initial: StructuredCv;
+  language: CvLanguage;
+  hasCvText: boolean;
+  /** The builder listens here to render the live preview. */
+  onChange?: (cv: StructuredCv) => void;
+  /** The builder's design choices, saved together with the CV. */
+  designJson?: string;
+}) {
   const t = useT();
   const [cv, setCv] = useState<StructuredCv>(initial);
   const [saveState, save, saving] = useActionState<CvSaveState, FormData>(saveStructuredCv, {});
@@ -36,6 +50,9 @@ export function CvEditor({ initial, language, hasCvText }: { initial: Structured
   useEffect(() => {
     if (extract.cv) setCv(extract.cv);
   }, [extract.cv]);
+  useEffect(() => {
+    onChange?.(cv);
+  }, [cv, onChange]);
 
   const set = <K extends keyof StructuredCv>(key: K, value: StructuredCv[K]) => setCv((c) => ({ ...c, [key]: value }));
 
@@ -76,6 +93,7 @@ export function CvEditor({ initial, language, hasCvText }: { initial: Structured
       <form action={save} className="flex flex-col gap-6">
         <input type="hidden" name="language" value={language} />
         <input type="hidden" name="cv" value={JSON.stringify(cv)} />
+        {designJson && <input type="hidden" name="design" value={designJson} />}
 
         <Section title={t("cvEditor.identity")}>
           <div className="grid gap-4 sm:grid-cols-2">

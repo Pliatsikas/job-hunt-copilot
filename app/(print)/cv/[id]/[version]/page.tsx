@@ -3,12 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireOwnedApplication } from "@/lib/applications/guards";
 import { getTailoredCv } from "@/lib/applications/documents";
-import { getPhoto } from "@/lib/cv/queries";
+import { getDesignFor, getPhoto } from "@/lib/cv/queries";
 import { formatDate } from "@/lib/format";
 import { getT } from "@/lib/i18n/server";
 import { CV_LANGUAGES, structuredCvSchema, type CvLanguage } from "@/lib/schemas/structured-cv";
 import { CvChanges } from "@/components/cv/changes";
-import { DesignedCv } from "@/components/cv/designed-cv";
+import { CvTemplateView } from "@/components/cv/templates";
 import { buttonVariants } from "@/components/ui/button";
 import { PrintButton } from "./print-button";
 
@@ -33,7 +33,9 @@ export default async function TailoredCvPage({ params }: { params: Promise<{ id:
   const t = await getT();
 
   const designed = readDesigned(doc.data);
-  const photo = designed ? await getPhoto(application.userId) : null;
+  const [photo, design] = designed
+    ? await Promise.all([getPhoto(application.userId), getDesignFor(application.userId, designed.language)])
+    : [null, null];
 
   return (
     <div className="min-h-full bg-[#ccc3bf] print:bg-white">
@@ -67,7 +69,7 @@ export default async function TailoredCvPage({ params }: { params: Promise<{ id:
             <CvChanges changes={designed.changes} rejected={designed.rejected} t={t} />
           </div>
           <div className="flex justify-center px-2 pb-8 print:p-0">
-            <DesignedCv cv={designed.cv} language={designed.language} photo={photo} />
+            <CvTemplateView cv={designed.cv} language={designed.language} photo={photo} design={design!} />
           </div>
         </>
       ) : (

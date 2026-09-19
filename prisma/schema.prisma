@@ -402,6 +402,9 @@ model StructuredCv {
   userId    String
   language  String // "en" | "el"
   data      Json
+  /// Επιλογές σχεδίασης του builder (T10): template, accent, showPhoto.
+  /// Ελέγχεται από το lib/schemas/cv-design.ts· null = προεπιλογές.
+  design    Json?
   updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

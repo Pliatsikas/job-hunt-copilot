@@ -1,0 +1,162 @@
+/*
+ * "Classic": one column, serif headings, hairlines between sections. The
+ * conservative CV — banks, public bodies, anyone who prints it. Photo, when
+ * shown, sits top-right of the header. Accent only in the rules and the
+ * section headings, so a wild accent never shouts.
+ */
+.page {
+  --accent: var(--cv-accent, #1c1f26);
+  --text: #1c1f26;
+  --muted: #5b6069;
+  --rule: #d9dbe0;
+
+  width: 210mm;
+  min-height: 297mm;
+  background: #ffffff;
+  color: var(--text);
+  padding: 18mm 18mm 16mm;
+  font-size: 10.5px;
+  line-height: 1.5;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--accent);
+}
+.name {
+  font-family: var(--font-cv-serif), Georgia, serif;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.1;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+.subtitle {
+  margin-top: 4px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.contacts {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 9.5px;
+  color: var(--muted);
+}
+.contacts a {
+  color: inherit;
+  text-decoration: none;
+}
+.photo {
+  width: 30mm;
+  height: 30mm;
+  flex: none;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 3px;
+}
+.about {
+  margin: 12px 0 0;
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.section {
+  margin-top: 16px;
+  break-inside: avoid-page;
+}
+.secTitle {
+  font-family: var(--font-cv-serif), Georgia, serif;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--accent);
+}
+.entry {
+  break-inside: avoid;
+}
+.entry + .entry {
+  margin-top: 10px;
+}
+.entryTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.entryRole {
+  font-weight: 600;
+  font-size: 11px;
+}
+.entryOrg {
+  color: var(--muted);
+}
+.entryDate {
+  font-size: 9.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.entryLoc {
+  font-size: 9.5px;
+  color: var(--muted);
+}
+.bullets {
+  margin: 4px 0 0;
+  padding-left: 14px;
+  list-style: disc;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bullets li {
+  color: var(--text);
+}
+.links {
+  margin-top: 3px;
+  font-size: 9.5px;
+  color: var(--muted);
+}
+.links a {
+  color: var(--accent);
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+}
+.skillGroup + .skillGroup {
+  margin-top: 4px;
+}
+.skillLabel {
+  font-weight: 600;
+}
+.inline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.inline li + li {
+  margin-top: 2px;
+}
+.inline strong {
+  font-weight: 600;
+}
+.muted {
+  color: var(--muted);
+}

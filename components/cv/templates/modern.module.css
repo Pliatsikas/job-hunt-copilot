@@ -1,0 +1,202 @@
+/*
+ * "Modern": a light page with an accent band across the top, a wide main
+ * column and a narrow right column for skills, languages, certifications and
+ * interests. Skill pills tinted with the accent. The one that looks like a
+ * product-company CV.
+ */
+.page {
+  --accent: var(--cv-accent, #2f52d8);
+  --text: #171a21;
+  --muted: #5f6672;
+  --tint: color-mix(in oklab, var(--accent) 10%, #ffffff);
+  --rule: #e6e8ec;
+
+  width: 210mm;
+  min-height: 297mm;
+  background: #ffffff;
+  color: var(--text);
+  font-size: 10.5px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.band {
+  background: var(--accent);
+  color: #ffffff;
+  padding: 16mm 16mm 12mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.name {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.05;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.subtitle {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.9;
+}
+.contacts {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 9.5px;
+  opacity: 0.92;
+}
+.contacts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.contacts a {
+  color: inherit;
+  text-decoration: none;
+}
+.icon {
+  display: inline-flex;
+  opacity: 0.85;
+}
+.icon svg {
+  width: 11px;
+  height: 11px;
+}
+.photo {
+  width: 30mm;
+  height: 30mm;
+  flex: none;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.7);
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 1fr 58mm;
+  gap: 0 10mm;
+  padding: 10mm 16mm 14mm;
+  flex: 1;
+}
+.about {
+  margin: 0 0 12px;
+  line-height: 1.6;
+}
+.section {
+  margin-top: 14px;
+  break-inside: avoid-page;
+}
+.section:first-child {
+  margin-top: 0;
+}
+.secTitle {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 8px;
+}
+.entry {
+  break-inside: avoid;
+  padding-left: 10px;
+  border-left: 2px solid var(--tint);
+}
+.entry + .entry {
+  margin-top: 10px;
+}
+.entryTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.entryRole {
+  font-weight: 700;
+  font-size: 11px;
+}
+.entryOrg {
+  color: var(--accent);
+}
+.entryDate {
+  font-size: 9.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.entryLoc {
+  font-size: 9.5px;
+  color: var(--muted);
+}
+.bullets {
+  margin: 4px 0 0;
+  padding-left: 12px;
+  list-style: disc;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.links {
+  margin-top: 3px;
+  font-size: 9.5px;
+}
+.links a {
+  color: var(--accent);
+}
+
+.side .section + .section {
+  margin-top: 14px;
+}
+.skillGroup + .skillGroup {
+  margin-top: 8px;
+}
+.skillLabel {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.pill {
+  background: var(--tint);
+  color: var(--text);
+  font-size: 9.5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.row:last-child {
+  border-bottom: 0;
+}
+.muted {
+  color: var(--muted);
+}
+.cert + .cert {
+  margin-top: 5px;
+}
+.cert strong {
+  font-weight: 600;
+  display: block;
+}

@@ -9,7 +9,8 @@ import { AnalysisError, completeWithRepair } from "../llm/repair";
 import { LlmAuthError, LlmQuotaError } from "../llm/types";
 import { assertWithinBudget, recordProviderCall, UsageLimitError } from "../llm/usage";
 import { getProfile } from "../profile/get";
-import { CV_LANGUAGES, extractedCvSchema, photoSchema, structuredCvSchema, type CvLanguage, type StructuredCv } from "../schemas/structured-cv";
+import { cvDesignSchema, readDesign } from "../schemas/cv-design";
+import { CV_LANGUAGES, EMPTY_CV, extractedCvSchema, photoSchema, structuredCvSchema, type CvLanguage, type StructuredCv } from "../schemas/structured-cv";
 import { groundExtraction } from "./extract-grounding";
 import { ensureIds } from "./ids";
 
@@ -17,6 +18,14 @@ export type CvSaveState = { error?: string; savedAt?: number };
 
 function parseLanguage(value: unknown): CvLanguage | null {
   return CV_LANGUAGES.includes(value as CvLanguage) ? (value as CvLanguage) : null;
+}
+
+function safeJson(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -42,12 +51,17 @@ export async function saveStructuredCv(_prev: CvSaveState, formData: FormData): 
   }
   const data = ensureIds(parsed.data);
 
+  // The builder posts its design choices alongside; the plain editor does not.
+  const designRaw = formData.get("design");
+  const design = typeof designRaw === "string" && designRaw ? readDesign(safeJson(designRaw)) : undefined;
+
   await db.structuredCv.upsert({
     where: { userId_language: { userId: user.id, language } },
-    update: { data },
-    create: { userId: user.id, language, data },
+    update: { data, ...(design ? { design } : {}) },
+    create: { userId: user.id, language, data, design: design ?? readDesign(null) },
   });
   revalidatePath("/profile/cv");
+  revalidatePath("/cv/builder");
   return { savedAt: Date.now() };
 }
 
@@ -116,4 +130,26 @@ export async function removePhoto(): Promise<void> {
   const user = await requireUser();
   await db.profile.updateMany({ where: { userId: user.id }, data: { photo: null } });
   revalidatePath("/profile/cv");
+}
+
+/** The builder's design alone — template, accent, photo switch — without touching the CV. */
+export async function saveDesign(_prev: CvSaveState, formData: FormData): Promise<CvSaveState> {
+  const user = await requireUser();
+  const language = parseLanguage(formData.get("language"));
+  if (!language) return { error: "Unknown language." };
+  let raw: unknown;
+  try {
+    raw = JSON.parse(String(formData.get("design") ?? ""));
+  } catch {
+    return { error: "The design could not be read." };
+  }
+  const parsed = cvDesignSchema.safeParse(raw);
+  if (!parsed.success) return { error: "Unknown design." };
+  await db.structuredCv.upsert({
+    where: { userId_language: { userId: user.id, language } },
+    update: { design: parsed.data },
+    create: { userId: user.id, language, data: EMPTY_CV, design: parsed.data },
+  });
+  revalidatePath("/cv/builder");
+  return { savedAt: Date.now() };
 }

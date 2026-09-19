@@ -1,6 +1,7 @@
 import { requireUser } from "../auth";
 import { db } from "../db";
 import { CV_LANGUAGES, structuredCvSchema, type CvLanguage, type StructuredCv } from "../schemas/structured-cv";
+import { readDesign, type CvDesign } from "../schemas/cv-design";
 import { ensureIds } from "./ids";
 
 /** The structured CV in one language, re-validated on read, or null. */
@@ -30,4 +31,10 @@ export async function availableCvLanguages(userId: string): Promise<CvLanguage[]
 export async function getPhoto(userId: string): Promise<string | null> {
   const profile = await db.profile.findUnique({ where: { userId }, select: { photo: true } });
   return profile?.photo ?? null;
+}
+
+/** The builder's design for one CV language, defaults when none was saved. */
+export async function getDesignFor(userId: string, language: CvLanguage): Promise<CvDesign> {
+  const row = await db.structuredCv.findUnique({ where: { userId_language: { userId, language } }, select: { design: true } });
+  return readDesign(row?.design);
 }

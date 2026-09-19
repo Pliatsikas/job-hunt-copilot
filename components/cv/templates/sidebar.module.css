@@ -10,7 +10,7 @@
   --sidebar-bg: #3e3535;
   --sidebar-text: #f0ebe8;
   --sidebar-muted: #b8a8a2;
-  --accent: #c9a99a;
+  --accent: var(--cv-accent, #c9a99a);
   --main-bg: #faf8f6;
   --main-text: #2a2220;
   --main-muted: #7a6e6b;
