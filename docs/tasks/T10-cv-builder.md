@@ -1,6 +1,6 @@
 # T10 — CV builder: pick a template, fill it in, download — like the paid sites
 
-**Status:** in progress · **Branch:** `task/10-cv-builder` (on top of `task/09-designed-cv`)
+**Status:** done 2026-09-20 · PR #10 (after #9) · verified by the owner on the preview, production Ready
 
 ## Asked (owner, 2026-09-19)
 

@@ -33,6 +33,7 @@ known failure modes in `NOTES.md`.
 | Evals | `evals/` | `pnpm eval --runs 3`; results committed under `evals/results/`. |
 | UI shell | `components/shell/`, `components/page*.tsx` | Sidebar on desktop, bottom tabs on mobile. Inter with Greek subset. |
 | Language (T06) | `lib/i18n/` | Cookie `locale=el\|en`, typed messages `messages/{el,en}.ts`, `getT()` server / `useT()` client. Every string in the UI goes through `t()`; adding copy means adding it to both files or typecheck fails. |
+| CV builder (T09+T10) | `lib/cv/`, `lib/schemas/{structured-cv,cv-design}.ts`, `components/cv/`, `app/(app)/cv/`, `app/(print)/cv/` | "CV" in the nav. Structured CV per language (`StructuredCv`), guided from zero (`/cv/new`, 7 steps) or filled from the profile text (model, fact-grounded), four templates + accent + photo (`/cv/builder`, live scaled preview), browser print-to-PDF (`/cv/mine/[lang]`). The role-tailoring (`tailor-cv@3`, rewrites under fact/keyword guards, changes shown) works but is parked — do not iterate without a written target from the owner. |
 | Feedback layer (T08) | `components/shell/navigation-progress.tsx`, `components/ui/button.tsx` | Progress bar + dimmed page on navigation, `pending` prop on every submit button. **No `loading.tsx` anywhere** — it breaks server actions that revalidate (Next bug #66426); `lib/no-loading-boundary.test.ts` enforces it. |
 | Guide (T06) | `lib/start/`, `app/(app)/start/[step]` | Three steps for a new account: CV → preferences → first posting analysed. Today shows the guide until done, then an action list. |
 

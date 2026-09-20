@@ -1,6 +1,6 @@
 # T09 — The CV for a role: designed like the real one, Greek or English, with a photo
 
-**Status:** parked 2026-09-18 (owner's call) · **Branch:** `task/09-designed-cv` · PR #9 open, preview verified twice, not merged
+**Status:** merged 2026-09-20 (PR #9) as T10's foundation — structured CV, editor, photo, print route are live; the *tailoring* (`tailor-cv@3`) is in production but stays parked as a feature: not promoted, not iterated until the owner gives a written target
 
 ## Asked (owner, 2026-09-17)
 

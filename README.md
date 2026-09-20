@@ -221,6 +221,14 @@ happy path asserts that a status change shows up without a reload. The lesson wa
 Next than about testing: the bug only exists in the production build, so a suite that runs
 against `next dev` would have shipped it.
 
+**A const exported from a client file is not a const on the server.** The CV guide's step
+list lived in the wizard component — a `"use client"` file — and the server page imported it
+to validate `?step=`. Every step 404'd. Nothing threw: Next hands a server component a
+*reference* to a client module's export, not its value, so `WIZARD_STEPS.length` was
+`undefined`, the range check passed vacuously, and `WIZARD_STEPS[0]` was nothing. The fix is
+a plain module for anything both sides read; the lesson is that the client/server boundary
+turns ordinary imports into something else without a type error to say so.
+
 ## Eval results
 
 Ten job ads against one real CV, on a pinned prompt version, so a prompt change produces a
