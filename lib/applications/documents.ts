@@ -35,6 +35,8 @@ export type SaveDocumentInput = {
   context?: "AFTER_APPLYING" | "AFTER_INTERVIEW" | "NUDGE" | null;
   language: string;
   content: string;
+  /** CV_TAILORED from a structured CV: the selected structure, for the designed print view. */
+  data?: unknown;
 };
 
 /**
@@ -59,6 +61,7 @@ export async function saveGeneratedDocument(input: SaveDocumentInput) {
         context: input.context ?? null,
         language: input.language,
         content: input.content,
+        data: input.data === undefined ? undefined : (input.data as object),
         version,
       },
     });

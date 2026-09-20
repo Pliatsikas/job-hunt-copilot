@@ -3,6 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { getProvider } from "../llm";
 import * as tailorPrompt from "../llm/prompts/tailor-cv.v1";
+import * as tailorPromptV3 from "../llm/prompts/tailor-cv.v3";
+import { getStructuredCvFor } from "../cv/queries";
+import { allowedPostingTerms, applySelection, renderStructuredCvText } from "../cv/select";
+import { cvSelectionSchema } from "../schemas/cv-selection";
+import { CV_LABELS, CV_LANGUAGES, type CvLanguage } from "../schemas/structured-cv";
 import { AnalysisError, completeWithRepair } from "../llm/repair";
 import { cvLines, groundTailoredCv, renderTailoredCv } from "../llm/tailor-grounding";
 import { LlmAuthError, LlmQuotaError } from "../llm/types";
@@ -15,6 +20,12 @@ import { requireOwnedApplication } from "./guards";
 export type TailorState = {
   error?: string;
   version?: number;
+  /** "designed" when built from the structured CV (T09), "text" for the line-based fallback. */
+  kind?: "designed" | "text";
+  /** Designed: bullets the model rephrased for this role (original → new). */
+  changes?: { id: string; from: string; to: string }[];
+  /** Designed: rewrites refused for an invented fact or the wrong language. */
+  rejected?: { id: string; text: string; reason: string }[];
   /** Lines the model returned that were not the CV's; shown so the drop is visible. */
   droppedLines?: string[];
   coverage?: number;
@@ -22,7 +33,7 @@ export type TailorState = {
 };
 
 const TAILOR_TEMPERATURE = 0.1;
-const TAILOR_MAX_TOKENS = 4096;
+const TAILOR_MAX_TOKENS = 3500;
 
 /**
  * If more than this share of returned lines fails grounding, the output is
@@ -30,6 +41,7 @@ const TAILOR_MAX_TOKENS = 4096;
  * model meant to include is not a tailored CV; it is a broken one.
  */
 const MAX_DROPPED_SHARE = 0.34;
+
 
 /**
  * Not streamed, for the same reason the analysis is not (SPEC.md §8 Α4): the
@@ -39,21 +51,83 @@ const MAX_DROPPED_SHARE = 0.34;
 export async function tailorCv(
   applicationId: string,
   _prev: TailorState,
-  _formData: FormData,
+  formData: FormData,
 ): Promise<TailorState> {
   try {
     const application = await requireOwnedApplication(applicationId);
-
-    const profile = await getProfile();
-    if (!profile?.cvText.trim()) {
-      return { error: "Add your CV text on the profile page first — there is nothing to tailor." };
-    }
 
     // The ordering is built around the analysis's keywords and matches; without
     // one there is nothing to tailor towards, and guessing would be worse.
     const analysis = await getLatestAnalysisResult(application.id, application.userId);
     if (!analysis) {
       return { error: "Run the analysis first. The tailored CV is ordered around its keywords and matched skills." };
+    }
+
+    // T09: a structured CV in the asked-for language gives the designed
+    // document; otherwise the line-based text path below still works.
+    const requested = formData.get("language");
+    const language: CvLanguage = CV_LANGUAGES.includes(requested as CvLanguage) ? (requested as CvLanguage) : "en";
+    const structured = await getStructuredCvFor(application.userId, language);
+    if (structured) {
+      await assertWithinBudget(application.userId);
+      const completion = await completeWithRepair(
+        getProvider(),
+        {
+          system: tailorPromptV3.system,
+          user: tailorPromptV3.buildUserPrompt({
+            cv: structured,
+            language,
+            jobDescription: application.jobDescription,
+            roleTitle: application.roleTitle,
+            analysis,
+          }),
+          temperature: TAILOR_TEMPERATURE,
+          // Rewrites for ~20 bullets plus ids: ~2 000 tokens of answer. Low
+          // reasoning keeps gpt-oss from spending the rest deliberating, and
+          // the whole request stays under Groq's 8 000-per-minute cap.
+          maxTokens: 5000,
+          reasoning: "low",
+        },
+        cvSelectionSchema,
+        (usage) => recordProviderCall(application.userId, usage),
+      );
+      const applied = applySelection(
+        structured,
+        completion.data,
+        language,
+        renderStructuredCvText(structured, CV_LABELS[language]),
+        allowedPostingTerms(analysis),
+      );
+      const version = await saveGeneratedDocument({
+        applicationId: application.id,
+        userId: application.userId,
+        type: "CV_TAILORED",
+        language,
+        content: renderStructuredCvText(applied.cv, CV_LABELS[language]),
+        data: {
+          source: "structured",
+          language,
+          cv: applied.cv,
+          keywordsAddressed: completion.data.keywordsAddressed,
+          changes: applied.changes,
+          rejected: applied.rejected,
+        },
+      });
+      revalidatePath(`/applications/${application.id}`);
+      return {
+        version,
+        kind: "designed",
+        coverage: applied.coverage,
+        keywordsAddressed: completion.data.keywordsAddressed,
+        droppedLines: applied.unknownIds,
+        changes: applied.changes,
+        rejected: applied.rejected,
+      };
+    }
+
+    const profile = await getProfile();
+    if (!profile?.cvText.trim()) {
+      return { error: "Add your CV text on the profile page first — there is nothing to tailor." };
     }
 
     await assertWithinBudget(application.userId);
@@ -104,6 +178,7 @@ export async function tailorCv(
     revalidatePath(`/applications/${application.id}`);
     return {
       version,
+      kind: "text",
       droppedLines: grounded.droppedLines,
       coverage: grounded.coverage,
       keywordsAddressed: grounded.cv.keywordsAddressed,

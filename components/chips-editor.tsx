@@ -4,11 +4,11 @@ import { useState, type KeyboardEvent } from "react";
 import { useT } from "@/lib/i18n/client";
 import { Input } from "@/components/ui/input";
 
-function normalize(items: string[]): string[] {
+function normalize(items: string[], keepCase: boolean): string[] {
   const out: string[] = [];
   for (const raw of items) {
     for (const piece of raw.split(",")) {
-      const v = piece.trim().toLowerCase();
+      const v = keepCase ? piece.trim() : piece.trim().toLowerCase();
       if (v && !out.includes(v)) out.push(v);
     }
   }
@@ -28,6 +28,7 @@ export function ChipsEditor({
   onChange,
   placeholder,
   max,
+  keepCase = false,
 }: {
   id: string;
   name: string;
@@ -35,6 +36,8 @@ export function ChipsEditor({
   onChange: (next: string[]) => void;
   placeholder: string;
   max?: number;
+  /** CV skills keep their spelling ("Next.js", "C#"); search terms are lowercased. */
+  keepCase?: boolean;
 }) {
   const t = useT();
   const [draft, setDraft] = useState("");
@@ -42,7 +45,7 @@ export function ChipsEditor({
 
   function commit() {
     if (!draft.trim()) return;
-    onChange(normalize([...value, draft]).slice(0, max ?? Infinity));
+    onChange(normalize([...value, draft], keepCase).slice(0, max ?? Infinity));
     setDraft("");
   }
 
