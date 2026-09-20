@@ -31,6 +31,19 @@ CV and print route — those are the foundation; T09's *tailoring* stays parked.
   library, no server rendering, same as T09 — the templates are CSS, and a print stylesheet
   does A4 better than any generated layout.
 - **No dependency.** Templates are CSS modules; the preview scale is one `transform`.
+- **The CV is its own section, and it starts from nothing** (owner, 2026-09-20: "like the
+  profile and the others, and buildable from zero with guidance, without putting your own
+  CV in first"). "CV" joins the nav. `/cv` is the front door: with a CV in the language it
+  goes straight to the builder; without one it offers two doors — **Start from scratch**
+  (the guide) and **From my profile text** (the model sorts the existing text, when there
+  is any). The guide, `/cv/new?step=1..7`, is one section per screen — who you are, how to
+  reach you, where you have worked, education, what you know, what you have built, extras —
+  each with a *why*, a *tip* and, where it helps, an *example*, written for someone who has
+  never written a CV. Every "Continue" saves (the same action as the editor), so a closed
+  tab loses nothing and the back button works; the last step lands on the builder. Steps
+  after the first can be skipped. The editor's sections became components
+  (`components/cv/sections.tsx`) so the guide and the full editor are the same fields with
+  different chrome.
 
 ## Built
 

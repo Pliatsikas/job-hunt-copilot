@@ -29,12 +29,15 @@ export function Builder({
   hasCvText,
   photo,
   initialDesign,
+  autoFill = false,
 }: {
   initial: StructuredCv;
   language: CvLanguage;
   hasCvText: boolean;
   photo: string | null;
   initialDesign: CvDesign;
+  /** From the start screen's "from my profile text": run the extraction on arrival, once. */
+  autoFill?: boolean;
 }) {
   const t = useT();
   const [cv, setCv] = useState<StructuredCv>(initial);
@@ -183,7 +186,7 @@ export function Builder({
               <PhotoForm current={photo} />
             </section>
           )}
-          <CvEditor initial={initial} language={language} hasCvText={hasCvText} onChange={onChange} designJson={designJson} />
+          <CvEditor initial={initial} language={language} hasCvText={hasCvText} onChange={onChange} designJson={designJson} autoFill={autoFill} />
         </div>
 
         <div className={pane === "preview" ? "block" : "hidden lg:block"}>
