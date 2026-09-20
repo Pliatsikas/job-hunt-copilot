@@ -119,8 +119,8 @@ export function AppShell({
 
         <nav
           aria-label="Main"
-          className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 border-t bg-card/95 backdrop-blur md:hidden"
-          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+          className="fixed inset-x-0 bottom-0 z-20 grid border-t bg-card/95 backdrop-blur md:hidden"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)", gridTemplateColumns: `repeat(${MOBILE_TABS.length}, minmax(0, 1fr))` }}
         >
           {MOBILE_TABS.map(({ href, labelKey, icon: Icon }) => (
             <NavLink

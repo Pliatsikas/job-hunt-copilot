@@ -49,9 +49,14 @@ export default async function ProfilePage({
             <p className="mt-1 text-xs text-muted-foreground">{t("cvEditor.cardReady", { languages: cvLanguages.map((l) => l.toUpperCase()).join(", ") })}</p>
           )}
         </div>
-        <Link href="/profile/cv" className={buttonVariants()}>
-          {t("cvEditor.cardCta")}
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/cv/builder" className={buttonVariants()}>
+            {t("builder.profileCardCta")}
+          </Link>
+          <Link href="/profile/cv" className={buttonVariants({ variant: "secondary" })}>
+            {t("cvEditor.cardCta")}
+          </Link>
+        </div>
       </div>
 
       <ProfileForm

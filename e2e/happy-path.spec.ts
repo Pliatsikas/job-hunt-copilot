@@ -357,6 +357,56 @@ test("register, analyse and generate", async ({ page }) => {
     await expect(page.getByRole("button", { name: /print/i })).toBeVisible();
   });
 
+  await test.step("the CV guide: from nothing to a saved CV, one section per step", async () => {
+    // No structured CV yet, so the CV section opens on the choice screen.
+    await page.goto("/cv");
+    await expect(page).toHaveURL(/\/cv$/);
+    await page.getByRole("link", { name: /start from scratch/i }).click();
+    await page.waitForURL(/\/cv\/new\?lang=en&step=1/);
+    await page.getByLabel("Name", { exact: true }).fill("E2E Person");
+    await page.getByRole("button", { name: /continue/i }).click();
+    await page.waitForURL(/step=2/);
+    // Saved on Continue: the row exists after the first step.
+    expect(await db.structuredCv.count({ where: { user: { email: EMAIL }, language: "en" } })).toBe(1);
+    await page.getByRole("button", { name: /^add$/i }).click();
+    await page.getByLabel("Type").selectOption("email");
+    await page.getByLabel("Value").fill(EMAIL);
+    await page.getByRole("button", { name: /continue/i }).click();
+    await page.waitForURL(/step=3/);
+    for (let s = 3; s < 7; s += 1) {
+      await page.getByRole("link", { name: /skip for now/i }).click();
+      await page.waitForURL(new RegExp(`step=${s + 1}`));
+    }
+    await page.getByRole("button", { name: /see the design/i }).click();
+    await page.waitForURL(/\/cv\/builder/);
+    // From now on the CV section is the builder.
+    await page.goto("/cv");
+    await page.waitForURL(/\/cv\/builder/);
+  });
+
+  await test.step("the CV builder: type, see it on the page, pick a template, save, print route", async () => {
+    await page.goto("/cv/builder?lang=en");
+    await page.getByLabel("Name", { exact: true }).fill("E2E Person");
+    await page.getByLabel("Subtitle").fill("Fullstack developer");
+    // The preview is the real template, re-rendered from the form as you type.
+    await expect(page.locator('div[lang="en"]').getByText("E2E Person")).toBeVisible();
+
+    await page.getByRole("button", { name: /^Modern/ }).click();
+    await page.getByRole("radio", { name: "Navy" }).click();
+    await expect(page.getByText("Design saved.")).toBeVisible();
+    await page.getByRole("button", { name: /^save cv$/i }).click();
+    await expect(page.getByText("CV saved.")).toBeVisible();
+
+    await page.reload();
+    await expect(page.getByRole("button", { name: /^Modern/ })).toHaveAttribute("aria-pressed", "true");
+    expect(await db.structuredCv.findFirst({ where: { user: { email: EMAIL }, language: "en" }, select: { design: true } })).toMatchObject({
+      design: { template: "modern", accent: "navy" },
+    });
+
+    await page.goto("/cv/mine/en");
+    await expect(page.locator('div[lang="en"] h1')).toContainText("E2E Person");
+  });
+
   await test.step("settings: change the password with the current one, then sign in with the new", async () => {
     await page.goto("/settings");
     await page.getByLabel("Current password").fill(PASSWORD);

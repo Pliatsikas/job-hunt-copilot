@@ -1,0 +1,110 @@
+/*
+ * "Minimal": one column, black on white, no photo, no columns, no pills —
+ * the layout an applicant-tracking system parses without losing anything.
+ * The accent is used once, on the name, so a company colour can still be
+ * picked without hurting the parse.
+ */
+.page {
+  --accent: var(--cv-accent, #1c1f26);
+  --text: #111318;
+  --muted: #555b66;
+
+  width: 210mm;
+  min-height: 297mm;
+  background: #ffffff;
+  color: var(--text);
+  padding: 16mm 20mm;
+  font-size: 10.5px;
+  line-height: 1.5;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.name {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--accent);
+}
+.subtitle {
+  font-size: 11px;
+  margin-top: 2px;
+}
+.contacts {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 9.5px;
+  color: var(--muted);
+}
+.contacts li {
+  display: inline;
+}
+.contacts li + li::before {
+  content: " | ";
+}
+.contacts a {
+  color: inherit;
+  text-decoration: none;
+}
+.about {
+  margin: 12px 0 0;
+}
+.section {
+  margin-top: 14px;
+  break-inside: avoid-page;
+}
+.secTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 6px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--text);
+}
+.entry {
+  break-inside: avoid;
+}
+.entry + .entry {
+  margin-top: 8px;
+}
+.entryTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.entryRole {
+  font-weight: 700;
+}
+.entryDate {
+  color: var(--muted);
+  white-space: nowrap;
+}
+.entryMeta {
+  color: var(--muted);
+  font-size: 9.5px;
+}
+.bullets {
+  margin: 3px 0 0;
+  padding-left: 14px;
+  list-style: disc;
+}
+.links {
+  font-size: 9.5px;
+  color: var(--muted);
+}
+.links a {
+  color: inherit;
+}
+.plain {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.plain li + li {
+  margin-top: 2px;
+}
+.label {
+  font-weight: 700;
+}
