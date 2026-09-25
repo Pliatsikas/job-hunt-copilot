@@ -117,7 +117,14 @@ export function CvEditor({
             {t("cvEditor.saved")}
           </p>
         )}
-        <div className="sticky bottom-16 z-10 -mx-4 flex justify-end border-t bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 md:bottom-0 lg:-mx-8 lg:px-8">
+        {/* On its own page the bar bleeds to the gutters; inside the builder's
+            column it must not — the negative margins made the column wider
+            than a 360px screen (caught by the layout E2E). */}
+        <div
+          className={`sticky bottom-16 z-10 flex justify-end border-t bg-background/90 py-3 backdrop-blur md:bottom-0 ${
+            designJson ? "px-1" : "-mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+          }`}
+        >
           <Button type="submit" pending={saving} size="lg">
             {t("cvEditor.save")}
           </Button>

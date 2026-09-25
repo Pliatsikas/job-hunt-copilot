@@ -10,16 +10,29 @@ interview questions](docs/screenshots/analysis.png)
 
 ## Live demo
 
-**<https://job-hunt-copilot-gamma.vercel.app>**
+**<https://job-hunt-copilot-gamma.vercel.app>** — the landing page has a **Try the demo**
+button that signs you straight in; no sign-up, nothing to type.
 
 | | |
 |---|---|
 | Email | `demo@example.com` |
 | Password | `demo12345` |
 
-The demo account is seeded with a profile, three applications, a stored analysis and a cover
-letter, so you can see the product without spending any of the shared model budget. Registration
-is open if you would rather use your own CV — you get 12 model calls a day.
+The demo account is seeded with a profile, a structured CV in Greek and English, three
+applications, a stored analysis, a cover letter and two leads, so you can see the product —
+including the CV builder — without spending any of the shared model budget. Registration is
+open if you would rather use your own CV: you get 12 model calls a day.
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/builder.png" alt="The CV builder: four template cards with thumbnails, eight accent colours, a photo switch, the form on the left and the CV rendered live on the right"></td>
+<td width="50%"><img src="docs/screenshots/usage.png" alt="The usage page: today's model calls and tokens against the per-user and shared budgets"></td>
+</tr>
+<tr>
+<td><strong>The CV builder</strong> — four templates, a colour, an optional photo, and the real template rendered live beside the form. Download is the browser's print-to-PDF over a print stylesheet; there is no PDF library.</td>
+<td><strong>Usage</strong> — every model call is counted against a per-user and a project-wide budget, and the page says so before you hit the ceiling rather than after.</td>
+</tr>
+</table>
 
 <table>
 <tr>

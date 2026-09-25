@@ -12,7 +12,10 @@ export const config = {
   // session — otherwise the middleware redirects the crawler to /login and the
   // file might as well not exist. Same for the icons: a redirect there shows
   // up as a broken tab icon rather than as an auth problem.
+  // `shots/` holds the landing page's screenshots (T11): a guarded image
+  // answers a 307 to /login, which renders as a broken image on the one page
+  // that is meant to be public.
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|icon.png|apple-icon.png|opengraph-image).*)",
+    "/((?!api|_next/static|_next/image|shots/|favicon.ico|robots.txt|sitemap.xml|icon.png|apple-icon.png|opengraph-image).*)",
   ],
 };

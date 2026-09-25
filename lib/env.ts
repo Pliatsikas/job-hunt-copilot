@@ -40,6 +40,10 @@ export const envSchema = z.object({
   // Vercel sends this as a bearer token when it triggers a cron route. Unset
   // locally, so the route refuses every caller outside Vercel.
   CRON_SECRET: optionalEnvString(),
+  // "true" turns on the landing page's one-click demo sign-in (T11). The
+  // credentials are public either way; this is the switch a self-hosted copy
+  // without a seeded demo account leaves off.
+  ALLOW_DEMO_LOGIN: optionalEnvString(),
   EMAIL_FROM: z.preprocess((v) => (v === "" ? undefined : v), z.email().optional()),
   EMAIL_FROM_NAME: z.string().trim().min(1).default("Job Hunt Copilot"),
 

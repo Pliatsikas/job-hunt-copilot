@@ -4,6 +4,8 @@ import type { NextAuthConfig } from "next-auth";
 // authorize() — those touch Prisma/pg/bcryptjs, none of which run on Edge.
 // The full config in lib/auth.ts spreads this and adds them back in for
 // everywhere else (route handlers, server actions, server components).
+// "/" is the landing page (T11): the one page a visitor sees before deciding
+// to try anything. Everything else still needs a session.
 const PUBLIC_PATHS = ["/login", "/register", "/verify", "/forgot", "/reset", "/email-change"];
 
 export default {
@@ -18,7 +20,7 @@ export default {
   trustHost: true,
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
-      const isPublic = PUBLIC_PATHS.some((path) => nextUrl.pathname.startsWith(path));
+      const isPublic = nextUrl.pathname === "/" || PUBLIC_PATHS.some((path) => nextUrl.pathname.startsWith(path));
       return isPublic || Boolean(auth?.user);
     },
   },
