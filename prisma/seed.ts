@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { db } from "../lib/db";
 import { hashPassword } from "../lib/password";
+import { DEMO_CV_EL, DEMO_CV_EN, DEMO_DESIGN } from "./seed-cv";
 
 // Deliberately public — a recruiter needs these to try the live demo.
 const DEMO_EMAIL = "demo@example.com";
@@ -200,12 +201,62 @@ async function main() {
     });
   }
 
+  // T11: the CV builder is half the product, so the demo has a finished CV
+  // in both languages with a design chosen. Written by hand in seed-cv.ts —
+  // a seed that called the model would spend budget on every deploy.
+  for (const [language, data] of [["en", DEMO_CV_EN], ["el", DEMO_CV_EL]] as const) {
+    await db.structuredCv.upsert({
+      where: { userId_language: { userId: user.id, language } },
+      update: { data, design: DEMO_DESIGN },
+      create: { userId: user.id, language, data, design: DEMO_DESIGN },
+    });
+  }
+
+  // Two leads waiting, so "Jobs for you" is not an empty page either. The
+  // dedupeKey is what the real ingestion would have written.
+  for (const lead of [
+    {
+      id: "seed-lead-1",
+      companyName: "Skroutz",
+      roleTitle: "Frontend Engineer",
+      location: "Athens · hybrid",
+      jobUrl: "https://example.com/jobs/frontend-engineer",
+      jobDescription:
+        "Frontend engineer for a high-traffic marketplace. React, TypeScript, performance work on pages seen by millions. You will work with designers on a shared component library.",
+      fitScore: 78,
+      matchedTerms: ["react", "typescript"],
+    },
+    {
+      id: "seed-lead-2",
+      companyName: "Blueground",
+      roleTitle: "Fullstack Developer (Node.js)",
+      location: "Athens · remote",
+      jobUrl: "https://example.com/jobs/fullstack-node",
+      jobDescription:
+        "Fullstack developer working across a Node.js API on PostgreSQL and a React frontend. Docker, REST APIs, and a team that reviews every change.",
+      fitScore: 71,
+      matchedTerms: ["node.js", "postgresql", "docker"],
+    },
+  ]) {
+    await db.lead.upsert({
+      where: { id: lead.id },
+      update: {},
+      create: {
+        ...lead,
+        userId: user.id,
+        source: "WORKABLE",
+        externalId: lead.id,
+        dedupeKey: `${lead.companyName.toLowerCase()}::${lead.roleTitle.toLowerCase()}`,
+      },
+    });
+  }
+
   // The demo account is a shop window, not a used one: a visitor should find
   // its daily allowance intact.
   await db.usageCounter.deleteMany({ where: { userId: user.id } });
 
   console.log(`Seeded ${DEMO_EMAIL} (password: ${DEMO_PASSWORD})`);
-  console.log("  profile, 3 applications, 1 stored analysis, 1 cover letter, counters cleared");
+  console.log("  profile, structured CV (en + el), 3 applications, 1 stored analysis, 1 cover letter, 2 leads, counters cleared");
 }
 
 main()

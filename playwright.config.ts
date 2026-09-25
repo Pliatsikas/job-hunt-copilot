@@ -50,6 +50,8 @@ export default defineConfig({
       REGISTER_LIMIT_PER_HOUR: "50",
       REGISTER_LIMIT_PER_DAY: "50",
       LOGIN_LIMIT_PER_15_MIN: "50",
+      // The landing page's one-click demo sign-in (T11) is behind this.
+      ALLOW_DEMO_LOGIN: "true",
     },
   },
 });

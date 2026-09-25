@@ -8,11 +8,16 @@
  *   pnpm build && pnpm start --port 3100 &   # in one shell
  *   pnpm exec tsx --env-file=.env docs/screenshots/capture.ts
  */
+import { copyFileSync, mkdirSync } from "node:fs";
 import { chromium } from "@playwright/test";
 import { db } from "../../lib/db";
 
 const B = "http://127.0.0.1:3100";
 const OUT = "docs/screenshots";
+// T11: the landing page shows three of the same shots, so they are captured
+// once and written to both places rather than kept in sync by hand.
+const PUBLIC_OUT = "public/shots";
+const ON_LANDING = new Set(["today", "analysis", "builder"]);
 const DEMO = "demo@example.com";
 
 const day = (n: number) => new Date(Date.now() - n * 86_400_000);
@@ -58,10 +63,22 @@ async function main() {
     await p.getByLabel("Password", { exact: true }).fill("demo12345");
     await p.getByRole("button", { name: /sign in/i }).click();
     await p.waitForURL(/\/today/);
-    for (const [path, file] of [["today", "today"], ["insights", "insights"], ["applications/seed-app-fullstack", "analysis"], ["usage", "usage"]]) {
+    mkdirSync(PUBLIC_OUT, { recursive: true });
+    const CLIP = { x: 0, y: 0, width: 1280, height: 800 };
+    for (const [path, file] of [
+      ["today", "today"],
+      ["insights", "insights"],
+      ["applications/seed-app-fullstack", "analysis"],
+      ["usage", "usage"],
+      ["cv/builder?lang=en", "builder"],
+    ]) {
       await p.goto(`${B}/${path}`);
       await p.waitForLoadState("networkidle");
-      await p.screenshot({ path: `${OUT}/${file}.png`, fullPage: file !== "analysis", clip: file === "analysis" ? { x: 0, y: 0, width: 1280, height: 1250 } : undefined });
+      // The landing page lays these out side by side, so they are all the
+      // same shape: the top 1280×800 of the page, not a full-page strip.
+      const cropped = ON_LANDING.has(file);
+      await p.screenshot({ path: `${OUT}/${file}.png`, fullPage: !cropped, clip: cropped ? CLIP : undefined });
+      if (cropped) copyFileSync(`${OUT}/${file}.png`, `${PUBLIC_OUT}/${file}.png`);
       console.log("captured", file);
     }
     await b.close();

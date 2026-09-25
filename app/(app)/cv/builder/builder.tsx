@@ -179,7 +179,7 @@ export function Builder({
       </div>
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
-        <div className={pane === "edit" ? "flex flex-col gap-6" : "hidden lg:flex lg:flex-col lg:gap-6"}>
+        <div className={pane === "edit" ? "flex min-w-0 flex-col gap-6" : "hidden min-w-0 lg:flex lg:flex-col lg:gap-6"}>
           {TEMPLATE_HAS_PHOTO[design.template] && design.showPhoto && (
             <section className="rounded-xl border bg-card p-4 sm:p-5">
               <h2 className="mb-3 text-base font-semibold">{t("cvEditor.photo")}</h2>
@@ -189,7 +189,7 @@ export function Builder({
           <CvEditor initial={initial} language={language} hasCvText={hasCvText} onChange={onChange} designJson={designJson} autoFill={autoFill} />
         </div>
 
-        <div className={pane === "preview" ? "block" : "hidden lg:block"}>
+        <div className={pane === "preview" ? "block min-w-0" : "hidden min-w-0 lg:block"}>
           <div className="lg:sticky lg:top-4">
             <ScaledPage pagesLabel={(n) => (n === 1 ? t("builder.onePage") : t("builder.pages", { count: n }))}>
               <CvTemplateView cv={cv} language={language} photo={photo} design={design} embedded />
