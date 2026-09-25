@@ -55,7 +55,7 @@ their content; the editor's sticky save bar bled into the gutters inside the bui
 
 ## Verify
 
-_(preview URL when pushed)_ — open the site signed out (a private window): the landing page,
+https://job-hunt-copilot-6gd5bebmu-pliatsikas-projects.vercel.app — open the site signed out (a private window): the landing page,
 "Try the demo" → straight into Today with data, the CV section with a finished CV in both
 languages.
 
